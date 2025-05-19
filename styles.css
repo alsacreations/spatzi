@@ -185,16 +185,20 @@ a:focus {
   anchor-name: --thumb; /* Anchor point for position-anchor */
 }
 
+.range-value {
+  position: absolute;
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--layer);
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  translate: 0 1.4rem; /* Offset to avoid overlap */
+}
+
 /* Value display anchored to the slider thumb (if position-anchor is supported) */
 @supports (position-anchor: initial) {
   .range-value {
-    position: absolute;
     position-anchor: --thumb;
     position-area: bottom;
-    padding: var(--space-xs) var(--space-sm);
-    background: var(--layer);
-    border-radius: var(--radius-sm);
-    font-size: 0.875rem;
     translate: 0 0.3rem; /* Offset to avoid overlap */
   }
 }
