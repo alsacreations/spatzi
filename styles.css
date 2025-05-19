@@ -1,0 +1,596 @@
+:root {
+  /* Spacing variables (4px system) */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 2rem;
+
+  /* System colors */
+  --color-border: #ccc;
+  --color-label: #000;
+  --color-gray-50: oklch(97% 0 0);
+  --color-gray-100: oklch(92.2% 0 0);
+  --color-gray-200: oklch(87% 0 0);
+  --color-gray-300: oklch(70.8% 0 0);
+  --color-gray-400: oklch(55.6% 0 0);
+  --color-gray-500: oklch(43.9% 0 0);
+  --color-gray-600: oklch(37.1% 0 0);
+  --color-gray-700: oklch(26.9% 0 0);
+  --color-gray-800: oklch(20.5% 0 0);
+  --color-gray-900: oklch(14.5% 0 0);
+  --color-white: oklch(100% 0 0);
+  --color-red-100: oklch(80% 0.17 18);
+  --color-red-300: oklch(70.54% 0.19 27.52);
+  --color-red-500: oklch(50.54% 0.19 27.52);
+  --color-red-700: oklch(35.54% 0.19 27.52);
+  --color-red-900: oklch(20.54% 0.11 27.52);
+  --color-green-100: oklch(97% 0.16 150.73);
+  --color-green-300: oklch(71.66% 0.13 150.73);
+  --color-green-500: oklch(51.66% 0.13 150.73);
+  --color-green-700: oklch(36.66% 0.13 150.73);
+  --color-green-900: oklch(21.66% 0.13 150.73);
+  --color-orange-300: oklch(89% 0.17 71);
+  --color-orange-700: oklch(49% 0.17 71);
+
+  /* Slider variables, managed by JavaScript. Initial values are fallbacks. */
+  --slider-l: 0.75;
+  --slider-c: 0.1;
+  --slider-h: 180;
+
+  /* OKLCH relative colors. For modifying the primary color (L: lightness, C: chroma, H: hue) */
+  --color-primary: #ff69b4;
+  --color-text-user: #ffffff; /* Default for user text, synced with picker */
+  --color-text-variant: var(--color-white); /* Default for variant text */
+  --color-variant: oklch(var(--slider-l) var(--slider-c) var(--slider-h)); /* Variant color derived from sliders */
+
+  --color-accent: light-dark(var(--color-orange-700), var(--color-orange-300));
+
+  --on-surface: light-dark(var(--color-gray-700), var(--color-gray-100));
+  --surface: light-dark(var(--color-gray-50), var(--color-gray-700));
+  --layer: light-dark(var(--color-gray-100), var(--color-gray-600));
+  --success: light-dark(var(--color-green-500), var(--color-green-100));
+  --error: light-dark(var(--color-red-500), var(--color-red-100));
+
+  /* Border radii */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+
+  /* Sizes */
+  --width-color-picker: 3rem;
+  --size-thumb: 1.5rem;
+
+  /* Shadows */
+  --shadow-sm: 0 0 1rem rgba(0, 0, 0, 0.1);
+}
+
+.app {
+  width: min(100% - 2rem, 80rem);
+  margin-inline: auto;
+  padding: 1rem;
+  gap: 2rem;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 300;
+  color: var(--color-accent);
+}
+
+a {
+  color: var(--color-accent);
+}
+
+a:hover,
+a:focus {
+  color: oklch(from var(--color-accent) calc(l + 0.1) c h);
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.control-group {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.color-pickers-group {
+  padding: var(--space-md);
+  background: var(--layer);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+@media (width > 40rem) {
+  .color-pickers-group {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.lch-sliders-group {
+  grid-template-areas:
+    "lumi"
+    "chroma"
+    "hue";
+}
+
+@media (width > 40rem) {
+  .lch-sliders-group {
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-areas: "lumi chroma hue";
+  }
+}
+
+.control {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.control--on-surface {
+  grid-area: text;
+}
+
+.control--lumi {
+  grid-area: lumi;
+}
+.control--chroma {
+  grid-area: chroma;
+}
+.control--hue {
+  grid-area: hue;
+}
+
+.color-inputs {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.color-inputs input[type="color"] {
+  width: var(--width-color-picker);
+  height: 2rem;
+  padding: 0;
+}
+
+.color-inputs input[type="text"],
+.range {
+  width: 100%;
+  padding: var(--space-xs);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.range-wrapper {
+  position: relative;
+  height: 2rem;
+}
+
+.range {
+  width: 100%;
+  accent-color: var(--color-accent);
+}
+
+.range::-webkit-slider-thumb {
+  width: var(--size-thumb);
+  height: var(--size-thumb);
+  anchor-name: --thumb; /* Anchor point for position-anchor */
+}
+
+.range::-moz-range-thumb {
+  width: var(--size-thumb);
+  height: var(--size-thumb);
+  anchor-name: --thumb; /* Anchor point for position-anchor */
+}
+
+/* Value display anchored to the slider thumb (if position-anchor is supported) */
+@supports (position-anchor: initial) {
+  .range-value {
+    position: absolute;
+    position-anchor: --thumb;
+    position-area: bottom;
+    padding: var(--space-xs) var(--space-sm);
+    background: var(--color-label);
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    translate: 0 0.3rem; /* Offset to avoid overlap */
+  }
+}
+
+.range-value {
+  position: absolute;
+  right: 0;
+  font-size: 0.875rem;
+}
+
+.box-group {
+  display: grid;
+  gap: 1rem;
+  margin-top: var(--space-lg);
+  grid-template-areas:
+    "user"
+    "variant";
+
+  @media (width > 40rem) {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: "user variant";
+  }
+}
+
+.box {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-content: start;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--layer);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.box-body {
+  display: grid;
+  grid-row: 1;
+  grid-column: 1 / -1;
+  min-height: 6rem;
+  border-radius: var(--radius-sm);
+  overflow: hidden; /* To ensure children with border-radius are clipped if needed */
+  @media (width > 40rem) {
+    grid-template-columns: 1fr 1fr; /* Two columns for larger screens */
+  }
+}
+
+.box-half {
+  display: grid;
+  place-content: center;
+  padding: var(--space-sm);
+  text-align: center;
+  overflow-wrap: break-word;
+  word-break: break-all; /* Ensure long color strings break */
+}
+
+.box-half .box-color-value {
+  display: grid;
+  font-size: 0.9rem; /* Adjust as needed */
+  font-family: monospace;
+  /* color will be set by JS based on contrast */
+}
+
+.box-half .box-color-value .gamut-warning-inline {
+  font-size: 0.8em; /* Smaller than the hex code */
+  margin-left: var(--space-xs); /* Space from the hex code */
+  /* Color is set by JS, but can have a fallback */
+  /* color: var(--color-accent); */
+}
+
+/* Background colors for user and variant boxes */
+.box-user .box-half.box-oklch {
+  background: var(--color-primary); /* OKLCH side uses the direct color */
+  color: var(--color-text-user);
+}
+.box-user .box-half.box-hex {
+  /* HEX side will have its background set by JS to the sRGB equivalent */
+  color: var(--color-text-user);
+}
+
+.box-variant .box-half.box-oklch {
+  background: var(--color-variant); /* OKLCH side uses the direct color */
+  color: var(--color-text-user);
+}
+.box-variant .box-half.box-hex {
+  /* HEX side will have its background set by JS to the sRGB equivalent */
+  color: var(--color-text-user);
+}
+
+/* Update text color for the color values inside box-half based on their specific background */
+.box-user .box-half.box-oklch .box-color-value,
+.box-variant .box-half.box-oklch .box-color-value {
+  color: var(--color-text-user);
+}
+
+.box-user .box-half.box-hex .box-color-value,
+.box-variant .box-half.box-hex .box-color-value {
+  color: var(--color-text-user);
+}
+
+.color-value,
+.contrast-ratio-display,
+.apca-contrast-display {
+  text-align: center;
+  margin: 0;
+}
+
+.color-value {
+  display: block;
+  border-radius: var(--radius-sm);
+  font-family: monospace;
+  font-size: 1rem;
+  overflow-wrap: break-word;
+  line-height: 1.1;
+}
+
+.hex-value-container {
+  line-height: 1.1;
+  text-align: center; /* Centers content (HEX code + warning) */
+}
+
+.gamut-warning {
+  /* Warning next to the HEX value */
+  font-size: 0.8em;
+  margin-left: 5px; /* Space from the HEX value */
+  color: var(--color-accent); /* Consistent warning color */
+  /* display: inline; is default for span, correct here */
+}
+
+.wcag-container {
+  display: block; /* So that the container takes the full width and centers its content */
+  text-align: center;
+  line-height: 1.1;
+}
+
+.wcag-gamut-warning {
+  display: block;
+  font-size: 0.8em;
+  text-align: center;
+  /* text-align: center; handled by parent */
+  color: var(--color-accent);
+  margin-left: var(--space-xs); /* A little space from the WCAG2 ratio */
+}
+
+.ratio-check {
+  font-weight: bold;
+  color: var(--success);
+}
+
+.subtitle p {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.more-info {
+  margin-bottom: var(--space-lg);
+}
+
+.button-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.5em 1em 0.5em 0;
+  border: none;
+  background: transparent;
+  color: var(--color-accent);
+  font: inherit;
+  font-style: italic;
+  cursor: pointer;
+}
+
+/* -------------------/*
+ * CSS Reset "Bretzel"
+ * Made by Alsacréations
+ * Instructions: place in a `reset` layer
+ /* ------------------ */
+@layer reset {
+  :root {
+    color-scheme: light dark;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    min-width: 0;
+  }
+
+  :target {
+    scroll-margin-block: 1rem;
+  }
+
+  html {
+    overflow-wrap: break-word;
+    -webkit-text-size-adjust: none;
+  }
+
+  body {
+    min-height: 100dvh;
+    margin: 0;
+    line-height: 1.5;
+    font-weight: 200;
+    font-family: system-ui, sans-serif;
+    text-rendering: optimizeSpeed;
+    background-color: var(--surface);
+    color: var(--on-surface);
+  }
+
+  :where(ol, ul)[class] {
+    padding-left: 0;
+
+    & > li::marker {
+      content: "";
+    }
+  }
+
+  img,
+  table,
+  td,
+  blockquote,
+  pre,
+  code,
+  input,
+  textarea,
+  select,
+  video,
+  svg,
+  iframe {
+    max-width: 100%;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  button,
+  input,
+  label {
+    line-height: 1.1;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    text-wrap: balance;
+  }
+  p,
+  li,
+  figcaption {
+    text-wrap: pretty;
+  }
+  p {
+    margin-block: 1lh;
+  }
+
+  iframe,
+  img,
+  input,
+  select,
+  textarea {
+    height: auto;
+  }
+
+  a:not([class]) {
+    text-decoration-skip-ink: auto;
+  }
+  :any-link {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  img,
+  svg,
+  video,
+  canvas,
+  audio,
+  iframe,
+  embed,
+  object {
+    display: block;
+  }
+
+  input,
+  button,
+  textarea,
+  select {
+    margin: 0;
+    background-color: transparent;
+    color: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    font-family: inherit;
+    letter-spacing: inherit;
+    vertical-align: middle;
+  }
+  form,
+  fieldset {
+    border: none;
+  }
+  fieldset {
+    margin: 0;
+    padding: 1em;
+  }
+  legend {
+    max-width: 100%;
+    border: 0;
+    color: inherit;
+    white-space: normal;
+  }
+  label {
+    display: inline-block;
+    cursor: pointer;
+  }
+  button {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  textarea {
+    overflow: auto;
+    vertical-align: top;
+    white-space: pre-wrap;
+    resize: vertical;
+    field-sizing: content;
+  }
+
+  pre,
+  code,
+  kbd,
+  samp {
+    font-size: 1em;
+    font-family: monospace, monospace;
+  }
+  pre {
+    overflow: auto;
+    line-height: normal;
+    white-space: pre-wrap;
+    tab-size: 2;
+  }
+
+  svg:not([fill]) {
+    fill: currentColor;
+  }
+  svg {
+    overflow: visible;
+  }
+  svg * {
+    transform-box: fill-box;
+  }
+  svg:has(symbol) {
+    display: none;
+  }
+
+  [aria-busy="true"] {
+    cursor: progress;
+  }
+  [aria-controls] {
+    cursor: pointer;
+  }
+  [aria-disabled="true"],
+  [disabled] {
+    cursor: not-allowed;
+  }
+  [aria-hidden="false"][hidden] {
+    display: revert;
+  }
+  [aria-hidden="false"][hidden]:not(:focus) {
+    clip: rect(0, 0, 0, 0);
+    position: absolute;
+  }
+
+  .visually-hidden {
+    position: absolute !important;
+    clip-path: inset(50%) !important;
+    width: 1px !important;
+    height: 1px !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      background-attachment: initial !important;
+      animation-duration: 1ms !important;
+      animation-delay: -1ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+      transition-delay: 0s !important;
+      transition-duration: 0s !important;
+    }
+  }
+
+  abbr {
+    cursor: help;
+  }
+}
