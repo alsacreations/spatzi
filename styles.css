@@ -394,7 +394,7 @@ a:focus {
 }
 
 .logo-link {
-  display: block;
+  display: inline-block;
   margin: auto;
 
   &:hover,
