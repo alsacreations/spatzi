@@ -41,7 +41,9 @@
   --color-primary: #ff69b4;
   --color-text-user: #ffffff; /* Default for user text, synced with picker */
   --color-text-variant: var(--color-white); /* Default for variant text */
-  --color-variant: oklch(var(--slider-l) var(--slider-c) var(--slider-h)); /* Variant color derived from sliders */
+  --color-variant: oklch(
+    var(--slider-l) var(--slider-c) var(--slider-h)
+  ); /* Variant color derived from sliders */
 
   --color-accent: light-dark(var(--color-orange-700), var(--color-orange-300));
 
@@ -363,6 +365,46 @@ a:focus {
   font: inherit;
   font-style: italic;
   cursor: pointer;
+}
+
+/* Footer */
+.footer {
+  margin-top: var(--space-lg);
+  text-align: center;
+
+  & p {
+    margin: 0;
+    font-size: 0.8rem;
+  }
+}
+
+/* Logo */
+.logo-alsacreations {
+  display: block;
+  width: 150px;
+  margin: auto;
+}
+.logo-alsacreations-pepins-inner {
+  fill: var(--surface);
+}
+.logo-alsacreations-pepins-outer,
+.logo-alsacreations-alsa,
+.logo-alsacreations-creations {
+  fill: var(--on-surface);
+}
+
+.logo-link {
+  display: block;
+  margin: auto;
+
+  &:hover,
+  &:focus {
+    & .logo-alsacreations-pepins-outer,
+    & .logo-alsacreations-alsa,
+    & .logo-alsacreations-creations {
+      fill: var(--color-accent);
+    }
+  }
 }
 
 /* -------------------/*
