@@ -7,7 +7,6 @@
 
   /* System colors */
   --color-border: #ccc;
-  --color-label: #000;
   --color-gray-50: oklch(97% 0 0);
   --color-gray-100: oklch(92.2% 0 0);
   --color-gray-200: oklch(87% 0 0);
@@ -193,7 +192,7 @@ a:focus {
     position-anchor: --thumb;
     position-area: bottom;
     padding: var(--space-xs) var(--space-sm);
-    background: var(--color-label);
+    background: var(--layer);
     border-radius: var(--radius-sm);
     font-size: 0.875rem;
     translate: 0 0.3rem; /* Offset to avoid overlap */
