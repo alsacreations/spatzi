@@ -152,7 +152,9 @@ a:focus {
 .color-inputs input[type="color"] {
   width: var(--width-color-picker);
   height: 2rem;
-  padding: 0;
+  padding: 2px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
 }
 
 .color-inputs input[type="text"],
