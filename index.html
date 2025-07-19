@@ -16,14 +16,15 @@
           <p>
             Assistant de contraste des couleurs : obtenez les ratios de
             contraste (<abbr
-              title="Règles pour l'accessibilité des contenus Web"
+              lang="en"
+              title="Web Content Accessibility Guidelines"
               >WCAG</abbr
             >
             et
-            <abbr title="Algorithme de Contraste Perceptuel Accessible"
+            <abbr lang="en" title="Accessible Perceptual Contrast Algorithm"
               >APCA</abbr
             >) et explorez les variations de couleurs
-            <abbr title="OK LCh (Luminance, Chromaticité, Teinte)">OKLCH</abbr>
+            <abbr lang="en" title="OK LCh (Lightness, Chroma, Hue)">OKLCH</abbr>
             pour générer des palettes accessibles.
           </p>
         </div>
@@ -71,9 +72,9 @@
 
         <!-- Contrôles de modification OKLCH -->
         <div class="control-group lch-sliders-group">
-          <!-- Luminosité : modifie le composant L -->
+          <!-- Luminosity : modifie le composant L -->
           <div class="control control--lumi">
-            <label for="lumi">Luminosité</label>
+            <label for="lumi">Luminosity</label>
             <div class="range-wrapper">
               <input
                 class="range"
@@ -89,9 +90,9 @@
             </div>
           </div>
 
-          <!-- Chromaticité : modifie le composant C -->
+          <!-- Chroma : modifie le composant C -->
           <div class="control control--chroma">
-            <label for="chroma">Chromaticité</label>
+            <label for="chroma">Chroma</label>
             <div class="range-wrapper">
               <input
                 class="range"
@@ -107,9 +108,9 @@
             </div>
           </div>
 
-          <!-- Teinte : modifie le composant H -->
+          <!-- Hue : modifie le composant H -->
           <div class="control control--hue">
-            <label for="hue">Teinte</label>
+            <label for="hue">Hue</label>
             <div class="range-wrapper">
               <input
                 class="range"
@@ -146,6 +147,27 @@
 
         <!-- Valeurs de contraste -->
         <div class="contrast-info">
+          <!-- Affichage WCAG2 (par défaut) -->
+          <div class="contrast-display contrast-display--wcag">
+            <p class="contrast-value" id="wcag-contrast-value">
+              <span class="visually-hidden">Contraste WCAG2 : </span
+              ><span class="contrast-ratio">0.00</span>
+            </p>
+            <!-- L'avertissement de gamme pour WCAG sera inséré ici par JS -->
+            <div class="contrast-warning" id="wcag-gamut-warning"></div>
+          </div>
+
+          <!-- Affichage APCA (masqué par défaut) -->
+          <div
+            class="contrast-display contrast-display--apca"
+            style="display: none"
+          >
+            <p class="contrast-value" id="apca-contrast-value">
+              <span class="visually-hidden">APCA Lc : </span
+              ><span class="contrast-ratio">0.00</span>
+            </p>
+          </div>
+
           <!-- Switcher pour choisir le type de contraste -->
           <div class="contrast-switcher">
             <span class="switcher-label-left">WCAG2</span>
@@ -163,23 +185,6 @@
             <div id="switch_help" class="visually-hidden">
               Basculer entre WCAG2 et APCA
             </div>
-          </div>
-
-          <!-- Affichage WCAG2 (par défaut) -->
-          <div class="wcag-display">
-            <span class="wcag-container">
-              <p class="contrast-ratio-display" id="variant-wcag-contrast">
-                Contraste WCAG2 : 0.00 ✗
-              </p>
-              <!-- L'avertissement de gamme pour WCAG sera inséré ici par JS -->
-            </span>
-          </div>
-
-          <!-- Affichage APCA (masqué par défaut) -->
-          <div class="apca-display" style="display: none">
-            <p class="apca-contrast-display">
-              APCA Lc : <span class="apca-lc-value">0.00</span>
-            </p>
           </div>
         </div>
       </div>

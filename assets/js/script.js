@@ -23,8 +23,8 @@ const hValueDisplay = document.querySelector('output[for="hue"]');
 
 // Contrast switcher and displays
 const contrastSwitcher = $("#switch_contrast");
-const wcagDisplay = $(".wcag-display");
-const apcaDisplay = $(".apca-display");
+const wcagDisplay = $(".contrast-display--wcag");
+const apcaDisplay = $(".contrast-display--apca");
 
 // Prevent form submission
 form.addEventListener("submit", (e) => e.preventDefault());
@@ -294,11 +294,9 @@ function updateOKLCHValues() {
       ? hexDisplayContainerInBox.querySelector(".gamut-warning-inline")
       : null;
 
-    const contrastRatioElement = document.querySelector(
-      ".contrast-ratio-display"
-    );
+    const contrastRatioElement = document.querySelector(".contrast-value");
     const apcaContrastDisplay = document.querySelector(
-      ".apca-contrast-display"
+      ".contrast-display--apca .contrast-value"
     );
 
     if (
@@ -379,14 +377,24 @@ function updateOKLCHValues() {
 
       const wcagContrast = getContrastRatio(hexEquivalentColor, textColor);
       if (contrastRatioElement) {
+        const wcagRatioSpan =
+          contrastRatioElement.querySelector(".contrast-ratio");
         if (isNaN(wcagContrast) || typeof wcagContrast !== "number") {
-          contrastRatioElement.textContent = "Contraste WCAG2 : N/A";
+          if (wcagRatioSpan) {
+            wcagRatioSpan.textContent = "N/A";
+          } else {
+            contrastRatioElement.innerHTML =
+              '<span class="visually-hidden">Contraste WCAG2 : </span><span class="contrast-ratio">N/A</span>';
+          }
           contrastRatioElement.style.color = "var(--on-surface)";
         } else {
-          const wcagPass = wcagContrast >= 4.5 ? "✓" : "✗";
-          contrastRatioElement.textContent = `Contraste WCAG2 : ${wcagContrast.toFixed(
-            2
-          )} ${wcagPass}`;
+          if (wcagRatioSpan) {
+            wcagRatioSpan.textContent = wcagContrast.toFixed(2);
+          } else {
+            contrastRatioElement.innerHTML = `<span class="visually-hidden">Contraste WCAG2 : </span><span class="contrast-ratio">${wcagContrast.toFixed(
+              2
+            )}</span>`;
+          }
           if (wcagContrast >= 4.5) {
             contrastRatioElement.style.color = "var(--success)";
           } else {
@@ -398,14 +406,18 @@ function updateOKLCHValues() {
       const apcaLc = getAPCAContrast(textColor, hexEquivalentColor);
       if (apcaContrastDisplay) {
         const apcaValueSpan =
-          apcaContrastDisplay.querySelector(".apca-lc-value");
+          apcaContrastDisplay.querySelector(".contrast-ratio");
         if (apcaLc === null || isNaN(apcaLc)) {
           if (apcaValueSpan) apcaValueSpan.textContent = "N/A";
-          else apcaContrastDisplay.textContent = "APCA Lc : N/A";
+          else
+            apcaContrastDisplay.innerHTML =
+              '<span class="visually-hidden">APCA Lc : </span><span class="contrast-ratio">N/A</span>';
         } else {
           if (apcaValueSpan) apcaValueSpan.textContent = apcaLc.toFixed(2);
           else
-            apcaContrastDisplay.textContent = `APCA Lc : ${apcaLc.toFixed(2)}`;
+            apcaContrastDisplay.innerHTML = `<span class="visually-hidden">APCA Lc : </span><span class="contrast-ratio">${apcaLc.toFixed(
+              2
+            )}</span>`;
         }
       }
 
@@ -438,14 +450,23 @@ function updateOKLCHValues() {
       }
     } else {
       if (contrastRatioElement) {
-        contrastRatioElement.textContent = "Contraste WCAG2 : 0.00 ✗";
+        const wcagRatioSpan =
+          contrastRatioElement.querySelector(".contrast-ratio");
+        if (wcagRatioSpan) {
+          wcagRatioSpan.textContent = "0.00";
+        } else {
+          contrastRatioElement.innerHTML =
+            '<span class="visually-hidden">Contraste WCAG2 : </span><span class="contrast-ratio">0.00</span>';
+        }
         contrastRatioElement.style.color = "var(--error)";
       }
       if (apcaContrastDisplay) {
         const apcaValueSpan =
-          apcaContrastDisplay.querySelector(".apca-lc-value");
+          apcaContrastDisplay.querySelector(".contrast-ratio");
         if (apcaValueSpan) apcaValueSpan.textContent = "0.00";
-        else apcaContrastDisplay.textContent = "APCA Lc : 0.00";
+        else
+          apcaContrastDisplay.innerHTML =
+            '<span class="visually-hidden">APCA Lc : </span><span class="contrast-ratio">0.00</span>';
       }
     }
   }

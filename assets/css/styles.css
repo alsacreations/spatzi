@@ -288,8 +288,7 @@ a:focus {
 }
 
 .color-value,
-.contrast-ratio-display,
-.apca-contrast-display {
+.contrast-value {
   text-align: center;
   margin: 0;
 }
@@ -303,6 +302,21 @@ a:focus {
   line-height: 1.1;
 }
 
+.contrast-value {
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.contrast-display {
+  text-align: center;
+}
+
+.contrast-warning {
+  font-size: 0.8em;
+  color: var(--color-accent);
+  margin-top: var(--space-xs);
+}
+
 .hex-value-container {
   line-height: 1.1;
   text-align: center; /* Centers content (HEX code + warning) */
@@ -314,21 +328,6 @@ a:focus {
   margin-left: 5px; /* Space from the HEX value */
   color: var(--color-accent); /* Consistent warning color */
   /* display: inline; is default for span, correct here */
-}
-
-.wcag-container {
-  display: block; /* So that the container takes the full width and centers its content */
-  text-align: center;
-  line-height: 1.1;
-}
-
-.wcag-gamut-warning {
-  display: block;
-  font-size: 0.8em;
-  text-align: center;
-  /* text-align: center; handled by parent */
-  color: var(--color-accent);
-  margin-left: var(--space-xs); /* A little space from the WCAG2 ratio */
 }
 
 .ratio-check {
