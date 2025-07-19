@@ -35,6 +35,10 @@ form.addEventListener("submit", (e) => e.preventDefault());
 
 // Handle contrast type switching
 contrastSwitcher.addEventListener("change", (e) => {
+  const contrastTypeIndicator = document.querySelector(
+    ".contrast-type-indicator"
+  );
+
   if (e.target.checked) {
     // Show APCA, hide WCAG2
     wcagDisplay.style.display = "none";
@@ -43,6 +47,11 @@ contrastSwitcher.addEventListener("change", (e) => {
     // Switch guide content
     wcagGuide.style.display = "none";
     apcaGuide.style.display = "block";
+
+    // Update example title indicator
+    if (contrastTypeIndicator) {
+      contrastTypeIndicator.textContent = "(APCA)";
+    }
   } else {
     // Show WCAG2, hide APCA
     wcagDisplay.style.display = "block";
@@ -51,10 +60,16 @@ contrastSwitcher.addEventListener("change", (e) => {
     // Switch guide content
     wcagGuide.style.display = "block";
     apcaGuide.style.display = "none";
+
+    // Update example title indicator
+    if (contrastTypeIndicator) {
+      contrastTypeIndicator.textContent = "(WCAG)";
+    }
   }
 
   // Met à jour les indicateurs après le changement de mode
   updateThresholdIndicators();
+  updateExampleIndicators();
 });
 
 // Converts a color to #RRGGBB or #RRGGBBAA hexadecimal value
@@ -246,7 +261,10 @@ function updateThresholdIndicators() {
       const threshold = parseFloat(indicator.dataset.threshold);
       const isPassed = wcagRatio >= threshold;
 
-      indicator.textContent = isPassed ? "✅" : "❌";
+      // Création d'un contenu accessible
+      indicator.innerHTML = isPassed
+        ? '✅<span class="visually-hidden"> accessible</span>'
+        : '❌<span class="visually-hidden"> non accessible</span>';
       indicator.dataset.passed = isPassed.toString();
     });
   }
@@ -264,10 +282,68 @@ function updateThresholdIndicators() {
       // Pour APCA, seule la valeur absolue compte
       const isPassed = Math.abs(apcaValue) >= threshold;
 
-      indicator.textContent = isPassed ? "✅" : "❌";
+      // Création d'un contenu accessible
+      indicator.innerHTML = isPassed
+        ? '✅<span class="visually-hidden"> accessible</span>'
+        : '❌<span class="visually-hidden"> non accessible</span>';
       indicator.dataset.passed = isPassed.toString();
     });
   }
+}
+
+/**
+ * Met à jour les indicateurs de seuil dans la section d'exemple
+ */
+function updateExampleIndicators() {
+  const contrastSwitcherChecked = contrastSwitcher.checked;
+  const exampleItems = document.querySelectorAll(".example-text-item");
+
+  exampleItems.forEach((item) => {
+    const size = parseInt(item.dataset.size);
+    const weight = item.dataset.weight;
+    const statusElement = item.querySelector(".threshold-status");
+
+    if (!statusElement) return;
+
+    let isPassed = false;
+
+    if (contrastSwitcherChecked) {
+      // Mode APCA
+      const apcaRatioElement = apcaDisplay.querySelector(".contrast-ratio");
+      if (apcaRatioElement) {
+        const apcaValue = Math.abs(parseFloat(apcaRatioElement.textContent));
+
+        // Seuils APCA selon la taille
+        let threshold = 75; // Défaut pour texte normal
+        if ((size >= 24 && weight === "bold") || size >= 36) {
+          threshold = 45; // Texte large
+        } else if (size >= 24 || (size >= 16 && weight === "bold")) {
+          threshold = 60; // Texte moyen
+        }
+
+        isPassed = apcaValue >= threshold;
+      }
+    } else {
+      // Mode WCAG2
+      const wcagRatioElement = wcagDisplay.querySelector(".contrast-ratio");
+      if (wcagRatioElement) {
+        const wcagRatio = parseFloat(wcagRatioElement.textContent);
+
+        // Seuils WCAG2 selon la taille (seuil AA)
+        let threshold = 4.5; // Défaut pour texte normal
+        if ((size >= 18 && weight === "bold") || size >= 24) {
+          threshold = 3; // Texte large
+        }
+
+        isPassed = wcagRatio >= threshold;
+      }
+    }
+
+    // Création d'un contenu accessible
+    statusElement.innerHTML = isPassed
+      ? '✅<span class="visually-hidden"> accessible</span>'
+      : '❌<span class="visually-hidden"> non accessible</span>';
+  });
 }
 
 function updateOKLCHValues() {
@@ -527,6 +603,7 @@ function updateOKLCHValues() {
 
   // Met à jour les indicateurs de seuil dans le guide
   updateThresholdIndicators();
+  updateExampleIndicators();
 }
 
 function updateColor(value, isPrimaryColor = true) {
