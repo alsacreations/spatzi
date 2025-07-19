@@ -36,8 +36,7 @@
   --slider-c: 0.1;
   --slider-h: 180;
 
-  /* OKLCH relative colors. For modifying the primary color (L: lightness, C: chroma, H: hue) */
-  --color-primary: #ff69b4;
+  /* OKLCH relative colors. For modifying colors (L: lightness, C: chroma, H: hue) */
   --color-text-user: #ffffff; /* Default for user text, synced with picker */
   --color-text-variant: var(--color-white); /* Default for variant text */
   --color-variant: oklch(
@@ -215,25 +214,26 @@ a:focus {
   display: grid;
   gap: 1rem;
   margin-top: var(--space-lg);
-  grid-template-areas:
-    "user"
-    "variant";
-
-  @media (width > 40rem) {
-    grid-template-columns: 1fr 1fr;
-    grid-template-areas: "user variant";
-  }
 }
 
 .box {
   display: grid;
-  grid-template-columns: 1fr 1fr;
   align-content: start;
   gap: var(--space-md);
   padding: var(--space-md);
   background: var(--layer);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
+}
+
+.contrast-info {
+  display: grid;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: var(--layer);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  text-align: center;
 }
 
 .box-body {
@@ -271,9 +271,9 @@ a:focus {
   /* color: var(--color-accent); */
 }
 
-/* Background colors for user and variant boxes */
+/* Background colors for user box */
 .box-user .box-half.box-oklch {
-  background: var(--color-primary); /* OKLCH side uses the direct color */
+  background: var(--color-variant); /* OKLCH side uses the variant color */
   color: var(--color-text-user);
 }
 .box-user .box-half.box-hex {
@@ -281,23 +281,9 @@ a:focus {
   color: var(--color-text-user);
 }
 
-.box-variant .box-half.box-oklch {
-  background: var(--color-variant); /* OKLCH side uses the direct color */
-  color: var(--color-text-user);
-}
-.box-variant .box-half.box-hex {
-  /* HEX side will have its background set by JS to the sRGB equivalent */
-  color: var(--color-text-user);
-}
-
 /* Update text color for the color values inside box-half based on their specific background */
 .box-user .box-half.box-oklch .box-color-value,
-.box-variant .box-half.box-oklch .box-color-value {
-  color: var(--color-text-user);
-}
-
-.box-user .box-half.box-hex .box-color-value,
-.box-variant .box-half.box-hex .box-color-value {
+.box-user .box-half.box-hex .box-color-value {
   color: var(--color-text-user);
 }
 
@@ -355,23 +341,6 @@ a:focus {
   font-size: 1.2rem;
 }
 
-.more-info {
-  margin-bottom: var(--space-lg);
-}
-
-.button-more {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5em;
-  padding: 0.5em 1em 0.5em 0;
-  border: none;
-  background: transparent;
-  color: var(--color-accent);
-  font: inherit;
-  font-style: italic;
-  cursor: pointer;
-}
-
 /* Footer */
 .footer {
   margin-top: var(--space-lg);
@@ -409,235 +378,5 @@ a:focus {
     & .logo-alsacreations-creations {
       fill: var(--color-accent);
     }
-  }
-}
-
-/* -------------------/*
- * CSS Reset "Bretzel"
- * Made by Alsacréations
- * Instructions: place in a `reset` layer
- /* ------------------ */
-@layer reset {
-  :root {
-    color-scheme: light dark;
-  }
-
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-    min-width: 0;
-  }
-
-  :target {
-    scroll-margin-block: 1rem;
-  }
-
-  html {
-    overflow-wrap: break-word;
-    -webkit-text-size-adjust: none;
-  }
-
-  body {
-    min-height: 100dvh;
-    margin: 0;
-    line-height: 1.5;
-    font-weight: 200;
-    font-family: system-ui, sans-serif;
-    text-rendering: optimizeSpeed;
-    background-color: var(--surface);
-    color: var(--on-surface);
-  }
-
-  :where(ol, ul)[class] {
-    padding-left: 0;
-
-    & > li::marker {
-      content: "";
-    }
-  }
-
-  img,
-  table,
-  td,
-  blockquote,
-  pre,
-  code,
-  input,
-  textarea,
-  select,
-  video,
-  svg,
-  iframe {
-    max-width: 100%;
-  }
-
-  h1,
-  h2,
-  h3,
-  h4,
-  button,
-  input,
-  label {
-    line-height: 1.1;
-  }
-
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    text-wrap: balance;
-  }
-  p,
-  li,
-  figcaption {
-    text-wrap: pretty;
-  }
-  p {
-    margin-block: 1lh;
-  }
-
-  iframe,
-  img,
-  input,
-  select,
-  textarea {
-    height: auto;
-  }
-
-  a:not([class]) {
-    text-decoration-skip-ink: auto;
-  }
-  :any-link {
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  img,
-  svg,
-  video,
-  canvas,
-  audio,
-  iframe,
-  embed,
-  object {
-    display: block;
-  }
-
-  input,
-  button,
-  textarea,
-  select {
-    margin: 0;
-    background-color: transparent;
-    color: inherit;
-    font-size: inherit;
-    line-height: inherit;
-    font-family: inherit;
-    letter-spacing: inherit;
-    vertical-align: middle;
-  }
-  form,
-  fieldset {
-    border: none;
-  }
-  fieldset {
-    margin: 0;
-    padding: 1em;
-  }
-  legend {
-    max-width: 100%;
-    border: 0;
-    color: inherit;
-    white-space: normal;
-  }
-  label {
-    display: inline-block;
-    cursor: pointer;
-  }
-  button {
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-  }
-  textarea {
-    overflow: auto;
-    vertical-align: top;
-    white-space: pre-wrap;
-    resize: vertical;
-    field-sizing: content;
-  }
-
-  pre,
-  code,
-  kbd,
-  samp {
-    font-size: 1em;
-    font-family: monospace, monospace;
-  }
-  pre {
-    overflow: auto;
-    line-height: normal;
-    white-space: pre-wrap;
-    tab-size: 2;
-  }
-
-  svg:not([fill]) {
-    fill: currentColor;
-  }
-  svg {
-    overflow: visible;
-  }
-  svg * {
-    transform-box: fill-box;
-  }
-  svg:has(symbol) {
-    display: none;
-  }
-
-  [aria-busy="true"] {
-    cursor: progress;
-  }
-  [aria-controls] {
-    cursor: pointer;
-  }
-  [aria-disabled="true"],
-  [disabled] {
-    cursor: not-allowed;
-  }
-  [aria-hidden="false"][hidden] {
-    display: revert;
-  }
-  [aria-hidden="false"][hidden]:not(:focus) {
-    clip: rect(0, 0, 0, 0);
-    position: absolute;
-  }
-
-  .visually-hidden {
-    position: absolute !important;
-    clip-path: inset(50%) !important;
-    width: 1px !important;
-    height: 1px !important;
-    margin: -1px !important;
-    overflow: hidden !important;
-    white-space: nowrap !important;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    *,
-    ::before,
-    ::after {
-      background-attachment: initial !important;
-      animation-duration: 1ms !important;
-      animation-delay: -1ms !important;
-      animation-iteration-count: 1 !important;
-      scroll-behavior: auto !important;
-      transition-delay: 0s !important;
-      transition-duration: 0s !important;
-    }
-  }
-
-  abbr {
-    cursor: help;
   }
 }
