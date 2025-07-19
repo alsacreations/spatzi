@@ -189,6 +189,110 @@
         </div>
       </div>
     </main>
+
+    <!-- Guide des seuils de contraste -->
+    <section class="contrast-guide" aria-labelledby="contrast-guide-title">
+      <h2 id="contrast-guide-title">Guide des seuils de contraste</h2>
+
+      <!-- Guide WCAG2 (visible par défaut) -->
+      <div class="guide-content guide-content--wcag">
+        <h3>
+          <abbr lang="en" title="Web Content Accessibility Guidelines"
+            >WCAG</abbr
+          >
+          2.1 - Ratios de contraste
+        </h3>
+        <div class="threshold-grid">
+          <div class="threshold-item">
+            <h4>Texte normal (< 24px ou < 19px gras)</h4>
+            <ul>
+              <li>
+                <strong>AA :</strong> 4.5:1 minimum
+                <span class="threshold-indicator" data-threshold="4.5"></span>
+              </li>
+              <li>
+                <strong>AAA :</strong> 7:1 minimum
+                <span class="threshold-indicator" data-threshold="7"></span>
+              </li>
+            </ul>
+          </div>
+          <div class="threshold-item">
+            <h4>Texte large (≥ 24px ou ≥ 19px gras)</h4>
+            <ul>
+              <li>
+                <strong>AA :</strong> 3:1 minimum
+                <span class="threshold-indicator" data-threshold="3"></span>
+              </li>
+              <li>
+                <strong>AAA :</strong> 4.5:1 minimum
+                <span class="threshold-indicator" data-threshold="4.5"></span>
+              </li>
+            </ul>
+          </div>
+          <div class="threshold-item">
+            <h4>Éléments graphiques</h4>
+            <ul>
+              <li>
+                <strong>AA :</strong> 3:1 minimum (bordures, icônes)
+                <span class="threshold-indicator" data-threshold="3"></span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Guide APCA (masqué par défaut) -->
+      <div class="guide-content guide-content--apca" style="display: none">
+        <h3>
+          <abbr lang="en" title="Accessible Perceptual Contrast Algorithm"
+            >APCA</abbr
+          >
+          - Contraste perceptuel
+        </h3>
+        <div class="threshold-grid">
+          <div class="threshold-item">
+            <h4>Texte normal</h4>
+            <ul>
+              <li>
+                <strong>Minimum :</strong> Lc ≥ 75 (ou ≤ -75)
+                <span
+                  class="threshold-indicator"
+                  data-threshold="75"
+                  data-type="apca"
+                ></span>
+              </li>
+            </ul>
+          </div>
+          <div class="threshold-item">
+            <h4>Texte moyen (≥ 24px ou ≥ 16px gras)</h4>
+            <ul>
+              <li>
+                <strong>Minimum :</strong> Lc ≥ 60 (ou ≤ -60)
+                <span
+                  class="threshold-indicator"
+                  data-threshold="60"
+                  data-type="apca"
+                ></span>
+              </li>
+            </ul>
+          </div>
+          <div class="threshold-item">
+            <h4>Texte large (≥ 36px ou ≥ 24px gras)</h4>
+            <ul>
+              <li>
+                <strong>Minimum :</strong> Lc ≥ 45 (ou ≤ -45)
+                <span
+                  class="threshold-indicator"
+                  data-threshold="45"
+                  data-type="apca"
+                ></span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <footer class="footer" role="contentinfo">
       <p>Spätzi est un projet <i>fifoo</i> conçu avec ❤️ par</p>
       <a class="logo-link" href="https://www.alsacreations.fr/"

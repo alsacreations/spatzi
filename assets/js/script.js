@@ -26,6 +26,10 @@ const contrastSwitcher = $("#switch_contrast");
 const wcagDisplay = $(".contrast-display--wcag");
 const apcaDisplay = $(".contrast-display--apca");
 
+// Guide elements
+const wcagGuide = $(".guide-content--wcag");
+const apcaGuide = $(".guide-content--apca");
+
 // Prevent form submission
 form.addEventListener("submit", (e) => e.preventDefault());
 
@@ -35,182 +39,87 @@ contrastSwitcher.addEventListener("change", (e) => {
     // Show APCA, hide WCAG2
     wcagDisplay.style.display = "none";
     apcaDisplay.style.display = "block";
+
+    // Switch guide content
+    wcagGuide.style.display = "none";
+    apcaGuide.style.display = "block";
   } else {
     // Show WCAG2, hide APCA
     wcagDisplay.style.display = "block";
     apcaDisplay.style.display = "none";
+
+    // Switch guide content
+    wcagGuide.style.display = "block";
+    apcaGuide.style.display = "none";
   }
+
+  // Met à jour les indicateurs après le changement de mode
+  updateThresholdIndicators();
 });
 
 // Converts a color to #RRGGBB or #RRGGBBAA hexadecimal value
 function toHex(colorStringInput) {
   const originalColorString = String(colorStringInput);
 
-  const canvas = document.createElement("canvas");
-  canvas.width = 1;
-  canvas.height = 1;
-  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  try {
+    let color = originalColorString;
 
-  ctx.fillStyle = originalColorString;
-  ctx.fillRect(0, 0, 1, 1);
+    if (color.toLowerCase().startsWith("oklch(")) {
+      const oklchRegex =
+        /oklch\(\s*([\d.%]+)\s+([\d.%]+)\s+([\d.]+)\s*(?:\/\s*([\d.%]+))?\s*\)/i;
+      const match = color.match(oklchRegex);
+      if (match) {
+        let [, l, c, h, alpha] = match;
 
-  const imageData = ctx.getImageData(0, 0, 1, 1).data;
-  const r = imageData[0];
-  const g = imageData[1];
-  const b = imageData[2];
-  const a = imageData[3];
+        if (!l.includes("%")) {
+          const lNum = parseFloat(l);
+          if (!isNaN(lNum) && lNum >= 0 && lNum <= 1) {
+            l = (lNum * 100).toString() + "%";
+          }
+        }
 
-  if (
-    typeof r === "undefined" ||
-    typeof g === "undefined" ||
-    typeof b === "undefined" ||
-    typeof a === "undefined" ||
-    isNaN(r) ||
-    isNaN(g) ||
-    isNaN(b) ||
-    isNaN(a)
-  ) {
+        color = `oklch(${l} ${c} ${h}${alpha ? ` / ${alpha}` : ""})`;
+      }
+    }
+
+    const colorObj = new Color(color);
+    const srgbColor = colorObj.to("srgb");
+
+    // Check if within sRGB gamut, if not clamp to gamut
+    if (!srgbColor.inGamut("srgb")) {
+      srgbColor.toGamut({ method: "clip" });
+    }
+
+    const hex = srgbColor.to("srgb").toString({ format: "hex" });
+    return hex;
+  } catch (e) {
     return "#000000";
   }
-
-  const rHex = r.toString(16).padStart(2, "0");
-  const gHex = g.toString(16).padStart(2, "0");
-  const bHex = b.toString(16).padStart(2, "0");
-
-  if (a === 255) {
-    return `#${rHex}${gHex}${bHex}`;
-  } else {
-    const aHex = a.toString(16).padStart(2, "0");
-    return `#${rHex}${gHex}${bHex}${aHex}`;
-  }
 }
 
+// Simple validation of a color string
 function isValidColor(color) {
-  const style = new Option().style;
-  style.color = color;
-  return style.color !== "";
+  return colorParsley(color) !== false;
 }
 
-const oklchRegex =
-  /oklch\(\s*([\d.]+%?)\s+([\d.]+%?)\s+([\d.]+%?)(?:\s*\/\s*([\d.]+%?))?\s*\)/i;
-
-function formatToOKLCHDisplay(colorString) {
-  let temp = document.createElement("div");
-  temp.style.color = colorString;
-  document.body.appendChild(temp);
-  let computedColor = getComputedStyle(temp).color;
-
-  let colorObj;
-  try {
-    colorObj = new Color(computedColor).to("oklch");
-  } catch (e) {
-    document.body.removeChild(temp);
-    const regexMatches = computedColor.match(oklchRegex);
-    if (regexMatches) {
-      let [, l_regex, c_regex, h_regex, a_regex] = regexMatches;
-      const l_num_regex = parseFloat(l_regex);
-      const l_percent_regex = l_regex.includes("%")
-        ? `${Math.round(l_num_regex)}%`
-        : `${Math.round(l_num_regex * 100)}%`;
-      const c_formatted_regex =
-        parseFloat(c_regex)
-          .toFixed(3)
-          .replace(/\.?0+$/, "") || "0";
-      const h_formatted_regex = Math.round(parseFloat(h_regex));
-      let alphaPart_regex = "";
-      if (a_regex !== undefined) {
-        let aNum_regex = parseFloat(a_regex);
-        if (Math.abs(aNum_regex - 1) > 0.001 && Math.abs(aNum_regex) > 0.001) {
-          alphaPart_regex = ` / ${aNum_regex.toFixed(2).replace(/\.?0+$/, "")}`;
-        } else if (Math.abs(aNum_regex) < 0.001) {
-          alphaPart_regex = ` / 0`;
-        }
-      }
-      return `oklch(${l_percent_regex} ${c_formatted_regex} ${h_formatted_regex}${alphaPart_regex})`;
-    }
-    return computedColor;
-  }
-  document.body.removeChild(temp);
-
-  let [l, c, h, alpha] = colorObj.coords;
-  let oklchAlpha = colorObj.alpha;
-
-  const lPercent = (l * 100).toFixed(4).replace(/\.?0+$/, "") + "%";
-
-  const cFormatted =
-    parseFloat(c)
-      .toFixed(4)
-      .replace(/\.?0+$/, "") || "0";
-
-  const hFormatted = !isNaN(h)
-    ? parseFloat(h)
-        .toFixed(4)
-        .replace(/\.?0+$/, "")
-    : "0";
-
-  let alphaPart = "";
-  if (
-    oklchAlpha !== undefined &&
-    Math.abs(oklchAlpha - 1) > 0.00001 &&
-    Math.abs(oklchAlpha) > 0.00001
-  ) {
-    alphaPart = ` / ${parseFloat(oklchAlpha)
-      .toFixed(2)
-      .replace(/\.?0+$/, "")}`;
-  } else if (oklchAlpha !== undefined && Math.abs(oklchAlpha) < 0.00001) {
-    alphaPart = ` / 0`;
-  }
-
-  return `oklch(${lPercent} ${cFormatted} ${hFormatted}${alphaPart})`;
-}
-
-function getOKLCHValuesFromColor(colorString) {
-  try {
-    const color = new Color(colorString);
-
-    if (typeof color.to === "function") {
-      const oklchColorSpaceObject = color.to("oklch");
-
-      if (
-        oklchColorSpaceObject &&
-        typeof oklchColorSpaceObject.coords !== "undefined" &&
-        Array.isArray(oklchColorSpaceObject.coords)
-      ) {
-        const coords = oklchColorSpaceObject.coords;
-        return {
-          l: coords[0],
-          c: coords[1],
-          h: coords[2] !== undefined && !isNaN(coords[2]) ? coords[2] : 0,
-        };
-      }
-    }
-
-    if (typeof color.oklch === "function") {
-      const oklch = color.oklch();
-      if (Array.isArray(oklch)) {
-        return {
-          l: oklch[0],
-          c: oklch[1],
-          h: oklch[2] !== undefined && !isNaN(oklch[2]) ? oklch[2] : 0,
-        };
-      } else {
-        throw new Error("color.oklch() did not return an array.");
-      }
-    } else {
-      throw new TypeError("Cannot get OKLCH values from the color object.");
-    }
-  } catch (e) {
-    return { l: 0, c: 0, h: 0 };
-  }
-}
-
+// Get the relative luminance of a color
 function getLuminance(colorString) {
   try {
-    const color = new Color(colorString).to("srgb");
-    const rgb = color.coords.map((c) => {
-      return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    const colorObj = new Color(colorString);
+    const srgbColor = colorObj.to("srgb");
+
+    // Convert to linear RGB
+    const [r, g, b] = srgbColor.coords.map((c) => {
+      if (c <= 0.04045) {
+        return c / 12.92;
+      } else {
+        return Math.pow((c + 0.055) / 1.055, 2.4);
+      }
     });
-    return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
+
+    // Calculate luminance
+    const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    return luminance;
   } catch (e) {
     return 0;
   }
@@ -251,16 +160,113 @@ function getAPCAContrast(textColor, backgroundColor) {
     const gB = Math.round(colorBgObj.coords[1] * 255);
     const bB = Math.round(colorBgObj.coords[2] * 255);
 
-    const contrastLc = APCAcontrast(
-      sRGBtoY([rT, gT, bT]),
-      sRGBtoY([rB, gB, bB])
-    );
-    if (isNaN(contrastLc)) {
-      return 0;
+    // D'abord essayer la fonction officielle APCAcontrast
+    try {
+      const result = APCAcontrast([rT, gT, bT], [rB, gB, bB]);
+      if (result !== 0 && !isNaN(result)) {
+        return parseFloat(result.toFixed(1));
+      }
+    } catch (e) {
+      // La fonction officielle a échoué, utiliser notre implémentation
     }
-    return parseFloat(contrastLc.toFixed(2));
+
+    // Implémentation APCA 0.1.9 4g exacte selon la documentation officielle
+    const textY = sRGBtoY([rT, gT, bT]);
+    const bgY = sRGBtoY([rB, gB, bB]);
+
+    // Constantes APCA 0.0.98G-4g officielles
+    const Strc = 2.4;
+    const Ntx = 0.57; // normTXT
+    const Nbg = 0.56; // normBG
+    const Rtx = 0.62; // revTXT
+    const Rbg = 0.65; // revBG
+    const Bclip = 1.414; // blkClmp
+    const Bthrsh = 0.022; // blkThrs
+    const Wscale = 1.14; // scale
+    const Woffset = 0.027; // offset
+    const Wclamp = 0.1; // loClip
+
+    // Soft clamp pour les noirs (fsc function)
+    function softClamp(Yc) {
+      if (Yc < 0.0) return 0.0;
+      if (Yc < Bthrsh) {
+        return Yc + Math.pow(Bthrsh - Yc, Bclip);
+      }
+      return Yc;
+    }
+
+    // Appliquer le soft clamp
+    const Ytxt = softClamp(textY);
+    const Ybg = softClamp(bgY);
+
+    // Déterminer la polarité et calculer Sapc
+    let Sapc = 0;
+
+    if (Ybg > Ytxt) {
+      // Normal polarity (dark text on light background)
+      Sapc = (Math.pow(Ybg, Nbg) - Math.pow(Ytxt, Ntx)) * Wscale;
+    } else {
+      // Reverse polarity (light text on dark background)
+      Sapc = (Math.pow(Ybg, Rbg) - Math.pow(Ytxt, Rtx)) * Wscale;
+    }
+
+    // Clamp minimum contrast et offset final
+    let Lc = 0;
+    if (Math.abs(Sapc) < Wclamp) {
+      Lc = 0.0;
+    } else if (Sapc > 0) {
+      Lc = (Sapc - Woffset) * 100.0;
+    } else {
+      Lc = (Sapc + Woffset) * 100.0;
+    }
+
+    return parseFloat(Lc.toFixed(1));
+
+    return parseFloat(result.toFixed(1));
   } catch (e) {
     return 0;
+  }
+}
+
+/**
+ * Met à jour les indicateurs visuels dans le guide des seuils
+ */
+function updateThresholdIndicators() {
+  const contrastRatioElement = wcagDisplay.querySelector(".contrast-ratio");
+  const apcaRatioElement = apcaDisplay.querySelector(".contrast-ratio");
+
+  if (contrastRatioElement) {
+    const wcagRatio = parseFloat(contrastRatioElement.textContent);
+
+    // Met à jour les indicateurs WCAG2
+    const wcagIndicators = document.querySelectorAll(
+      ".guide-content--wcag .threshold-indicator"
+    );
+    wcagIndicators.forEach((indicator) => {
+      const threshold = parseFloat(indicator.dataset.threshold);
+      const isPassed = wcagRatio >= threshold;
+
+      indicator.textContent = isPassed ? "✅" : "❌";
+      indicator.dataset.passed = isPassed.toString();
+    });
+  }
+
+  if (apcaRatioElement) {
+    const apcaValue = parseFloat(apcaRatioElement.textContent);
+
+    // Met à jour les indicateurs APCA
+    const apcaIndicators = document.querySelectorAll(
+      ".guide-content--apca .threshold-indicator"
+    );
+    apcaIndicators.forEach((indicator) => {
+      const threshold = parseFloat(indicator.dataset.threshold);
+
+      // Pour APCA, seule la valeur absolue compte
+      const isPassed = Math.abs(apcaValue) >= threshold;
+
+      indicator.textContent = isPassed ? "✅" : "❌";
+      indicator.dataset.passed = isPassed.toString();
+    });
   }
 }
 
@@ -287,24 +293,28 @@ function updateOKLCHValues() {
     const hexDisplayContainerInBox = boxBodyHexHalf
       ? boxBodyHexHalf.querySelector(".box-color-value")
       : null;
-    const hexCodeSpanInBox = hexDisplayContainerInBox
-      ? hexDisplayContainerInBox.querySelector(".hex-code")
-      : null;
-    const gamutWarningSpanInBox = hexDisplayContainerInBox
-      ? hexDisplayContainerInBox.querySelector(".gamut-warning-inline")
-      : null;
 
-    const contrastRatioElement = document.querySelector(".contrast-value");
-    const apcaContrastDisplay = document.querySelector(
-      ".contrast-display--apca .contrast-value"
-    );
+    const contrastRatioElement = wcagDisplay.querySelector(".contrast-value");
+    const apcaContrastDisplay = apcaDisplay.querySelector(".contrast-value");
 
-    if (
-      oklchBgColorString &&
-      oklchBgColorString !== "rgba(0, 0, 0, 0)" &&
-      oklchBgColorString !== "transparent"
-    ) {
-      const oklchDisplayValue = formatToOKLCHDisplay(oklchBgColorString);
+    if (textColor && oklchBgColorString) {
+      const oklchRegex =
+        /oklch\(\s*([\d.%]+)\s+([\d.%]+)\s+([\d.]+)\s*(?:\/\s*([\d.%]+))?\s*\)/i;
+      const oklchDisplayValue = oklchBgColorString.replace(
+        oklchRegex,
+        (match, l, c, h, alpha) => {
+          const lightness = l.includes("%")
+            ? l
+            : `${(parseFloat(l) * 100).toFixed(0)}%`;
+          const chroma = c.includes("%")
+            ? `${parseFloat(c.replace("%", "")).toFixed(0)}%`
+            : `${parseFloat(c).toFixed(3)}`;
+          const hue = `${parseFloat(h).toFixed(0)}°`;
+
+          return `${lightness} ${chroma} ${hue}`;
+        }
+      );
+
       const hexEquivalentColor = toHex(oklchBgColorString);
 
       if (boxBodyOklchHalf) {
@@ -337,57 +347,68 @@ function updateOKLCHValues() {
               }
             }
 
-            if (lComponent !== originalLComponent) {
-              colorStringToParse = `oklch(${lComponent} ${cComponent} ${hComponent}${
-                alphaComponent !== undefined ? ` / ${alphaComponent}` : ""
-              })`;
-            }
+            colorStringToParse = `oklch(${lComponent} ${cComponent} ${hComponent}${
+              alphaComponent ? ` / ${alphaComponent}` : ""
+            })`;
           }
         }
-        const colorObj = new Color(colorStringToParse);
-        currentBoxColorOutOfGamut = !colorObj.inGamut("srgb");
-        if (currentBoxColorOutOfGamut) {
-          gamutWarningText = " (couleur sRGB la plus proche)";
+
+        const oklchColorObj = new Color(colorStringToParse);
+        const isInGamut = oklchColorObj.inGamut("srgb");
+        currentBoxColorOutOfGamut = !isInGamut;
+
+        if (!isInGamut) {
+          const clampedColor = oklchColorObj
+            .clone()
+            .toGamut({ method: "clip" });
+          const clampedColorString = clampedColor.toString();
+          hexDisplayValue = toHex(clampedColorString);
+          gamutWarningText = " (sRGB la plus proche)";
         }
       } catch (e) {
+        // Use the fallback hex color if there's an error
         currentBoxColorOutOfGamut = true;
-        gamutWarningText = " (couleur sRGB la plus proche)";
+        gamutWarningText = " (sRGB la plus proche)";
       }
 
       if (boxBodyHexHalf) {
-        boxBodyHexHalf.style.backgroundColor = hexEquivalentColor;
-        if (hexCodeSpanInBox) hexCodeSpanInBox.textContent = hexDisplayValue;
-        if (gamutWarningSpanInBox)
-          gamutWarningSpanInBox.textContent = gamutWarningText;
-      }
+        boxBodyHexHalf.style.backgroundColor = hexDisplayValue;
+        if (hexDisplayContainerInBox) {
+          const upperCaseHex = hexDisplayValue.toUpperCase();
+          hexDisplayContainerInBox.innerHTML = upperCaseHex;
 
-      if (oklchValueInBox) {
-        oklchValueInBox.style.color = textColor;
-      }
-      if (hexCodeSpanInBox) {
-        hexCodeSpanInBox.style.color = textColor;
-      }
-      if (gamutWarningSpanInBox) {
-        gamutWarningSpanInBox.style.color = textColor;
-      }
-
-      const wcagContainer = contrastRatioElement
-        ? contrastRatioElement.parentElement
-        : null;
-
-      const wcagContrast = getContrastRatio(hexEquivalentColor, textColor);
-      if (contrastRatioElement) {
-        const wcagRatioSpan =
-          contrastRatioElement.querySelector(".contrast-ratio");
-        if (isNaN(wcagContrast) || typeof wcagContrast !== "number") {
-          if (wcagRatioSpan) {
-            wcagRatioSpan.textContent = "N/A";
+          if (gamutWarningText) {
+            let gamutWarningElement =
+              hexDisplayContainerInBox.querySelector(".gamut-warning");
+            if (!gamutWarningElement) {
+              gamutWarningElement = document.createElement("span");
+              gamutWarningElement.classList.add("gamut-warning");
+              hexDisplayContainerInBox.appendChild(gamutWarningElement);
+            }
+            gamutWarningElement.textContent = gamutWarningText;
           } else {
-            contrastRatioElement.innerHTML =
-              '<span class="visually-hidden">Contraste WCAG2 : </span><span class="contrast-ratio">N/A</span>';
+            const existingWarning =
+              hexDisplayContainerInBox.querySelector(".gamut-warning");
+            if (existingWarning) {
+              existingWarning.remove();
+            }
           }
-          contrastRatioElement.style.color = "var(--on-surface)";
-        } else {
+        }
+      }
+
+      try {
+        // Utiliser les vraies couleurs pour les calculs de contraste
+        const realTextColor = textColor.startsWith("#")
+          ? textColor
+          : toHex(textColor);
+        const realBgColor = toHex(oklchBgColorString);
+
+        const wcagContrast = getContrastRatio(realTextColor, realBgColor);
+        const apcaContrast = getAPCAContrast(realTextColor, realBgColor);
+
+        if (contrastRatioElement) {
+          const wcagRatioSpan =
+            contrastRatioElement.querySelector(".contrast-ratio");
           if (wcagRatioSpan) {
             wcagRatioSpan.textContent = wcagContrast.toFixed(2);
           } else {
@@ -395,57 +416,90 @@ function updateOKLCHValues() {
               2
             )}</span>`;
           }
+
+          const level =
+            wcagContrast >= 7
+              ? "AAA"
+              : wcagContrast >= 4.5
+              ? "AA"
+              : wcagContrast >= 3
+              ? "AA Large"
+              : "Échec";
+          contrastRatioElement.dataset.level = level;
+
+          let color;
           if (wcagContrast >= 4.5) {
-            contrastRatioElement.style.color = "var(--success)";
+            color = "var(--success)";
+          } else if (wcagContrast >= 3) {
+            color = "var(--warning)";
           } else {
-            contrastRatioElement.style.color = "var(--error)";
+            color = "var(--error)";
           }
-        }
-      }
+          contrastRatioElement.style.color = color;
 
-      const apcaLc = getAPCAContrast(textColor, hexEquivalentColor);
-      if (apcaContrastDisplay) {
-        const apcaValueSpan =
-          apcaContrastDisplay.querySelector(".contrast-ratio");
-        if (apcaLc === null || isNaN(apcaLc)) {
-          if (apcaValueSpan) apcaValueSpan.textContent = "N/A";
-          else
-            apcaContrastDisplay.innerHTML =
-              '<span class="visually-hidden">APCA Lc : </span><span class="contrast-ratio">N/A</span>';
-        } else {
-          if (apcaValueSpan) apcaValueSpan.textContent = apcaLc.toFixed(2);
-          else
-            apcaContrastDisplay.innerHTML = `<span class="visually-hidden">APCA Lc : </span><span class="contrast-ratio">${apcaLc.toFixed(
-              2
-            )}</span>`;
-        }
-      }
+          // Utiliser le conteneur d'avertissement existant
+          const wcagWarningContainer =
+            document.getElementById("wcag-gamut-warning");
+          const shouldShowWcagWarning = currentBoxColorOutOfGamut;
 
-      if (wcagContainer) {
-        let wcagWarningElement = wcagContainer.querySelector(
-          ".wcag-gamut-warning"
-        );
-        const shouldShowWcagWarning = currentBoxColorOutOfGamut;
-
-        if (shouldShowWcagWarning) {
-          if (!wcagWarningElement) {
-            wcagWarningElement = document.createElement("span");
-            wcagWarningElement.classList.add("wcag-gamut-warning");
-            if (contrastRatioElement.nextSibling) {
-              wcagContainer.insertBefore(
-                wcagWarningElement,
-                contrastRatioElement.nextSibling
-              );
-            } else {
-              wcagContainer.appendChild(wcagWarningElement);
+          if (shouldShowWcagWarning) {
+            if (wcagWarningContainer) {
+              wcagWarningContainer.textContent =
+                " (ratio basé sur la couleur sRGB la plus proche)";
+            }
+          } else {
+            if (wcagWarningContainer) {
+              wcagWarningContainer.textContent = "";
             }
           }
-          wcagWarningElement.textContent =
-            " (ratio basé sur la couleur sRGB la plus proche)";
-        } else {
-          if (wcagWarningElement) {
-            wcagWarningElement.remove();
+        }
+
+        if (apcaContrastDisplay) {
+          const apcaValueSpan =
+            apcaContrastDisplay.querySelector(".contrast-ratio");
+          if (apcaValueSpan) {
+            apcaValueSpan.textContent =
+              apcaContrast >= 0
+                ? `+${apcaContrast.toFixed(1)}`
+                : apcaContrast.toFixed(1);
+          } else {
+            apcaContrastDisplay.innerHTML = `<span class="visually-hidden">APCA Lc : </span><span class="contrast-ratio">${
+              apcaContrast >= 0
+                ? `+${apcaContrast.toFixed(1)}`
+                : apcaContrast.toFixed(1)
+            }</span>`;
           }
+
+          const absValue = Math.abs(apcaContrast);
+          let color;
+          if (absValue >= 75) {
+            color = "var(--success)";
+          } else if (absValue >= 60) {
+            color = "var(--warning)";
+          } else {
+            color = "var(--error)";
+          }
+          apcaContrastDisplay.style.color = color;
+        }
+      } catch (error) {
+        if (contrastRatioElement) {
+          const wcagRatioSpan =
+            contrastRatioElement.querySelector(".contrast-ratio");
+          if (wcagRatioSpan) {
+            wcagRatioSpan.textContent = "0.00";
+          } else {
+            contrastRatioElement.innerHTML =
+              '<span class="visually-hidden">Contraste WCAG2 : </span><span class="contrast-ratio">0.00</span>';
+          }
+          contrastRatioElement.style.color = "var(--error)";
+        }
+        if (apcaContrastDisplay) {
+          const apcaValueSpan =
+            apcaContrastDisplay.querySelector(".contrast-ratio");
+          if (apcaValueSpan) apcaValueSpan.textContent = "0.00";
+          else
+            apcaContrastDisplay.innerHTML =
+              '<span class="visually-hidden">APCA Lc : </span><span class="contrast-ratio">0.00</span>';
         }
       }
     } else {
@@ -470,6 +524,9 @@ function updateOKLCHValues() {
       }
     }
   }
+
+  // Met à jour les indicateurs de seuil dans le guide
+  updateThresholdIndicators();
 }
 
 function updateColor(value, isPrimaryColor = true) {
@@ -478,12 +535,26 @@ function updateColor(value, isPrimaryColor = true) {
   }
 
   if (isPrimaryColor) {
+    // Mettre à jour la couleur directement ET les variables slider
     root.style.setProperty("--color-variant", value);
     if (colorText) colorText.value = value;
+
     try {
       const colorObj = new Color(value);
       const inGamut = colorObj.inGamut("srgb");
       root.dataset.primaryColorOutOfGamut = String(!inGamut);
+
+      // Convertir en OKLCH et mettre à jour les variables slider
+      const oklch = colorObj.to("oklch");
+      root.style.setProperty(
+        "--slider-l",
+        Math.max(0, Math.min(1, oklch.coords[0])).toString()
+      );
+      root.style.setProperty(
+        "--slider-c",
+        Math.max(0, oklch.coords[1] || 0).toString()
+      );
+      root.style.setProperty("--slider-h", (oklch.coords[2] || 0).toString());
     } catch (e) {
       root.dataset.primaryColorOutOfGamut = "true";
     }
@@ -507,140 +578,120 @@ if (textColorPicker) {
   });
 }
 
+// Initialize slider displays with current color values
+function initializeSliderDisplays() {
+  updateSliderFromCSS("--slider-l", lSlider, lValueDisplay);
+  updateSliderFromCSS("--slider-c", cSlider, cValueDisplay);
+  updateSliderFromCSS("--slider-h", hSlider, hValueDisplay);
+}
+
 if (colorText) {
-  colorText.addEventListener("change", (e) => {
+  colorText.addEventListener("input", (e) => {
     updateColor(e.target.value, true);
   });
 }
 
 if (textColorText) {
-  textColorText.addEventListener("change", (e) => {
+  textColorText.addEventListener("input", (e) => {
     updateColor(e.target.value, false);
   });
 }
 
-updateOKLCHValues();
+function updateSliderFromCSS(cssVarName, slider, valueDisplay) {
+  if (!slider) return;
 
-initializeSliderDisplays();
-
-[lSlider, cSlider, hSlider].forEach((slider) => {
-  if (slider) {
-    slider.addEventListener("input", (e) => {
-      const l = lSlider.value / 100;
-      const c = cSlider.value;
-      const h = hSlider.value;
-
-      if (lValueDisplay)
-        lValueDisplay.textContent = `${Math.round(lSlider.value)}%`;
-      if (cValueDisplay)
-        cValueDisplay.textContent = parseFloat(cSlider.value).toFixed(4);
-      if (hValueDisplay)
-        hValueDisplay.textContent = parseFloat(hSlider.value).toFixed(4);
-
-      const oklchColor = `oklch(${l} ${c} ${h})`;
-
-      root.style.setProperty("--color-variant", oklchColor);
-      updateOKLCHValues();
-    });
-  }
-});
-
-function initializeSliderDisplays() {
-  const initialPrimaryColor = getComputedStyle(root)
-    .getPropertyValue("--color-variant")
+  const computedValue = getComputedStyle(root)
+    .getPropertyValue(cssVarName)
     .trim();
 
-  root.style.setProperty("--color-variant", initialPrimaryColor);
-
-  if (
-    lSlider &&
-    cSlider &&
-    hSlider &&
-    lValueDisplay &&
-    cValueDisplay &&
-    hValueDisplay
-  ) {
-    try {
-      const formattedPrimaryOKLCHString =
-        formatToOKLCHDisplay(initialPrimaryColor);
-
-      const matches = formattedPrimaryOKLCHString.match(oklchRegex);
-      if (matches) {
-        let [, l_str_from_format, c_str_from_format, h_str_from_format] =
-          matches;
-
-        const l_slider_val = parseFloat(l_str_from_format.replace("%", ""));
-        const c_slider_val = parseFloat(c_str_from_format);
-        const h_slider_val = parseFloat(h_str_from_format);
-
-        lSlider.value = l_slider_val.toFixed(0);
-        cSlider.value = c_slider_val.toFixed(4);
-        hSlider.value = h_slider_val.toFixed(4);
-
-        lValueDisplay.textContent = `${Math.round(l_slider_val)}%`;
-        cValueDisplay.textContent = c_slider_val.toFixed(4);
-        hValueDisplay.textContent = h_slider_val.toFixed(4);
-
-        root.style.setProperty("--slider-l", (l_slider_val / 100).toString());
-        root.style.setProperty("--slider-c", c_slider_val.toString());
-        root.style.setProperty("--slider-h", h_slider_val.toString());
-      } else {
-        const oklchValues = getOKLCHValuesFromColor(initialPrimaryColor);
-        if (oklchValues) {
-          const l_val = oklchValues.l * 100;
-          lSlider.value = l_val.toFixed(0);
-          cSlider.value = oklchValues.c.toFixed(4);
-          hSlider.value = oklchValues.h.toFixed(4);
-          lValueDisplay.textContent = `${Math.round(l_val)}%`;
-          cValueDisplay.textContent = oklchValues.c.toFixed(4);
-          hValueDisplay.textContent = oklchValues.h.toFixed(4);
-          root.style.setProperty("--slider-l", oklchValues.l.toString());
-          root.style.setProperty("--slider-c", oklchValues.c.toString());
-          root.style.setProperty("--slider-h", oklchValues.h.toString());
-        }
-      }
-    } catch (e) {
-      lSlider.value = 75;
-      cSlider.value = 0.1;
-      hSlider.value = 180;
-      lValueDisplay.textContent = "75%";
-      cValueDisplay.textContent = "0.1000";
-      hValueDisplay.textContent = "180.0000";
-      root.style.setProperty("--slider-l", "0.75");
-      root.style.setProperty("--slider-c", "0.1");
-      root.style.setProperty("--slider-h", "180");
-    }
+  if (cssVarName === "--slider-l") {
+    let lightness = parseFloat(computedValue) * 100; // Convert from 0-1 to 0-100
+    if (isNaN(lightness)) lightness = 75;
+    lightness = Math.round(lightness); // Arrondir à l'entier
+    slider.value = lightness;
+    if (valueDisplay) valueDisplay.textContent = `${lightness}%`;
+  } else if (cssVarName === "--slider-c") {
+    let chroma = parseFloat(computedValue);
+    if (isNaN(chroma)) chroma = 0.1;
+    slider.value = chroma;
+    if (valueDisplay) valueDisplay.textContent = chroma.toFixed(3);
+  } else if (cssVarName === "--slider-h") {
+    let hue = parseFloat(computedValue);
+    if (isNaN(hue)) hue = 180;
+    hue = Math.round(hue); // Arrondir à l'entier
+    slider.value = hue;
+    if (valueDisplay) valueDisplay.textContent = `${hue}°`;
   }
-
-  updateOKLCHValues();
 }
 
-function initializeApp() {
-  const initialPrimaryColor = getComputedStyle(root)
-    .getPropertyValue("--color-variant")
-    .trim();
-  const initialTextColor = getComputedStyle(root)
-    .getPropertyValue("--color-text-user")
-    .trim();
+if (lSlider) {
+  lSlider.addEventListener("input", () => {
+    const value = lSlider.value;
+    root.style.setProperty("--slider-l", (value / 100).toString()); // Convert from 0-100 to 0-1
+    if (lValueDisplay) lValueDisplay.textContent = `${value}%`;
+    updateOKLCHValues();
+  });
+}
 
-  if (initialPrimaryColor && isValidColor(initialPrimaryColor)) {
-    if (colorPicker) colorPicker.value = toHex(initialPrimaryColor);
-    if (colorText) colorText.value = initialPrimaryColor;
-    try {
-      const colorObj = new Color(initialPrimaryColor);
-      root.dataset.primaryColorOutOfGamut = String(!colorObj.inGamut("srgb"));
-    } catch (e) {
-      root.dataset.primaryColorOutOfGamut = "true";
-    }
+if (cSlider) {
+  cSlider.addEventListener("input", () => {
+    const value = cSlider.value;
+    root.style.setProperty("--slider-c", value);
+    if (cValueDisplay) cValueDisplay.textContent = parseFloat(value).toFixed(3);
+    updateOKLCHValues();
+  });
+}
+
+if (hSlider) {
+  hSlider.addEventListener("input", () => {
+    const value = hSlider.value;
+    root.style.setProperty("--slider-h", value);
+    if (hValueDisplay) hValueDisplay.textContent = `${value}°`;
+    updateOKLCHValues();
+  });
+}
+
+// Initialize the page
+function initializePage() {
+  // Set initial colors from HTML default values
+  const initialBgColor = colorPicker ? colorPicker.value : "#ff69b4";
+  const initialTextColor = textColorPicker ? textColorPicker.value : "#ffffff";
+
+  // Set the CSS variables
+  root.style.setProperty("--color-text-user", initialTextColor);
+
+  // Convert initial color to OKLCH and set slider values
+  try {
+    const colorObj = new Color(initialBgColor);
+    const oklch = colorObj.to("oklch");
+
+    // Set slider variables
+    root.style.setProperty(
+      "--slider-l",
+      Math.max(0, Math.min(1, oklch.coords[0])).toString()
+    );
+    root.style.setProperty(
+      "--slider-c",
+      Math.max(0, oklch.coords[1] || 0).toString()
+    );
+    root.style.setProperty("--slider-h", (oklch.coords[2] || 0).toString());
+
+    // Set gamut info
+    const inGamut = colorObj.inGamut("srgb");
+    root.dataset.primaryColorOutOfGamut = String(!inGamut);
+  } catch (e) {
+    // Fallback values
+    root.style.setProperty("--slider-l", "0.75");
+    root.style.setProperty("--slider-c", "0.1");
+    root.style.setProperty("--slider-h", "180");
+    root.dataset.primaryColorOutOfGamut = "false";
   }
 
-  if (initialTextColor && isValidColor(initialTextColor)) {
-    if (textColorPicker) textColorPicker.value = toHex(initialTextColor);
-    if (textColorText) textColorText.value = initialTextColor;
-  }
-
+  // Initialize slider displays
   initializeSliderDisplays();
+
+  // Update everything
   updateOKLCHValues();
 }
 
-document.addEventListener("DOMContentLoaded", initializeApp);
+initializePage();
