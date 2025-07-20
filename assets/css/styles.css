@@ -17,13 +17,27 @@
   --layer: var(--layer-2); /* Utilise le token layer-2 */
 }
 
-/* Sections principales */
-.color-controls,
-.color-display,
-.oklch-controls,
-.contrast-section {
-  margin-bottom: var(--spacing-l);
+/* Généralités */
+
+/* Main */
+.app {
+  display: grid;
+
+  @media (width >= 64rem) {
+    grid-template-columns: 3fr 2fr;
+    gap: var(--spacing-l);
+    align-content: start;
+    align-items: start;
+  }
 }
+
+.controls-group {
+  display: grid;
+  align-content: start;
+  gap: var(--spacing-m);
+}
+
+/* fonctionnalités principales */
 
 .oklch-controls .lch-sliders-group {
   margin-top: 0;
@@ -172,7 +186,6 @@ a:focus {
 .box-group {
   display: grid;
   gap: var(--spacing-m);
-  margin-top: var(--spacing-l);
 }
 
 .box {
@@ -291,7 +304,6 @@ a:focus {
 
 .contrast-guide {
   padding: var(--spacing-l);
-  margin-top: var(--spacing-l);
   background: var(--layer);
   border-radius: var(--form-control-border-radius);
 }
@@ -406,18 +418,16 @@ a:focus {
 }
 
 .color-example {
-  margin-block: var(--spacing-l);
-  padding: var(--spacing-l);
+  padding: var(--spacing-m);
   background: var(--layer);
   border-radius: var(--form-control-border-radius);
 }
 
 .example-content {
+  padding: var(--spacing-m);
   background: var(--ui-background);
   color: var(--ui-foreground);
-  padding: var(--spacing-l);
   border-radius: var(--form-control-border-radius);
-  margin-top: var(--spacing-m);
 }
 
 .example-text-item {
@@ -434,16 +444,20 @@ a:focus {
 .size-indicator {
   display: flex;
   align-items: center;
-  gap: var(--spacing-m);
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--on-surface);
-  background: var(--surface);
-  padding: var(--spacing-m) var(--spacing-m);
+  gap: var(--spacing-8);
+  font-size: var(--text-12);
+  background: var(--contrast);
+  color: var(--on-contrast);
+  padding: var(--spacing-4);
   white-space: nowrap;
   flex-shrink: 0;
-  min-width: 4rem;
   justify-content: center;
+  border-radius: var(--form-control-border-radius);
+
+  @media (width >= 64rem) {
+    position: absolute;
+    translate: -120% 0;
+  }
 }
 
 .threshold-status {

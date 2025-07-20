@@ -72,305 +72,311 @@
     </header>
 
     <main class="app">
-      <!-- Contrôles de sélection des couleurs -->
-      <section class="color-controls" aria-labelledby="color-controls-title">
-        <h2 id="color-controls-title" class="visually-hidden">
-          Sélection des couleurs
-        </h2>
-        <form class="controls" id="controls">
-          <!-- Contrôles de couleurs avec double saisie (sélecteur de couleur + texte) -->
-          <div class="control-group color-pickers-group">
-            <div
-              class="control control--color control--color-bg"
-              id="bg-color-control"
-            >
-              <label for="backgroundColorPicker">Couleur d'arrière-plan</label>
-              <div class="color-inputs">
-                <input
-                  type="color"
-                  id="backgroundColorPicker"
-                  name="backgroundColorPicker"
-                  value="#ff69b4"
-                />
-                <input
-                  type="text"
-                  id="backgroundColorText"
-                  name="backgroundColorText"
-                  value="#ff69b4"
-                />
-              </div>
-            </div>
-
-            <!-- Bouton de swap des couleurs -->
-            <button
-              type="button"
-              class="color-swap-button"
-              id="swapColorsButton"
-              title="Inverser les couleurs"
-              aria-label="Inverser couleur d'arrière-plan et couleur de texte"
-            >
-              ⇄
-            </button>
-
-            <div
-              class="control control--color control--color-text"
-              id="text-color-control"
-            >
-              <label for="foregroundColorPicker">Couleur de texte</label>
-              <div class="color-inputs">
-                <input
-                  type="color"
-                  id="foregroundColorPicker"
-                  name="foregroundColorPicker"
-                  value="#ffffff"
-                />
-                <input
-                  type="text"
-                  id="foregroundColorText"
-                  name="foregroundColorText"
-                  value="#ffffff"
-                />
-              </div>
-            </div>
-          </div>
-        </form>
-      </section>
-
-      <!-- Affichage de la couleur sélectionnée -->
-      <section class="color-display" aria-labelledby="color-display-title">
-        <h2 id="color-display-title" class="visually-hidden">
-          Couleur sélectionnée
-        </h2>
-        <div class="box-group">
-          <!-- Affichage des couleurs -->
-          <div class="box box-user">
-            <div class="box-body">
-              <div class="box-half box-oklch">
-                <span class="box-color-value">oklch(0% 0 0)</span>
-              </div>
-              <div class="box-half box-hex">
-                <span class="box-color-value">
-                  <span class="hex-code">#000000</span>
-                  <span class="gamut-warning-inline"></span>
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Contrôles OKLCH -->
-      <section class="oklch-controls" aria-labelledby="oklch-controls-title">
-        <h2 class="visually-hidden">Contrôles OKLCH</h2>
-        <div class="control-group lch-sliders-group">
-          <!-- Luminosity : modifie le composant L -->
-          <div class="control control--lumi">
-            <label for="lumi">Luminosity</label>
-            <div class="range-wrapper">
-              <input
-                class="range"
-                type="range"
-                id="lumi"
-                name="lumi"
-                min="0"
-                max="100"
-                step="0.01"
-                value="75"
-              />
-              <output class="range-value" for="lumi">75%</output>
-            </div>
-          </div>
-
-          <!-- Chroma : modifie le composant C -->
-          <div class="control control--chroma">
-            <label for="chroma">Chroma</label>
-            <div class="range-wrapper">
-              <input
-                class="range"
-                type="range"
-                id="chroma"
-                name="chroma"
-                min="0"
-                max="0.4"
-                step="0.0001"
-                value="0.1"
-              />
-              <output class="range-value" for="chroma">0.1</output>
-            </div>
-          </div>
-
-          <!-- Hue : modifie le composant H -->
-          <div class="control control--hue">
-            <label for="hue">Hue</label>
-            <div class="range-wrapper">
-              <input
-                class="range"
-                type="range"
-                id="hue"
-                name="hue"
-                min="0"
-                max="360"
-                step="0.01"
-                value="180"
-              />
-              <output class="range-value" for="hue">180</output>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Informations de contraste -->
-      <section
-        class="contrast-section"
-        aria-labelledby="contrast-section-title"
-      >
-        <h2 id="contrast-section-title" class="visually-hidden">
-          Informations de contraste
-        </h2>
-        <div class="contrast-info">
-          <!-- Affichage WCAG2 (par défaut) -->
-          <div class="contrast-display contrast-display--wcag">
-            <p class="contrast-value" id="wcag-contrast-value">
-              <span class="visually-hidden">Contraste WCAG2 : </span
-              ><span class="contrast-ratio">0.00</span>
-            </p>
-            <!-- L'avertissement de gamme pour WCAG sera inséré ici par JS -->
-            <div class="contrast-warning" id="wcag-gamut-warning"></div>
-          </div>
-
-          <!-- Affichage APCA (masqué par défaut) -->
-          <div
-            class="contrast-display contrast-display--apca"
-            style="display: none"
-          >
-            <p class="contrast-value" id="apca-contrast-value">
-              <span class="visually-hidden">APCA Lc : </span
-              ><span class="contrast-ratio">0.00</span>
-            </p>
-          </div>
-
-          <!-- Switcher pour choisir le type de contraste -->
-          <div class="contrast-switcher">
-            <span class="switcher-label-left">WCAG2</span>
-            <input
-              type="checkbox"
-              role="switch"
-              id="switch_contrast"
-              name="switch_contrast"
-              aria-describedby="switch_help"
-            />
-            <label for="switch_contrast" class="visually-hidden"
-              >Basculer entre WCAG2 et APCA</label
-            >
-            <span class="switcher-label-right">APCA Lc</span>
-            <div id="switch_help" class="visually-hidden">
-              Basculer entre WCAG2 et APCA
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Guide des seuils de contraste -->
-      <section class="contrast-guide" aria-labelledby="contrast-guide-title">
-        <!-- Guide WCAG2 (visible par défaut) -->
-        <div class="guide-content guide-content--wcag">
-          <h2>
-            <abbr lang="en" title="Web Content Accessibility Guidelines"
-              >WCAG</abbr
-            >
-            2.1 - Ratios de contraste
+      <section class="controls-group">
+        <!-- Contrôles de sélection des couleurs -->
+        <div class="color-controls" aria-labelledby="color-controls-title">
+          <h2 id="color-controls-title" class="visually-hidden">
+            Sélection des couleurs
           </h2>
-          <div class="threshold-grid">
-            <div class="threshold-item">
-              <h3>Texte normal (< 24px ou < 19px gras)</h3>
-              <ul>
-                <li>
-                  <strong>AA :</strong> 4.5:1 minimum
-                  <span class="threshold-indicator" data-threshold="4.5"></span>
-                </li>
-                <li>
-                  <strong>AAA :</strong> 7:1 minimum
-                  <span class="threshold-indicator" data-threshold="7"></span>
-                </li>
-              </ul>
+          <form class="controls" id="controls">
+            <!-- Contrôles de couleurs avec double saisie (sélecteur de couleur + texte) -->
+            <div class="control-group color-pickers-group">
+              <div
+                class="control control--color control--color-bg"
+                id="bg-color-control"
+              >
+                <label for="backgroundColorPicker"
+                  >Couleur d'arrière-plan</label
+                >
+                <div class="color-inputs">
+                  <input
+                    type="color"
+                    id="backgroundColorPicker"
+                    name="backgroundColorPicker"
+                    value="#ff69b4"
+                  />
+                  <input
+                    type="text"
+                    id="backgroundColorText"
+                    name="backgroundColorText"
+                    value="#ff69b4"
+                  />
+                </div>
+              </div>
+
+              <!-- Bouton de swap des couleurs -->
+              <button
+                type="button"
+                class="color-swap-button"
+                id="swapColorsButton"
+                title="Inverser les couleurs"
+                aria-label="Inverser couleur d'arrière-plan et couleur de texte"
+              >
+                ⇄
+              </button>
+
+              <div
+                class="control control--color control--color-text"
+                id="text-color-control"
+              >
+                <label for="foregroundColorPicker">Couleur de texte</label>
+                <div class="color-inputs">
+                  <input
+                    type="color"
+                    id="foregroundColorPicker"
+                    name="foregroundColorPicker"
+                    value="#ffffff"
+                  />
+                  <input
+                    type="text"
+                    id="foregroundColorText"
+                    name="foregroundColorText"
+                    value="#ffffff"
+                  />
+                </div>
+              </div>
             </div>
-            <div class="threshold-item">
-              <h3>Texte large (≥ 24px ou ≥ 19px gras)</h3>
-              <ul>
-                <li>
-                  <strong>AA :</strong> 3:1 minimum
-                  <span class="threshold-indicator" data-threshold="3"></span>
-                </li>
-                <li>
-                  <strong>AAA :</strong> 4.5:1 minimum
-                  <span class="threshold-indicator" data-threshold="4.5"></span>
-                </li>
-              </ul>
-            </div>
-            <div class="threshold-item">
-              <h3>Éléments graphiques</h3>
-              <ul>
-                <li>
-                  <strong>AA :</strong> 3:1 minimum (bordures, icônes)
-                  <span class="threshold-indicator" data-threshold="3"></span>
-                </li>
-              </ul>
+          </form>
+        </div>
+
+        <!-- Affichage de la couleur sélectionnée -->
+        <div class="color-display" aria-labelledby="color-display-title">
+          <h2 id="color-display-title" class="visually-hidden">
+            Couleur sélectionnée
+          </h2>
+          <div class="box-group">
+            <!-- Affichage des couleurs -->
+            <div class="box box-user">
+              <div class="box-body">
+                <div class="box-half box-oklch">
+                  <span class="box-color-value">oklch(0% 0 0)</span>
+                </div>
+                <div class="box-half box-hex">
+                  <span class="box-color-value">
+                    <span class="hex-code">#000000</span>
+                    <span class="gamut-warning-inline"></span>
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Guide APCA (masqué par défaut) -->
-        <div class="guide-content guide-content--apca" style="display: none">
-          <h2>
-            <abbr lang="en" title="Accessible Perceptual Contrast Algorithm"
-              >APCA</abbr
-            >
-            - Contraste perceptuel
+        <!-- Contrôles OKLCH -->
+        <div class="oklch-controls" aria-labelledby="oklch-controls-title">
+          <h2 class="visually-hidden">Contrôles OKLCH</h2>
+          <div class="control-group lch-sliders-group">
+            <!-- Luminosity : modifie le composant L -->
+            <div class="control control--lumi">
+              <label for="lumi">Luminosity</label>
+              <div class="range-wrapper">
+                <input
+                  class="range"
+                  type="range"
+                  id="lumi"
+                  name="lumi"
+                  min="0"
+                  max="100"
+                  step="0.01"
+                  value="75"
+                />
+                <output class="range-value" for="lumi">75%</output>
+              </div>
+            </div>
+
+            <!-- Chroma : modifie le composant C -->
+            <div class="control control--chroma">
+              <label for="chroma">Chroma</label>
+              <div class="range-wrapper">
+                <input
+                  class="range"
+                  type="range"
+                  id="chroma"
+                  name="chroma"
+                  min="0"
+                  max="0.4"
+                  step="0.0001"
+                  value="0.1"
+                />
+                <output class="range-value" for="chroma">0.1</output>
+              </div>
+            </div>
+
+            <!-- Hue : modifie le composant H -->
+            <div class="control control--hue">
+              <label for="hue">Hue</label>
+              <div class="range-wrapper">
+                <input
+                  class="range"
+                  type="range"
+                  id="hue"
+                  name="hue"
+                  min="0"
+                  max="360"
+                  step="0.01"
+                  value="180"
+                />
+                <output class="range-value" for="hue">180</output>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Informations de contraste -->
+        <div class="contrast-section" aria-labelledby="contrast-section-title">
+          <h2 id="contrast-section-title" class="visually-hidden">
+            Informations de contraste
           </h2>
-          <div class="threshold-grid">
-            <div class="threshold-item">
-              <h3>Texte normal</h3>
-              <ul>
-                <li>
-                  <strong>Minimum :</strong> Lc ≥ 75 (ou ≤ -75)
-                  <span
-                    class="threshold-indicator"
-                    data-threshold="75"
-                    data-type="apca"
-                  ></span>
-                </li>
-              </ul>
+          <div class="contrast-info">
+            <!-- Affichage WCAG2 (par défaut) -->
+            <div class="contrast-display contrast-display--wcag">
+              <p class="contrast-value" id="wcag-contrast-value">
+                <span class="visually-hidden">Contraste WCAG2 : </span
+                ><span class="contrast-ratio">0.00</span>
+              </p>
+              <!-- L'avertissement de gamme pour WCAG sera inséré ici par JS -->
+              <div class="contrast-warning" id="wcag-gamut-warning"></div>
             </div>
-            <div class="threshold-item">
-              <h3>Texte moyen (≥ 24px ou ≥ 16px gras)</h3>
-              <ul>
-                <li>
-                  <strong>Minimum :</strong> Lc ≥ 60 (ou ≤ -60)
-                  <span
-                    class="threshold-indicator"
-                    data-threshold="60"
-                    data-type="apca"
-                  ></span>
-                </li>
-              </ul>
+
+            <!-- Affichage APCA (masqué par défaut) -->
+            <div
+              class="contrast-display contrast-display--apca"
+              style="display: none"
+            >
+              <p class="contrast-value" id="apca-contrast-value">
+                <span class="visually-hidden">APCA Lc : </span
+                ><span class="contrast-ratio">0.00</span>
+              </p>
             </div>
-            <div class="threshold-item">
-              <h3>Texte large (≥ 36px ou ≥ 24px gras)</h3>
-              <ul>
-                <li>
-                  <strong>Minimum :</strong> Lc ≥ 45 (ou ≤ -45)
-                  <span
-                    class="threshold-indicator"
-                    data-threshold="45"
-                    data-type="apca"
-                  ></span>
-                </li>
-              </ul>
+
+            <!-- Switcher pour choisir le type de contraste -->
+            <div class="contrast-switcher">
+              <span class="switcher-label-left">WCAG2</span>
+              <input
+                type="checkbox"
+                role="switch"
+                id="switch_contrast"
+                name="switch_contrast"
+                aria-describedby="switch_help"
+              />
+              <label for="switch_contrast" class="visually-hidden"
+                >Basculer entre WCAG2 et APCA</label
+              >
+              <span class="switcher-label-right">APCA Lc</span>
+              <div id="switch_help" class="visually-hidden">
+                Basculer entre WCAG2 et APCA
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Guide des seuils de contraste -->
+        <div class="contrast-guide" aria-labelledby="contrast-guide-title">
+          <!-- Guide WCAG2 (visible par défaut) -->
+          <div class="guide-content guide-content--wcag">
+            <h2>
+              <abbr lang="en" title="Web Content Accessibility Guidelines"
+                >WCAG</abbr
+              >
+              2.1 - Ratios de contraste
+            </h2>
+            <div class="threshold-grid">
+              <div class="threshold-item">
+                <h3>Texte normal (< 24px ou < 19px gras)</h3>
+                <ul>
+                  <li>
+                    <strong>AA :</strong> 4.5:1 minimum
+                    <span
+                      class="threshold-indicator"
+                      data-threshold="4.5"
+                    ></span>
+                  </li>
+                  <li>
+                    <strong>AAA :</strong> 7:1 minimum
+                    <span class="threshold-indicator" data-threshold="7"></span>
+                  </li>
+                </ul>
+              </div>
+              <div class="threshold-item">
+                <h3>Texte large (≥ 24px ou ≥ 19px gras)</h3>
+                <ul>
+                  <li>
+                    <strong>AA :</strong> 3:1 minimum
+                    <span class="threshold-indicator" data-threshold="3"></span>
+                  </li>
+                  <li>
+                    <strong>AAA :</strong> 4.5:1 minimum
+                    <span
+                      class="threshold-indicator"
+                      data-threshold="4.5"
+                    ></span>
+                  </li>
+                </ul>
+              </div>
+              <div class="threshold-item">
+                <h3>Éléments graphiques</h3>
+                <ul>
+                  <li>
+                    <strong>AA :</strong> 3:1 minimum (bordures, icônes)
+                    <span class="threshold-indicator" data-threshold="3"></span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Guide APCA (masqué par défaut) -->
+          <div class="guide-content guide-content--apca" style="display: none">
+            <h2>
+              <abbr lang="en" title="Accessible Perceptual Contrast Algorithm"
+                >APCA</abbr
+              >
+              - Contraste perceptuel
+            </h2>
+            <div class="threshold-grid">
+              <div class="threshold-item">
+                <h3>Texte normal</h3>
+                <ul>
+                  <li>
+                    <strong>Minimum :</strong> Lc ≥ 75 (ou ≤ -75)
+                    <span
+                      class="threshold-indicator"
+                      data-threshold="75"
+                      data-type="apca"
+                    ></span>
+                  </li>
+                </ul>
+              </div>
+              <div class="threshold-item">
+                <h3>Texte moyen (≥ 24px ou ≥ 16px gras)</h3>
+                <ul>
+                  <li>
+                    <strong>Minimum :</strong> Lc ≥ 60 (ou ≤ -60)
+                    <span
+                      class="threshold-indicator"
+                      data-threshold="60"
+                      data-type="apca"
+                    ></span>
+                  </li>
+                </ul>
+              </div>
+              <div class="threshold-item">
+                <h3>Texte large (≥ 36px ou ≥ 24px gras)</h3>
+                <ul>
+                  <li>
+                    <strong>Minimum :</strong> Lc ≥ 45 (ou ≤ -45)
+                    <span
+                      class="threshold-indicator"
+                      data-threshold="45"
+                      data-type="apca"
+                    ></span>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
       </section>
-
       <!-- Exemple d'application des couleurs -->
       <section class="color-example" aria-labelledby="color-example-title">
         <h2 id="color-example-title">
@@ -443,42 +449,42 @@
           </div>
         </div>
       </section>
-
-      <footer class="footer" role="contentinfo">
-        <p>Spätzi est un projet <i>fifoo</i> conçu avec ❤️ par</p>
-        <a class="logo-link" href="https://www.alsacreations.fr/"
-          ><svg
-            role="img"
-            aria-labelledby="title-alsacreations"
-            class="logo-alsacreations"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 241 45"
-            width="241"
-            height="45"
-          >
-            <title id="title-alsacreations">Alsacreations</title>
-            <g class="logo-alsacreations-pepins-group">
-              <path
-                class="logo-alsacreations-pepins-outer"
-                d="M232 18.5c2.2-1.1 3.5-2.4 4-4 .6-1.9-.2-4-2.2-6.2-1.7-2-3.5-2.7-5.3-2.2-1.5.4-2.9 1.7-4.2 3.7-1.1 1.7-2 3.8-2.6 5.9-.6 2.1-.7 3.6-.4 4.5.9.3 2.3.3 4.5 0a14 14 0 0 0 6.2-1.7zm-12-9.1c1.1-2.2 1.4-4 .8-5.5-.7-1.9-2.5-3.1-5.4-3.7-2.5-.6-4.4-.1-5.5 1.4-.9 1.2-1.4 3-1.2 5.5.1 2.1.6 4.2 1.5 6.4.8 2 1.5 3.3 2.3 3.9a20 20 0 0 0 7.5-8zm13.6 24.3c2.4.4 4.2.1 5.5-.9 1.5-1.2 2.1-3.3 1.8-6.3-.2-2.6-1.3-4.1-3-4.8-1.5-.5-3.3-.3-5.6.6-1.9.8-3.8 1.9-5.5 3.3-1.7 1.4-2.7 2.5-2.9 3.5.6.7 1.7 1.6 3.6 2.6 2.1 1.1 4.1 1.8 6.1 2z"
-              ></path>
-              <path
-                class="logo-alsacreations-pepins-inner"
-                d="M214.4 7.8c-.9-.2-1.5 0-1.9.5-.3.4-.5 1.1-.4 1.9.1.7.2 1.5.5 2.2.2.7.6 1.2.8 1.4l1.2-.9c.6-.6 1.1-1.2 1.4-1.8.4-.7.5-1.4.3-1.9-.3-.7-1-1.2-1.9-1.4zm14 6.1c-.6-.7-1.2-.9-1.9-.7-.5.1-1 .6-1.5 1.3-.4.6-.7 1.3-.9 2.1-.2.7-.2 1.2-.1 1.5h1.5c.8-.1 1.5-.3 2.2-.7.7-.4 1.2-.8 1.4-1.4.2-.6 0-1.4-.7-2.1zm4.9 14c-.1-.9-.4-1.5-1.1-1.7-.5-.2-1.2-.1-2 .2-.7.3-1.4.7-1.9 1.2-.6.5-.9.9-1.1 1.2.2.2.6.6 1.3.9.7.4 1.5.6 2.2.7.8.1 1.5 0 1.9-.3.6-.5.9-1.2.7-2.2z"
-              ></path>
-            </g>
-            <path
-              class="logo-alsacreations-alsa"
-              d="m1.5 25.1-.1-.6.1-.6a12.7 12.7 0 0 1 9-2.2c3.8.2 5 2.6 5 6.7v2l-.1 5.3-.1 4s-.1 2.1 1.3 1.9l-.1 2c-.4.6-1.5 1.3-2.9 1.3a4 4 0 0 1-2.8-1.4l-1.1.7c-1.1.6-2.3.7-3.6.7-3.1 0-6.1-2-6.1-6.3 0-5.7 5.3-7.4 8.2-7.7l1.4-.1 1.1.1v-2.3c0-2-.2-3-1.7-3s-3.3.7-4.7 1.2c-.5.2-1.1.4-1.7.4-.8-.9-1-1.7-1.1-2.1zm9.1 12V34h-.5l-1.5.1h.1c-2 .4-3.8 1.3-3.8 4 0 2.2.9 3 2 3h.3c1.2 0 2.7-.6 3.2-1.4l-.1.1.1-.6c.2-.5.2-1.2.2-2.1zm16.2 4.4-.1 2c-.5.7-1.5 1.3-2.9 1.3-.7 0-1.4-.3-1.9-.7a3 3 0 0 1-1.4-2.5v-24l-.1-5.2c.6-1.3 2.3-1.5 4.6-1.5.3 1.1.3 2.2.3 4.6v24.1c.1.1 0 2.2 1.5 1.9zm11.6-19.9c3 .2 4.4 1.5 4.6 2.1 0 .6-.4 1.7-.9 2.4l-.9-.2-1.5-.4c-.7-.3-1.4-.4-2.1-.4-1.7 0-2.7.9-2.7 2.2 0 .7.3 1.4 1.3 2.2l2 1.4 2.7 2c2 1.7 2.9 3.3 2.9 5.3 0 4.5-3.6 6.7-8.2 6.7-3 0-5.7-.9-6.2-2.3 0-.7.4-1.8.9-2.5h.5c.4 0 .9.1 1.4.4v-.1c1 .4 2.2.7 3.3.7l.9-.1c1.4-.1 2.3-1.1 2.3-2.5 0-1.1-.5-1.9-1.8-2.8l-.6-.4c-1.1-.7-2.3-1.7-3.2-2.5l-1.3-.8c-1.5-1.5-2.2-2.9-2.2-4.6 0-3.7 3-5.9 7.5-5.9l1.3.1zm8.9 3.5-.1-.6.1-.6a12.7 12.7 0 0 1 9-2.2c3.8.2 5 2.6 5 6.7v2l-.1 5.3-.1 4s-.1 2.1 1.3 1.9l-.1 2c-.4.6-1.5 1.3-2.9 1.3a4 4 0 0 1-2.8-1.4l-1.1.7c-1.1.6-2.3.7-3.6.7-3.2 0-6.2-2-6.2-6.4 0-5.7 5.3-7.4 8.2-7.7l1.4-.1 1.1.1v-2.3c0-2-.2-3-1.7-3s-3.3.7-4.7 1.2c-.5.2-1.1.4-1.7.4-.8-.8-.9-1.6-1-2zm9.1 12V34h-.5l-1.5.1h.1c-2 .4-3.8 1.3-3.8 4 0 2.2.9 3 2 3h.3c1.2 0 2.7-.6 3.2-1.4l-.1.1.1-.6c.2-.5.2-1.2.2-2.1z"
-            ></path>
-            <path
-              class="logo-alsacreations-creations"
-              d="M80.8 23.6c0 .6-.3 1.7-.7 2.5h-.6a4 4 0 0 1-1.5-.3 7 7 0 0 0-2.5-.6 1 1 0 0 0-.5.1c-2.7.2-4.6 2.7-4.6 8.1 0 6.5 2.7 7.9 5.4 7.9 1.5 0 3.1-.5 4.3-1.1l.4 1.8c-.1.7-.6 1.5-1.2 2-.9.7-2.5 1.1-4.4 1.1-5.2 0-9.8-1.9-9.8-11.4 0-4.9 1.7-8 3.5-9.8a9.8 9.8 0 0 1 6.7-2.3c3-.1 5.3 1.3 5.5 2zm8.3 3.5V42c0 .7-.1 1.3-.5 1.9-.7.6-1.5.6-4.5.6l.1-9.3.1-7.9c0-1.5-.3-2.6-.6-3.5.4-.4 1-.7 2-1.2l.7-.1c1 0 1.4.3 1.7.9.9-.6 1.9-1.1 2.8-1.4.8-.3 1.9-.5 2.7-.4 1.4.1 2.2.6 2.3 1.3 0 .7-.2 2-.9 3l-.7.1-1.4-.1-.6-.1c-1.3.1-2.3.4-3.2 1.3zM113 39.7c.3.9.4 1.9.5 2.3-.1 1-1.6 2-3 2.5h.1c-.7.2-2.2.5-3.6.5-2.3 0-4.8-.4-6.6-2.3-1.7-1.8-2.6-4.8-2.6-8.6 0-9.2 4-12.5 9.3-12.5 4.5 0 6.8 2.7 7.2 6.7l.1 2.3-.2 2.8c-.6.5-2.3 1.1-3.6 1.3-1.5.2-3.8.3-6.1.3h-1.7c.1 4.7 2 6.2 5 6.2 1.6-.2 3.4-.5 5.2-1.5zM106.2 25c-1.7.2-3.3 2.2-3.6 6.4h1.3l4.5-.1.7-.2.2-1.4-.1-.5v-.5c-.2-2.5-1.1-3.7-2.8-3.7h-.2zm11.7.1-.1-.6.1-.6a12.7 12.7 0 0 1 9-2.2c3.8.2 5 2.6 5 6.7v2l-.1 5.3-.1 4s-.1 2.1 1.3 1.9l-.1 2c-.4.6-1.5 1.3-2.9 1.3a4 4 0 0 1-2.8-1.4l-1.1.7c-1.1.6-2.3.7-3.6.7-3.2 0-6.2-2-6.2-6.4 0-5.7 5.3-7.4 8.2-7.7l1.4-.1 1.1.1v-2.3c0-2-.2-3-1.7-3s-3.3.7-4.7 1.2c-.5.2-1.1.4-1.7.4-.7-.8-.9-1.6-1-2zm9.1 12V34h-.5l-1.5.1h.1c-2 .4-3.8 1.3-3.8 4 0 2.2.9 3 2 3h.3c1.2 0 2.7-.6 3.2-1.4l-.1.1.1-.6c.2-.5.2-1.2.2-2.1zm21.6 3.4.1 1.1-.1 1.3c-.1.3-.3.6-.7.9a8.7 8.7 0 0 1-4.4 1.1c-4.7 0-5.6-4.2-5.6-8V25.8a6.3 6.3 0 0 1-2.8-.7c0-1.4.1-1.4.4-1.7.7-.5 1.4-.7 2-.9l.7-.1.2-4.1c.4-1.1 1.6-2 4.5-2.2v.7l-.1 5.3h6c-.1 2.7-.5 3.2-1.5 3.5l-1.2.1-3.3.1-.1 6.1.1 3v2.2c.2 2.5.5 4.2 2 4.2.6.1 2.5-.6 2.8-.9l1 .1zm6.3-29c2.2 0 2.7.9 2.6 2.7-.1 1.8-.6 3-2.8 3-1.9 0-2.7-.9-2.7-2.9 0-1.8 1-2.8 2.9-2.8zm1.9 10.6c.4.7.4 1.4.4 3.4v15.8c0 1.1-.2 1.9-.7 2.6-.3.5-1.1.5-4.4.6v-3.8l.1-4.3v-8.2l-.1-4.8c.6-1.2 2.2-1.3 4.3-1.3h.4zm13.6 22.8c-6 0-9.4-3.5-9.4-11.7 0-8.1 4-11.8 9.5-11.8 6.2 0 9.3 4 9.3 11.5 0 8-4 12-9.4 12zm.1-3.4c2.2 0 4.1-2.1 4.1-8.3 0-5.9-1.7-8.1-4.2-8.1-2.2 0-4.2 2.2-4.2 8 0 6.3 1.8 8.4 4.3 8.4zm18-14.2.1-.1v14.5c0 1.1-.1 1.6-.6 2.3-.7.6-1.2.6-3.3.6h-1.2l.1-9.3v-7.9c0-1.5-.2-2.6-.5-3.5.3-.4.9-.7 2-1.2l.7-.1c.9 0 1.4.4 1.7 1a10 10 0 0 1 5.8-1.9c5.9 0 7 3 7 8.3v7l.1 6.7c-.6.6-1.5.7-4.6.7a4 4 0 0 1-.5-2.1V30c0-3.4-.8-4.6-3.2-4.6-1.4 0-2.7.8-3.6 1.9zm24.7-5.7c3 .2 4.4 1.5 4.6 2.1 0 .6-.4 1.7-.9 2.4l-.9-.2-1.5-.4c-.7-.3-1.4-.4-2.1-.4-1.7 0-2.7.9-2.7 2.2 0 .7.3 1.4 1.3 2.2l2 1.4 2.7 2c2 1.7 2.9 3.3 2.9 5.3 0 4.5-3.6 6.7-8.2 6.7-3 0-5.7-.9-6.2-2.3 0-.7.4-1.8.9-2.5h.5c.4 0 .9.1 1.4.4v-.1c1 .4 2.2.7 3.3.7l.9-.1c1.4-.1 2.3-1.1 2.3-2.5 0-1.1-.5-1.9-1.8-2.8l-.6-.4c-1.1-.7-2.3-1.7-3.2-2.5l-1.2-.9c-1.5-1.5-2.2-2.9-2.2-4.6 0-3.7 3-5.9 7.5-5.9l1.2.2zm-110.1-3.4s.5-3.2 1.9-5.1c1.5-2.1 3.9-3.3 5.5-1.3 1.2 1.4.9 2.9-1.6 4.5-3.1 1.9-5.8 1.9-5.8 1.9z"
-            ></path>
-          </svg>
-        </a>
-      </footer>
     </main>
+
+    <footer class="footer" role="contentinfo">
+      <p>Spätzi est un projet <i>fifoo</i> conçu avec ❤️ par</p>
+      <a class="logo-link" href="https://www.alsacreations.fr/"
+        ><svg
+          role="img"
+          aria-labelledby="title-alsacreations"
+          class="logo-alsacreations"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 241 45"
+          width="241"
+          height="45"
+        >
+          <title id="title-alsacreations">Alsacreations</title>
+          <g class="logo-alsacreations-pepins-group">
+            <path
+              class="logo-alsacreations-pepins-outer"
+              d="M232 18.5c2.2-1.1 3.5-2.4 4-4 .6-1.9-.2-4-2.2-6.2-1.7-2-3.5-2.7-5.3-2.2-1.5.4-2.9 1.7-4.2 3.7-1.1 1.7-2 3.8-2.6 5.9-.6 2.1-.7 3.6-.4 4.5.9.3 2.3.3 4.5 0a14 14 0 0 0 6.2-1.7zm-12-9.1c1.1-2.2 1.4-4 .8-5.5-.7-1.9-2.5-3.1-5.4-3.7-2.5-.6-4.4-.1-5.5 1.4-.9 1.2-1.4 3-1.2 5.5.1 2.1.6 4.2 1.5 6.4.8 2 1.5 3.3 2.3 3.9a20 20 0 0 0 7.5-8zm13.6 24.3c2.4.4 4.2.1 5.5-.9 1.5-1.2 2.1-3.3 1.8-6.3-.2-2.6-1.3-4.1-3-4.8-1.5-.5-3.3-.3-5.6.6-1.9.8-3.8 1.9-5.5 3.3-1.7 1.4-2.7 2.5-2.9 3.5.6.7 1.7 1.6 3.6 2.6 2.1 1.1 4.1 1.8 6.1 2z"
+            ></path>
+            <path
+              class="logo-alsacreations-pepins-inner"
+              d="M214.4 7.8c-.9-.2-1.5 0-1.9.5-.3.4-.5 1.1-.4 1.9.1.7.2 1.5.5 2.2.2.7.6 1.2.8 1.4l1.2-.9c.6-.6 1.1-1.2 1.4-1.8.4-.7.5-1.4.3-1.9-.3-.7-1-1.2-1.9-1.4zm14 6.1c-.6-.7-1.2-.9-1.9-.7-.5.1-1 .6-1.5 1.3-.4.6-.7 1.3-.9 2.1-.2.7-.2 1.2-.1 1.5h1.5c.8-.1 1.5-.3 2.2-.7.7-.4 1.2-.8 1.4-1.4.2-.6 0-1.4-.7-2.1zm4.9 14c-.1-.9-.4-1.5-1.1-1.7-.5-.2-1.2-.1-2 .2-.7.3-1.4.7-1.9 1.2-.6.5-.9.9-1.1 1.2.2.2.6.6 1.3.9.7.4 1.5.6 2.2.7.8.1 1.5 0 1.9-.3.6-.5.9-1.2.7-2.2z"
+            ></path>
+          </g>
+          <path
+            class="logo-alsacreations-alsa"
+            d="m1.5 25.1-.1-.6.1-.6a12.7 12.7 0 0 1 9-2.2c3.8.2 5 2.6 5 6.7v2l-.1 5.3-.1 4s-.1 2.1 1.3 1.9l-.1 2c-.4.6-1.5 1.3-2.9 1.3a4 4 0 0 1-2.8-1.4l-1.1.7c-1.1.6-2.3.7-3.6.7-3.1 0-6.1-2-6.1-6.3 0-5.7 5.3-7.4 8.2-7.7l1.4-.1 1.1.1v-2.3c0-2-.2-3-1.7-3s-3.3.7-4.7 1.2c-.5.2-1.1.4-1.7.4-.8-.9-1-1.7-1.1-2.1zm9.1 12V34h-.5l-1.5.1h.1c-2 .4-3.8 1.3-3.8 4 0 2.2.9 3 2 3h.3c1.2 0 2.7-.6 3.2-1.4l-.1.1.1-.6c.2-.5.2-1.2.2-2.1zm16.2 4.4-.1 2c-.5.7-1.5 1.3-2.9 1.3-.7 0-1.4-.3-1.9-.7a3 3 0 0 1-1.4-2.5v-24l-.1-5.2c.6-1.3 2.3-1.5 4.6-1.5.3 1.1.3 2.2.3 4.6v24.1c.1.1 0 2.2 1.5 1.9zm11.6-19.9c3 .2 4.4 1.5 4.6 2.1 0 .6-.4 1.7-.9 2.4l-.9-.2-1.5-.4c-.7-.3-1.4-.4-2.1-.4-1.7 0-2.7.9-2.7 2.2 0 .7.3 1.4 1.3 2.2l2 1.4 2.7 2c2 1.7 2.9 3.3 2.9 5.3 0 4.5-3.6 6.7-8.2 6.7-3 0-5.7-.9-6.2-2.3 0-.7.4-1.8.9-2.5h.5c.4 0 .9.1 1.4.4v-.1c1 .4 2.2.7 3.3.7l.9-.1c1.4-.1 2.3-1.1 2.3-2.5 0-1.1-.5-1.9-1.8-2.8l-.6-.4c-1.1-.7-2.3-1.7-3.2-2.5l-1.3-.8c-1.5-1.5-2.2-2.9-2.2-4.6 0-3.7 3-5.9 7.5-5.9l1.3.1zm8.9 3.5-.1-.6.1-.6a12.7 12.7 0 0 1 9-2.2c3.8.2 5 2.6 5 6.7v2l-.1 5.3-.1 4s-.1 2.1 1.3 1.9l-.1 2c-.4.6-1.5 1.3-2.9 1.3a4 4 0 0 1-2.8-1.4l-1.1.7c-1.1.6-2.3.7-3.6.7-3.2 0-6.2-2-6.2-6.4 0-5.7 5.3-7.4 8.2-7.7l1.4-.1 1.1.1v-2.3c0-2-.2-3-1.7-3s-3.3.7-4.7 1.2c-.5.2-1.1.4-1.7.4-.8-.8-.9-1.6-1-2zm9.1 12V34h-.5l-1.5.1h.1c-2 .4-3.8 1.3-3.8 4 0 2.2.9 3 2 3h.3c1.2 0 2.7-.6 3.2-1.4l-.1.1.1-.6c.2-.5.2-1.2.2-2.1z"
+          ></path>
+          <path
+            class="logo-alsacreations-creations"
+            d="M80.8 23.6c0 .6-.3 1.7-.7 2.5h-.6a4 4 0 0 1-1.5-.3 7 7 0 0 0-2.5-.6 1 1 0 0 0-.5.1c-2.7.2-4.6 2.7-4.6 8.1 0 6.5 2.7 7.9 5.4 7.9 1.5 0 3.1-.5 4.3-1.1l.4 1.8c-.1.7-.6 1.5-1.2 2-.9.7-2.5 1.1-4.4 1.1-5.2 0-9.8-1.9-9.8-11.4 0-4.9 1.7-8 3.5-9.8a9.8 9.8 0 0 1 6.7-2.3c3-.1 5.3 1.3 5.5 2zm8.3 3.5V42c0 .7-.1 1.3-.5 1.9-.7.6-1.5.6-4.5.6l.1-9.3.1-7.9c0-1.5-.3-2.6-.6-3.5.4-.4 1-.7 2-1.2l.7-.1c1 0 1.4.3 1.7.9.9-.6 1.9-1.1 2.8-1.4.8-.3 1.9-.5 2.7-.4 1.4.1 2.2.6 2.3 1.3 0 .7-.2 2-.9 3l-.7.1-1.4-.1-.6-.1c-1.3.1-2.3.4-3.2 1.3zM113 39.7c.3.9.4 1.9.5 2.3-.1 1-1.6 2-3 2.5h.1c-.7.2-2.2.5-3.6.5-2.3 0-4.8-.4-6.6-2.3-1.7-1.8-2.6-4.8-2.6-8.6 0-9.2 4-12.5 9.3-12.5 4.5 0 6.8 2.7 7.2 6.7l.1 2.3-.2 2.8c-.6.5-2.3 1.1-3.6 1.3-1.5.2-3.8.3-6.1.3h-1.7c.1 4.7 2 6.2 5 6.2 1.6-.2 3.4-.5 5.2-1.5zM106.2 25c-1.7.2-3.3 2.2-3.6 6.4h1.3l4.5-.1.7-.2.2-1.4-.1-.5v-.5c-.2-2.5-1.1-3.7-2.8-3.7h-.2zm11.7.1-.1-.6.1-.6a12.7 12.7 0 0 1 9-2.2c3.8.2 5 2.6 5 6.7v2l-.1 5.3-.1 4s-.1 2.1 1.3 1.9l-.1 2c-.4.6-1.5 1.3-2.9 1.3a4 4 0 0 1-2.8-1.4l-1.1.7c-1.1.6-2.3.7-3.6.7-3.2 0-6.2-2-6.2-6.4 0-5.7 5.3-7.4 8.2-7.7l1.4-.1 1.1.1v-2.3c0-2-.2-3-1.7-3s-3.3.7-4.7 1.2c-.5.2-1.1.4-1.7.4-.7-.8-.9-1.6-1-2zm9.1 12V34h-.5l-1.5.1h.1c-2 .4-3.8 1.3-3.8 4 0 2.2.9 3 2 3h.3c1.2 0 2.7-.6 3.2-1.4l-.1.1.1-.6c.2-.5.2-1.2.2-2.1zm21.6 3.4.1 1.1-.1 1.3c-.1.3-.3.6-.7.9a8.7 8.7 0 0 1-4.4 1.1c-4.7 0-5.6-4.2-5.6-8V25.8a6.3 6.3 0 0 1-2.8-.7c0-1.4.1-1.4.4-1.7.7-.5 1.4-.7 2-.9l.7-.1.2-4.1c.4-1.1 1.6-2 4.5-2.2v.7l-.1 5.3h6c-.1 2.7-.5 3.2-1.5 3.5l-1.2.1-3.3.1-.1 6.1.1 3v2.2c.2 2.5.5 4.2 2 4.2.6.1 2.5-.6 2.8-.9l1 .1zm6.3-29c2.2 0 2.7.9 2.6 2.7-.1 1.8-.6 3-2.8 3-1.9 0-2.7-.9-2.7-2.9 0-1.8 1-2.8 2.9-2.8zm1.9 10.6c.4.7.4 1.4.4 3.4v15.8c0 1.1-.2 1.9-.7 2.6-.3.5-1.1.5-4.4.6v-3.8l.1-4.3v-8.2l-.1-4.8c.6-1.2 2.2-1.3 4.3-1.3h.4zm13.6 22.8c-6 0-9.4-3.5-9.4-11.7 0-8.1 4-11.8 9.5-11.8 6.2 0 9.3 4 9.3 11.5 0 8-4 12-9.4 12zm.1-3.4c2.2 0 4.1-2.1 4.1-8.3 0-5.9-1.7-8.1-4.2-8.1-2.2 0-4.2 2.2-4.2 8 0 6.3 1.8 8.4 4.3 8.4zm18-14.2.1-.1v14.5c0 1.1-.1 1.6-.6 2.3-.7.6-1.2.6-3.3.6h-1.2l.1-9.3v-7.9c0-1.5-.2-2.6-.5-3.5.3-.4.9-.7 2-1.2l.7-.1c.9 0 1.4.4 1.7 1a10 10 0 0 1 5.8-1.9c5.9 0 7 3 7 8.3v7l.1 6.7c-.6.6-1.5.7-4.6.7a4 4 0 0 1-.5-2.1V30c0-3.4-.8-4.6-3.2-4.6-1.4 0-2.7.8-3.6 1.9zm24.7-5.7c3 .2 4.4 1.5 4.6 2.1 0 .6-.4 1.7-.9 2.4l-.9-.2-1.5-.4c-.7-.3-1.4-.4-2.1-.4-1.7 0-2.7.9-2.7 2.2 0 .7.3 1.4 1.3 2.2l2 1.4 2.7 2c2 1.7 2.9 3.3 2.9 5.3 0 4.5-3.6 6.7-8.2 6.7-3 0-5.7-.9-6.2-2.3 0-.7.4-1.8.9-2.5h.5c.4 0 .9.1 1.4.4v-.1c1 .4 2.2.7 3.3.7l.9-.1c1.4-.1 2.3-1.1 2.3-2.5 0-1.1-.5-1.9-1.8-2.8l-.6-.4c-1.1-.7-2.3-1.7-3.2-2.5l-1.2-.9c-1.5-1.5-2.2-2.9-2.2-4.6 0-3.7 3-5.9 7.5-5.9l1.2.2zm-110.1-3.4s.5-3.2 1.9-5.1c1.5-2.1 3.9-3.3 5.5-1.3 1.2 1.4.9 2.9-1.6 4.5-3.1 1.9-5.8 1.9-5.8 1.9z"
+          ></path>
+        </svg>
+      </a>
+    </footer>
 
     <script type="module" src="assets/js/color-contrast.js"></script>
     <script type="module" src="assets/js/theme-switcher.js"></script>
