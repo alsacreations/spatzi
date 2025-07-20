@@ -12,21 +12,9 @@
   /* Variables spécifiques aux composants */
   --width-color-picker: 3rem;
   --size-thumb: 1.5rem;
-  --shadow-sm: 0 0 1rem rgba(0, 0, 0, 0.1);
-
-  /* Radius (complément des tokens) */
-  --radius-sm: 0.25rem;
-  /* --radius-md est défini dans theme.css */
 
   /* Alias pour compatibilité */
   --layer: var(--layer-2); /* Utilise le token layer-2 */
-}
-
-.app {
-  width: min(100% - 2rem, 80rem);
-  margin-inline: auto;
-  padding: 1rem;
-  gap: 2rem;
 }
 
 /* Sections principales */
@@ -79,8 +67,7 @@ a:focus {
   gap: var(--spacing-m);
   padding: var(--spacing-m);
   background: var(--layer);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
+  border-radius: var(--form-control-border-radius);
 }
 
 @media (width > 40rem) {
@@ -194,8 +181,7 @@ a:focus {
   gap: var(--spacing-m);
   padding: var(--spacing-m);
   background: var(--layer);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
+  border-radius: var(--form-control-border-radius);
 }
 
 .contrast-info {
@@ -203,8 +189,7 @@ a:focus {
   gap: var(--spacing-m);
   padding: var(--spacing-m);
   background: var(--layer);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
+  border-radius: var(--form-control-border-radius);
   text-align: center;
 }
 
@@ -213,7 +198,6 @@ a:focus {
   grid-row: 1;
   grid-column: 1 / -1;
   min-height: 6rem;
-  border-radius: var(--radius-sm);
   overflow: hidden;
   @media (width > 40rem) {
     grid-template-columns: 1fr 1fr;
@@ -263,7 +247,6 @@ a:focus {
 
 .color-value {
   display: block;
-  border-radius: var(--radius-sm);
   font-family: monospace;
   font-size: 1rem;
   overflow-wrap: break-word;
@@ -307,13 +290,10 @@ a:focus {
 }
 
 .contrast-guide {
-  width: min(100% - 2rem, 80rem);
-  margin-inline: auto;
   padding: var(--spacing-l);
   margin-top: var(--spacing-l);
   background: var(--layer);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
+  border-radius: var(--form-control-border-radius);
 }
 
 .contrast-guide h2 {
@@ -341,7 +321,6 @@ a:focus {
 .threshold-item {
   padding: var(--spacing-m);
   background: var(--surface);
-  border-radius: var(--radius-sm);
   border-left: 4px solid var(--accent);
 }
 
@@ -430,14 +409,14 @@ a:focus {
   margin-block: var(--spacing-l);
   padding: var(--spacing-l);
   background: var(--layer);
-  border-radius: var(--radius-md);
+  border-radius: var(--form-control-border-radius);
 }
 
 .example-content {
   background: var(--ui-background);
   color: var(--ui-foreground);
   padding: var(--spacing-l);
-  border-radius: var(--radius-md);
+  border-radius: var(--form-control-border-radius);
   margin-top: var(--spacing-m);
 }
 
@@ -461,7 +440,6 @@ a:focus {
   color: var(--on-surface);
   background: var(--surface);
   padding: var(--spacing-m) var(--spacing-m);
-  border-radius: var(--radius-sm);
   white-space: nowrap;
   flex-shrink: 0;
   min-width: 4rem;
