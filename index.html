@@ -30,72 +30,97 @@
         </div>
       </header>
 
-      <!-- Panneau de contrôle -->
-      <form class="controls" id="controls">
-        <!-- Contrôles de couleurs avec double saisie (sélecteur de couleur + texte) -->
-        <div class="control-group color-pickers-group">
-          <div
-            class="control control--color control--color-bg"
-            id="bg-color-control"
-          >
-            <label for="colorPicker">Couleur d'arrière-plan</label>
-            <div class="color-inputs">
-              <input
-                type="color"
-                id="colorPicker"
-                name="colorPicker"
-                value="#ff69b4"
-              />
-              <input
-                type="text"
-                id="colorText"
-                name="colorText"
-                value="#ff69b4"
-              />
+      <!-- Contrôles de sélection des couleurs -->
+      <section class="color-controls" aria-labelledby="color-controls-title">
+        <h2 id="color-controls-title" class="visually-hidden">
+          Sélection des couleurs
+        </h2>
+        <form class="controls" id="controls">
+          <!-- Contrôles de couleurs avec double saisie (sélecteur de couleur + texte) -->
+          <div class="control-group color-pickers-group">
+            <div
+              class="control control--color control--color-bg"
+              id="bg-color-control"
+            >
+              <label for="backgroundColorPicker">Couleur d'arrière-plan</label>
+              <div class="color-inputs">
+                <input
+                  type="color"
+                  id="backgroundColorPicker"
+                  name="backgroundColorPicker"
+                  value="#ff69b4"
+                />
+                <input
+                  type="text"
+                  id="backgroundColorText"
+                  name="backgroundColorText"
+                  value="#ff69b4"
+                />
+              </div>
+            </div>
+
+            <!-- Bouton de swap des couleurs -->
+            <button
+              type="button"
+              class="color-swap-button"
+              id="swapColorsButton"
+              title="Inverser les couleurs"
+              aria-label="Inverser couleur d'arrière-plan et couleur de texte"
+            >
+              ⇄
+            </button>
+
+            <div
+              class="control control--color control--color-text"
+              id="text-color-control"
+            >
+              <label for="foregroundColorPicker">Couleur de texte</label>
+              <div class="color-inputs">
+                <input
+                  type="color"
+                  id="foregroundColorPicker"
+                  name="foregroundColorPicker"
+                  value="#ffffff"
+                />
+                <input
+                  type="text"
+                  id="foregroundColorText"
+                  name="foregroundColorText"
+                  value="#ffffff"
+                />
+              </div>
             </div>
           </div>
+        </form>
+      </section>
 
-          <!-- Bouton de swap des couleurs -->
-          <button
-            type="button"
-            class="color-swap-button"
-            id="swapColorsButton"
-            title="Inverser les couleurs"
-            aria-label="Inverser couleur d'arrière-plan et couleur de texte"
-          >
-            ⇄
-          </button>
-
-          <div
-            class="control control--color control--color-text"
-            id="text-color-control"
-          >
-            <label for="textColorPicker">Couleur de texte</label>
-            <div class="color-inputs">
-              <input
-                type="color"
-                id="textColorPicker"
-                name="textColorPicker"
-                value="#ffffff"
-              />
-              <input
-                type="text"
-                id="textColorText"
-                name="textColorText"
-                value="#ffffff"
-              />
+      <!-- Affichage de la couleur sélectionnée -->
+      <section class="color-display" aria-labelledby="color-display-title">
+        <h2 id="color-display-title" class="visually-hidden">
+          Couleur sélectionnée
+        </h2>
+        <div class="box-group">
+          <!-- Affichage des couleurs -->
+          <div class="box box-user">
+            <div class="box-body">
+              <div class="box-half box-oklch">
+                <span class="box-color-value">oklch(0% 0 0)</span>
+              </div>
+              <div class="box-half box-hex">
+                <span class="box-color-value">
+                  <span class="hex-code">#000000</span>
+                  <span class="gamut-warning-inline"></span>
+                </span>
+              </div>
             </div>
           </div>
         </div>
+      </section>
 
-        <!-- Contrôles de modification OKLCH -->
+      <!-- Contrôles OKLCH -->
+      <section class="oklch-controls" aria-labelledby="oklch-controls-title">
+        <h2 class="visually-hidden">Contrôles OKLCH</h2>
         <div class="control-group lch-sliders-group">
-          <div class="sliders-header">
-            <h3>Contrôles OKLCH</h3>
-            <span class="active-color-indicator" id="activeColorIndicator">
-              Couleur d'arrière-plan
-            </span>
-          </div>
           <!-- Luminosity : modifie le composant L -->
           <div class="control control--lumi">
             <label for="lumi">Luminosity</label>
@@ -150,26 +175,16 @@
             </div>
           </div>
         </div>
-      </form>
+      </section>
 
-      <!-- Affichage des résultats -->
-      <div class="box-group">
-        <!-- Affichage des couleurs -->
-        <div class="box box-user">
-          <div class="box-body">
-            <div class="box-half box-oklch">
-              <span class="box-color-value">oklch(0% 0 0)</span>
-            </div>
-            <div class="box-half box-hex">
-              <span class="box-color-value">
-                <span class="hex-code">#000000</span>
-                <span class="gamut-warning-inline"></span>
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Valeurs de contraste -->
+      <!-- Informations de contraste -->
+      <section
+        class="contrast-section"
+        aria-labelledby="contrast-section-title"
+      >
+        <h2 id="contrast-section-title" class="visually-hidden">
+          Informations de contraste
+        </h2>
         <div class="contrast-info">
           <!-- Affichage WCAG2 (par défaut) -->
           <div class="contrast-display contrast-display--wcag">
@@ -211,24 +226,22 @@
             </div>
           </div>
         </div>
-      </div>
+      </section>
     </main>
 
     <!-- Guide des seuils de contraste -->
     <section class="contrast-guide" aria-labelledby="contrast-guide-title">
-      <h2 id="contrast-guide-title">Guide des seuils de contraste</h2>
-
       <!-- Guide WCAG2 (visible par défaut) -->
       <div class="guide-content guide-content--wcag">
-        <h3>
+        <h2>
           <abbr lang="en" title="Web Content Accessibility Guidelines"
             >WCAG</abbr
           >
           2.1 - Ratios de contraste
-        </h3>
+        </h2>
         <div class="threshold-grid">
           <div class="threshold-item">
-            <h4>Texte normal (< 24px ou < 19px gras)</h4>
+            <h3>Texte normal (< 24px ou < 19px gras)</h3>
             <ul>
               <li>
                 <strong>AA :</strong> 4.5:1 minimum
@@ -241,7 +254,7 @@
             </ul>
           </div>
           <div class="threshold-item">
-            <h4>Texte large (≥ 24px ou ≥ 19px gras)</h4>
+            <h3>Texte large (≥ 24px ou ≥ 19px gras)</h3>
             <ul>
               <li>
                 <strong>AA :</strong> 3:1 minimum
@@ -254,7 +267,7 @@
             </ul>
           </div>
           <div class="threshold-item">
-            <h4>Éléments graphiques</h4>
+            <h3>Éléments graphiques</h3>
             <ul>
               <li>
                 <strong>AA :</strong> 3:1 minimum (bordures, icônes)
@@ -267,15 +280,15 @@
 
       <!-- Guide APCA (masqué par défaut) -->
       <div class="guide-content guide-content--apca" style="display: none">
-        <h3>
+        <h2>
           <abbr lang="en" title="Accessible Perceptual Contrast Algorithm"
             >APCA</abbr
           >
           - Contraste perceptuel
-        </h3>
+        </h2>
         <div class="threshold-grid">
           <div class="threshold-item">
-            <h4>Texte normal</h4>
+            <h3>Texte normal</h3>
             <ul>
               <li>
                 <strong>Minimum :</strong> Lc ≥ 75 (ou ≤ -75)
@@ -288,7 +301,7 @@
             </ul>
           </div>
           <div class="threshold-item">
-            <h4>Texte moyen (≥ 24px ou ≥ 16px gras)</h4>
+            <h3>Texte moyen (≥ 24px ou ≥ 16px gras)</h3>
             <ul>
               <li>
                 <strong>Minimum :</strong> Lc ≥ 60 (ou ≤ -60)
@@ -301,7 +314,7 @@
             </ul>
           </div>
           <div class="threshold-item">
-            <h4>Texte large (≥ 36px ou ≥ 24px gras)</h4>
+            <h3>Texte large (≥ 36px ou ≥ 24px gras)</h3>
             <ul>
               <li>
                 <strong>Minimum :</strong> Lc ≥ 45 (ou ≤ -45)

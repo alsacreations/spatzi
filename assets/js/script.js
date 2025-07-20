@@ -7,10 +7,10 @@ const $$ = document.querySelectorAll.bind(document);
 
 const form = $("#controls");
 const root = document.documentElement;
-const colorPicker = $("#colorPicker");
-const colorText = $("#colorText");
-const textColorPicker = $("#textColorPicker");
-const textColorText = $("#textColorText");
+const backgroundColorPicker = $("#backgroundColorPicker");
+const backgroundColorText = $("#backgroundColorText");
+const foregroundColorPicker = $("#foregroundColorPicker");
+const foregroundColorText = $("#foregroundColorText");
 
 const swapColorsButton = $("#swapColorsButton");
 const activeColorIndicator = $("#activeColorIndicator");
@@ -70,8 +70,8 @@ contrastSwitcher.addEventListener("change", (e) => {
  * Inverse les couleurs et reconfigure les sliders pour contrôler l'autre couleur
  */
 function swapColors() {
-  const currentBgColor = colorPicker.value;
-  const currentTextColor = textColorPicker.value;
+  const currentBgColor = backgroundColorPicker.value;
+  const currentTextColor = foregroundColorPicker.value;
 
   isTextColorPrimary = !isTextColorPrimary;
 
@@ -83,10 +83,10 @@ function swapColors() {
     root.style.setProperty("--color-user-1", currentTextColor);
     updateColor(currentBgColor, true);
 
-    if (textColorText) textColorText.value = currentBgColor;
-    if (textColorPicker) textColorPicker.value = currentBgColor;
-    if (colorText) colorText.value = currentTextColor;
-    if (colorPicker) colorPicker.value = currentTextColor;
+    if (foregroundColorText) foregroundColorText.value = currentBgColor;
+    if (foregroundColorPicker) foregroundColorPicker.value = currentBgColor;
+    if (backgroundColorText) backgroundColorText.value = currentTextColor;
+    if (backgroundColorPicker) backgroundColorPicker.value = currentTextColor;
 
     root.style.setProperty("--ui-background", "var(--color-user-1)");
     root.style.setProperty("--ui-foreground", "var(--color-user-2)");
@@ -95,10 +95,10 @@ function swapColors() {
     root.style.setProperty("--color-user-1", currentBgColor);
     updateColor(currentTextColor, true);
 
-    if (colorText) colorText.value = currentTextColor;
-    if (colorPicker) colorPicker.value = currentTextColor;
-    if (textColorText) textColorText.value = currentBgColor;
-    if (textColorPicker) textColorPicker.value = currentBgColor;
+    if (backgroundColorText) backgroundColorText.value = currentTextColor;
+    if (backgroundColorPicker) backgroundColorPicker.value = currentTextColor;
+    if (foregroundColorText) foregroundColorText.value = currentBgColor;
+    if (foregroundColorPicker) foregroundColorPicker.value = currentBgColor;
 
     root.style.setProperty("--ui-background", "var(--color-user-2)");
     root.style.setProperty("--ui-foreground", "var(--color-user-1)");
@@ -706,14 +706,14 @@ function updateColor(value, isPrimaryColor = true) {
   if (isPrimaryColor) {
     if (!isTextColorPrimary) {
       // Mode normal : sliders contrôlent l'arrière-plan
-      if (colorText) colorText.value = value;
-      if (colorPicker) colorPicker.value = value;
+      if (backgroundColorText) backgroundColorText.value = value;
+      if (backgroundColorPicker) backgroundColorPicker.value = value;
       root.style.setProperty("--ui-background", "var(--color-user-2)");
       root.style.setProperty("--ui-foreground", "var(--color-user-1)");
     } else {
       // Mode swap : sliders contrôlent le texte
-      if (textColorText) textColorText.value = value;
-      if (textColorPicker) textColorPicker.value = value;
+      if (foregroundColorText) foregroundColorText.value = value;
+      if (foregroundColorPicker) foregroundColorPicker.value = value;
       root.style.setProperty("--ui-background", "var(--color-user-1)");
       root.style.setProperty("--ui-foreground", "var(--color-user-2)");
     }
@@ -745,26 +745,26 @@ function updateColor(value, isPrimaryColor = true) {
       .trim();
     if (secondaryColor) {
       if (!isTextColorPrimary) {
-        if (textColorText) textColorText.value = secondaryColor;
-        if (textColorPicker) textColorPicker.value = secondaryColor;
+        if (foregroundColorText) foregroundColorText.value = secondaryColor;
+        if (foregroundColorPicker) foregroundColorPicker.value = secondaryColor;
       } else {
-        if (colorText) colorText.value = secondaryColor;
-        if (colorPicker) colorPicker.value = secondaryColor;
+        if (backgroundColorText) backgroundColorText.value = secondaryColor;
+        if (backgroundColorPicker) backgroundColorPicker.value = secondaryColor;
       }
     }
   } else {
     if (!isTextColorPrimary) {
       // Mode normal : mettre à jour la couleur de texte
       root.style.setProperty("--color-user-1", value);
-      if (textColorText) textColorText.value = value;
-      if (textColorPicker) textColorPicker.value = value;
+      if (foregroundColorText) foregroundColorText.value = value;
+      if (foregroundColorPicker) foregroundColorPicker.value = value;
       root.style.setProperty("--ui-background", "var(--color-user-2)");
       root.style.setProperty("--ui-foreground", "var(--color-user-1)");
     } else {
       // Mode swap : mettre à jour la couleur d'arrière-plan
       root.style.setProperty("--color-user-1", value);
-      if (colorText) colorText.value = value;
-      if (colorPicker) colorPicker.value = value;
+      if (backgroundColorText) backgroundColorText.value = value;
+      if (backgroundColorPicker) backgroundColorPicker.value = value;
       root.style.setProperty("--ui-background", "var(--color-user-1)");
       root.style.setProperty("--ui-foreground", "var(--color-user-2)");
     }
@@ -772,15 +772,19 @@ function updateColor(value, isPrimaryColor = true) {
   updateOKLCHValues();
 }
 
-if (colorPicker) {
-  colorPicker.addEventListener("input", (e) => {
-    updateColor(e.target.value, true);
+if (backgroundColorPicker) {
+  backgroundColorPicker.addEventListener("input", (e) => {
+    // En mode normal: backgroundColorPicker contrôle la couleur primaire (arrière-plan)
+    // En mode swap: backgroundColorPicker contrôle la couleur secondaire (texte)
+    updateColor(e.target.value, !isTextColorPrimary);
   });
 }
 
-if (textColorPicker) {
-  textColorPicker.addEventListener("input", (e) => {
-    updateColor(e.target.value, false);
+if (foregroundColorPicker) {
+  foregroundColorPicker.addEventListener("input", (e) => {
+    // En mode normal: foregroundColorPicker contrôle la couleur secondaire (texte)
+    // En mode swap: foregroundColorPicker contrôle la couleur primaire (arrière-plan)
+    updateColor(e.target.value, isTextColorPrimary);
   });
 }
 
@@ -793,15 +797,19 @@ function initializeSliderDisplays() {
   updateSliderFromCSS("--slider-h", hSlider, hValueDisplay);
 }
 
-if (colorText) {
-  colorText.addEventListener("input", (e) => {
-    updateColor(e.target.value, true);
+if (backgroundColorText) {
+  backgroundColorText.addEventListener("input", (e) => {
+    // En mode normal: backgroundColorText contrôle la couleur primaire (arrière-plan)
+    // En mode swap: backgroundColorText contrôle la couleur secondaire (texte)
+    updateColor(e.target.value, !isTextColorPrimary);
   });
 }
 
-if (textColorText) {
-  textColorText.addEventListener("input", (e) => {
-    updateColor(e.target.value, false);
+if (foregroundColorText) {
+  foregroundColorText.addEventListener("input", (e) => {
+    // En mode normal: foregroundColorText contrôle la couleur secondaire (texte)
+    // En mode swap: foregroundColorText contrôle la couleur primaire (arrière-plan)
+    updateColor(e.target.value, isTextColorPrimary);
   });
 }
 
@@ -848,14 +856,14 @@ function updateSliderColor() {
 
   if (!isTextColorPrimary) {
     // Mode normal : sliders contrôlent l'arrière-plan
-    if (colorPicker) colorPicker.value = hexColor;
-    if (colorText) colorText.value = hexColor;
+    if (backgroundColorPicker) backgroundColorPicker.value = hexColor;
+    if (backgroundColorText) backgroundColorText.value = hexColor;
     root.style.setProperty("--ui-background", "var(--color-user-2)");
     root.style.setProperty("--ui-foreground", "var(--color-user-1)");
   } else {
     // Mode swap : sliders contrôlent le texte
-    if (textColorPicker) textColorPicker.value = hexColor;
-    if (textColorText) textColorText.value = hexColor;
+    if (foregroundColorPicker) foregroundColorPicker.value = hexColor;
+    if (foregroundColorText) foregroundColorText.value = hexColor;
     root.style.setProperty("--ui-background", "var(--color-user-1)");
     root.style.setProperty("--ui-foreground", "var(--color-user-2)");
   }
@@ -894,8 +902,12 @@ if (hSlider) {
  * Initialise la page avec les couleurs par défaut
  */
 function initializePage() {
-  const initialBgColor = colorPicker ? colorPicker.value : "#ff69b4";
-  const initialTextColor = textColorPicker ? textColorPicker.value : "#ffffff";
+  const initialBgColor = backgroundColorPicker
+    ? backgroundColorPicker.value
+    : "#ff69b4";
+  const initialTextColor = foregroundColorPicker
+    ? foregroundColorPicker.value
+    : "#ffffff";
 
   root.style.setProperty("--color-user-1", initialTextColor);
   root.style.setProperty("--ui-background", initialBgColor);
@@ -940,15 +952,19 @@ function syncInitialValues() {
   updateColor(defaultBgColor, true);
   root.style.setProperty("--color-user-1", defaultTextColor);
 
-  const colorPicker = document.getElementById("colorPicker");
-  const colorText = document.getElementById("colorText");
-  const textColorPicker = document.getElementById("textColorPicker");
-  const textColorText = document.getElementById("textColorText");
+  const backgroundColorPicker = document.getElementById(
+    "backgroundColorPicker"
+  );
+  const backgroundColorText = document.getElementById("backgroundColorText");
+  const foregroundColorPicker = document.getElementById(
+    "foregroundColorPicker"
+  );
+  const foregroundColorText = document.getElementById("foregroundColorText");
 
-  if (colorPicker) colorPicker.value = defaultBgColor;
-  if (colorText) colorText.value = defaultBgColor;
-  if (textColorPicker) textColorPicker.value = defaultTextColor;
-  if (textColorText) textColorText.value = defaultTextColor;
+  if (backgroundColorPicker) backgroundColorPicker.value = defaultBgColor;
+  if (backgroundColorText) backgroundColorText.value = defaultBgColor;
+  if (foregroundColorPicker) foregroundColorPicker.value = defaultTextColor;
+  if (foregroundColorText) foregroundColorText.value = defaultTextColor;
 
   updateOKLCHValues();
 }

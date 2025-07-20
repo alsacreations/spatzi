@@ -51,6 +51,23 @@
   gap: 2rem;
 }
 
+/* Sections principales */
+.color-controls,
+.color-display,
+.oklch-controls,
+.contrast-section {
+  margin-bottom: var(--space-lg);
+}
+
+.oklch-controls .lch-sliders-group {
+  margin-top: 0;
+}
+
+.oklch-controls h2 {
+  margin: 0 0 var(--space-sm) 0;
+  font-size: 1.25rem;
+}
+
 h1,
 h2,
 h3 {
