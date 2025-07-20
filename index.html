@@ -34,7 +34,10 @@
       <form class="controls" id="controls">
         <!-- Contrôles de couleurs avec double saisie (sélecteur de couleur + texte) -->
         <div class="control-group color-pickers-group">
-          <div class="control control--color control--color-bg">
+          <div
+            class="control control--color control--color-bg"
+            id="bg-color-control"
+          >
             <label for="colorPicker">Couleur d'arrière-plan</label>
             <div class="color-inputs">
               <input
@@ -51,7 +54,22 @@
               />
             </div>
           </div>
-          <div class="control control--color control--color-text">
+
+          <!-- Bouton de swap des couleurs -->
+          <button
+            type="button"
+            class="color-swap-button"
+            id="swapColorsButton"
+            title="Inverser les couleurs"
+            aria-label="Inverser couleur d'arrière-plan et couleur de texte"
+          >
+            ⇄
+          </button>
+
+          <div
+            class="control control--color control--color-text"
+            id="text-color-control"
+          >
             <label for="textColorPicker">Couleur de texte</label>
             <div class="color-inputs">
               <input
@@ -72,6 +90,12 @@
 
         <!-- Contrôles de modification OKLCH -->
         <div class="control-group lch-sliders-group">
+          <div class="sliders-header">
+            <h3>Contrôles OKLCH</h3>
+            <span class="active-color-indicator" id="activeColorIndicator">
+              Couleur d'arrière-plan
+            </span>
+          </div>
           <!-- Luminosity : modifie le composant L -->
           <div class="control control--lumi">
             <label for="lumi">Luminosity</label>
@@ -330,7 +354,7 @@
         <div class="example-text-item" data-size="18" data-weight="bold">
           <span class="size-indicator">
             <span class="threshold-status"></span>
-            18px gras
+            19px gras
           </span>
           <p class="example-medium-bold">
             Les vins d'Alsace accompagnent traditionnellement les spécialités

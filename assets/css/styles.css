@@ -1,47 +1,31 @@
 :root {
-  /* Spacing variables (4px system) */
   --space-xs: 0.25rem;
   --space-sm: 0.5rem;
   --space-md: 1rem;
   --space-lg: 2rem;
 
-  /* System colors */
   --color-border: #ccc;
   --color-gray-50: oklch(97% 0 0);
   --color-gray-100: oklch(92.2% 0 0);
-  --color-gray-200: oklch(87% 0 0);
-  --color-gray-300: oklch(70.8% 0 0);
-  --color-gray-400: oklch(55.6% 0 0);
-  --color-gray-500: oklch(43.9% 0 0);
   --color-gray-600: oklch(37.1% 0 0);
   --color-gray-700: oklch(26.9% 0 0);
-  --color-gray-800: oklch(20.5% 0 0);
-  --color-gray-900: oklch(14.5% 0 0);
   --color-white: oklch(100% 0 0);
   --color-red-100: oklch(80% 0.17 18);
-  --color-red-300: oklch(70.54% 0.19 27.52);
   --color-red-500: oklch(50.54% 0.19 27.52);
-  --color-red-700: oklch(35.54% 0.19 27.52);
-  --color-red-900: oklch(20.54% 0.11 27.52);
   --color-green-100: oklch(97% 0.16 150.73);
-  --color-green-300: oklch(71.66% 0.13 150.73);
   --color-green-500: oklch(51.66% 0.13 150.73);
-  --color-green-700: oklch(36.66% 0.13 150.73);
-  --color-green-900: oklch(21.66% 0.13 150.73);
   --color-orange-300: oklch(89% 0.17 71);
   --color-orange-700: oklch(49% 0.17 71);
 
-  /* Slider variables, managed by JavaScript. Initial values are fallbacks. */
-  --slider-l: 0.5;
-  --slider-c: 0.01;
+  /* Variables dynamiques, gérées par JavaScript */
+  --slider-l: 0.3;
+  --slider-c: 0;
   --slider-h: 0;
 
-  /* OKLCH relative colors. For modifying colors (L: lightness, C: chroma, H: hue) */
-  --color-text-user: #ffffff; /* Default for user text, synced with picker */
-  --color-text-variant: var(--color-white); /* Default for variant text */
-  --color-variant: oklch(
-    var(--slider-l) var(--slider-c) var(--slider-h)
-  ); /* Variant color derived from sliders */
+  --color-user-1: #ffffff;
+  --ui-background: var(--color-user-2);
+  --ui-foreground: var(--color-user-1);
+  --color-user-2: oklch(var(--slider-l) var(--slider-c) var(--slider-h));
 
   --color-accent: light-dark(var(--color-orange-700), var(--color-orange-300));
 
@@ -51,15 +35,12 @@
   --success: light-dark(var(--color-green-500), var(--color-green-100));
   --error: light-dark(var(--color-red-500), var(--color-red-100));
 
-  /* Border radii */
   --radius-sm: 0.25rem;
   --radius-md: 0.5rem;
 
-  /* Sizes */
   --width-color-picker: 3rem;
   --size-thumb: 1.5rem;
 
-  /* Shadows */
   --shadow-sm: 0 0 1rem rgba(0, 0, 0, 0.1);
 }
 
@@ -98,6 +79,9 @@ a:focus {
 }
 
 .color-pickers-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
   padding: var(--space-md);
   background: var(--layer);
   border-radius: var(--radius-md);
@@ -106,8 +90,43 @@ a:focus {
 
 @media (width > 40rem) {
   .color-pickers-group {
-    grid-template-columns: 1fr 1fr;
+    flex-direction: row;
+    align-items: center;
   }
+}
+
+.color-swap-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  background: var(--surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--on-surface);
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.color-swap-button:hover {
+  background: var(--layer);
+  border-color: var(--color-accent);
+  transform: scale(1.05);
+}
+
+.color-swap-button:active {
+  transform: scale(0.95);
+}
+
+.active-color-indicator {
+  font-size: 0.875rem;
+  color: var(--on-surface);
+  font-weight: 500;
+  text-align: center;
+  margin-bottom: var(--space-sm);
 }
 
 .lch-sliders-group {
@@ -177,13 +196,13 @@ a:focus {
 .range::-webkit-slider-thumb {
   width: var(--size-thumb);
   height: var(--size-thumb);
-  anchor-name: --thumb; /* Anchor point for position-anchor */
+  anchor-name: --thumb;
 }
 
 .range::-moz-range-thumb {
   width: var(--size-thumb);
   height: var(--size-thumb);
-  anchor-name: --thumb; /* Anchor point for position-anchor */
+  anchor-name: --thumb;
 }
 
 .range-value {
@@ -192,15 +211,15 @@ a:focus {
   background: var(--layer);
   border-radius: var(--radius-sm);
   font-size: 0.875rem;
-  translate: 0 1.4rem; /* Offset to avoid overlap */
+  translate: 0 1.4rem;
 }
 
-/* Value display anchored to the slider thumb (if position-anchor is supported) */
+/* Positionnement ancré au pouce du slider si supporté */
 @supports (position-anchor: initial) {
   .range-value {
     position-anchor: --thumb;
     position-area: bottom;
-    translate: 0 0.3rem; /* Offset to avoid overlap */
+    translate: 0 0.3rem;
   }
 }
 
@@ -242,9 +261,9 @@ a:focus {
   grid-column: 1 / -1;
   min-height: 6rem;
   border-radius: var(--radius-sm);
-  overflow: hidden; /* To ensure children with border-radius are clipped if needed */
+  overflow: hidden;
   @media (width > 40rem) {
-    grid-template-columns: 1fr 1fr; /* Two columns for larger screens */
+    grid-template-columns: 1fr 1fr;
   }
 }
 
@@ -254,37 +273,33 @@ a:focus {
   padding: var(--space-sm);
   text-align: center;
   overflow-wrap: break-word;
-  word-break: break-all; /* Ensure long color strings break */
+  word-break: break-all;
 }
 
 .box-half .box-color-value {
   display: grid;
-  font-size: 0.9rem; /* Adjust as needed */
+  font-size: 0.9rem;
   font-family: monospace;
-  /* color will be set by JS based on contrast */
 }
 
 .box-half .box-color-value .gamut-warning-inline {
-  font-size: 0.8em; /* Smaller than the hex code */
-  margin-left: var(--space-xs); /* Space from the hex code */
-  /* Color is set by JS, but can have a fallback */
-  /* color: var(--color-accent); */
+  font-size: 0.8em;
+  margin-left: var(--space-xs);
 }
 
-/* Background colors for user box */
+/* Couleurs d'arrière-plan pour la boîte utilisateur */
 .box-user .box-half.box-oklch {
-  background: var(--color-variant); /* OKLCH side uses the variant color */
-  color: var(--color-text-user);
+  background: var(--ui-background);
+  color: var(--ui-foreground);
 }
 .box-user .box-half.box-hex {
-  /* HEX side will have its background set by JS to the sRGB equivalent */
-  color: var(--color-text-user);
+  background: var(--ui-background-hex, var(--ui-background));
+  color: var(--ui-foreground);
 }
 
-/* Update text color for the color values inside box-half based on their specific background */
 .box-user .box-half.box-oklch .box-color-value,
 .box-user .box-half.box-hex .box-color-value {
-  color: var(--color-text-user);
+  color: var(--ui-foreground);
 }
 
 .color-value,
@@ -319,15 +334,13 @@ a:focus {
 
 .hex-value-container {
   line-height: 1.1;
-  text-align: center; /* Centers content (HEX code + warning) */
+  text-align: center;
 }
 
 .gamut-warning {
-  /* Warning next to the HEX value */
   font-size: 0.8em;
-  margin-left: 5px; /* Space from the HEX value */
-  color: var(--color-accent); /* Consistent warning color */
-  /* display: inline; is default for span, correct here */
+  margin-left: 5px;
+  color: var(--ui-foreground);
 }
 
 .ratio-check {
@@ -340,7 +353,6 @@ a:focus {
   font-size: 1.2rem;
 }
 
-/* Guide des seuils de contraste */
 .contrast-guide {
   width: min(100% - 2rem, 80rem);
   margin-inline: auto;
@@ -423,7 +435,6 @@ a:focus {
   opacity: 1;
 }
 
-/* Footer */
 .footer {
   margin-top: var(--space-lg);
   text-align: center;
@@ -434,7 +445,6 @@ a:focus {
   }
 }
 
-/* Logo */
 .logo-alsacreations {
   display: block;
   width: 150px;
@@ -463,7 +473,6 @@ a:focus {
   }
 }
 
-/* Section d'exemple d'application des couleurs */
 .color-example {
   margin-block: var(--space-lg);
   padding: var(--space-lg);
@@ -472,8 +481,8 @@ a:focus {
 }
 
 .example-content {
-  background: var(--color-variant);
-  color: var(--color-text-user);
+  background: var(--ui-background);
+  color: var(--ui-foreground);
   padding: var(--space-lg);
   border-radius: var(--radius-md);
   margin-top: var(--space-md);
@@ -512,42 +521,42 @@ a:focus {
 }
 
 .example-title {
-  font-size: 2.25rem; /* 36px */
+  font-size: 36px;
   font-weight: 300;
   margin: 0;
   line-height: 1.2;
 }
 
 .example-subtitle {
-  font-size: 1.5rem; /* 24px */
+  font-size: 24px;
   font-weight: 400;
   margin: 0;
   line-height: 1.3;
 }
 
 .example-bold {
-  font-size: 1.5rem; /* 24px */
+  font-size: 24px;
   font-weight: 700;
   margin: 0;
   line-height: 1.4;
 }
 
 .example-medium-bold {
-  font-size: 1.125rem; /* 18px */
+  font-size: 19px;
   font-weight: 700;
   margin: 0;
   line-height: 1.4;
 }
 
 .example-normal {
-  font-size: 1rem; /* 16px */
+  font-size: 16px;
   font-weight: 400;
   margin: 0;
   line-height: 1.5;
 }
 
 .example-small {
-  font-size: 0.875rem; /* 14px */
+  font-size: 14px;
   font-weight: 400;
   margin: 0;
   line-height: 1.4;
