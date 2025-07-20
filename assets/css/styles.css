@@ -1,22 +1,4 @@
 :root {
-  --space-xs: 0.25rem;
-  --space-sm: 0.5rem;
-  --space-md: 1rem;
-  --space-lg: 2rem;
-
-  --color-border: #ccc;
-  --color-gray-50: oklch(97% 0 0);
-  --color-gray-100: oklch(92.2% 0 0);
-  --color-gray-600: oklch(37.1% 0 0);
-  --color-gray-700: oklch(26.9% 0 0);
-  --color-white: oklch(100% 0 0);
-  --color-red-100: oklch(80% 0.17 18);
-  --color-red-500: oklch(50.54% 0.19 27.52);
-  --color-green-100: oklch(97% 0.16 150.73);
-  --color-green-500: oklch(51.66% 0.13 150.73);
-  --color-orange-300: oklch(89% 0.17 71);
-  --color-orange-700: oklch(49% 0.17 71);
-
   /* Variables dynamiques, gérées par JavaScript */
   --slider-l: 0.3;
   --slider-c: 0;
@@ -27,21 +9,17 @@
   --ui-foreground: var(--color-user-1);
   --color-user-2: oklch(var(--slider-l) var(--slider-c) var(--slider-h));
 
-  --color-accent: light-dark(var(--color-orange-700), var(--color-orange-300));
-
-  --on-surface: light-dark(var(--color-gray-700), var(--color-gray-100));
-  --surface: light-dark(var(--color-gray-50), var(--color-gray-700));
-  --layer: light-dark(var(--color-gray-100), var(--color-gray-600));
-  --success: light-dark(var(--color-green-500), var(--color-green-100));
-  --error: light-dark(var(--color-red-500), var(--color-red-100));
-
-  --radius-sm: 0.25rem;
-  --radius-md: 0.5rem;
-
+  /* Variables spécifiques aux composants */
   --width-color-picker: 3rem;
   --size-thumb: 1.5rem;
-
   --shadow-sm: 0 0 1rem rgba(0, 0, 0, 0.1);
+
+  /* Radius (complément des tokens) */
+  --radius-sm: 0.25rem;
+  /* --radius-md est défini dans theme.css */
+
+  /* Alias pour compatibilité */
+  --layer: var(--layer-2); /* Utilise le token layer-2 */
 }
 
 .app {
@@ -56,7 +34,7 @@
 .color-display,
 .oklch-controls,
 .contrast-section {
-  margin-bottom: var(--space-lg);
+  margin-bottom: var(--spacing-l);
 }
 
 .oklch-controls .lch-sliders-group {
@@ -64,7 +42,7 @@
 }
 
 .oklch-controls h2 {
-  margin: 0 0 var(--space-sm) 0;
+  margin: 0 0 var(--spacing-m) 0;
   font-size: 1.25rem;
 }
 
@@ -72,34 +50,34 @@ h1,
 h2,
 h3 {
   font-weight: 300;
-  color: var(--color-accent);
+  color: var(--accent);
 }
 
 a {
-  color: var(--color-accent);
+  color: var(--accent);
 }
 
 a:hover,
 a:focus {
-  color: oklch(from var(--color-accent) calc(l + 0.1) c h);
+  color: oklch(from var(--accent) calc(l + 0.1) c h);
 }
 
 .controls {
   display: flex;
   flex-direction: column;
-  gap: var(--space-lg);
+  gap: var(--spacing-l);
 }
 
 .control-group {
   display: grid;
-  gap: var(--space-md);
+  gap: var(--spacing-m);
 }
 
 .color-pickers-group {
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
-  padding: var(--space-md);
+  gap: var(--spacing-m);
+  padding: var(--spacing-m);
   background: var(--layer);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
@@ -142,7 +120,7 @@ a:focus {
   color: var(--on-surface);
   font-weight: 500;
   text-align: center;
-  margin-bottom: var(--space-sm);
+  margin-bottom: var(--spacing-m);
 }
 
 .lch-sliders-group {
@@ -156,6 +134,27 @@ a:focus {
   .lch-sliders-group {
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-areas: "lumi chroma hue";
+  }
+}
+
+.range-wrapper {
+  position: relative;
+}
+.range-value {
+  position: absolute;
+  left: 0;
+  padding: 4px 8px;
+  border-radius: var(--form-control-border-radius, 4px);
+  background-color: var(--form-control-background, Field);
+  font-size: var(--text-14, 0.875rem);
+  translate: 0 1.4rem;
+}
+
+@supports (position-anchor: initial) {
+  .range-value {
+    position-anchor: auto;
+    position-area: none;
+    translate: 0 1.4rem;
   }
 }
 
@@ -183,79 +182,17 @@ a:focus {
   gap: 0.5rem;
 }
 
-.color-inputs input[type="color"] {
-  width: var(--width-color-picker);
-  height: 2rem;
-  padding: 2px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-}
-
-.color-inputs input[type="text"],
-.range {
-  width: 100%;
-  padding: var(--space-xs);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-}
-
-.range-wrapper {
-  position: relative;
-  height: 2rem;
-}
-
-.range {
-  width: 100%;
-  accent-color: var(--color-accent);
-}
-
-.range::-webkit-slider-thumb {
-  width: var(--size-thumb);
-  height: var(--size-thumb);
-  anchor-name: --thumb;
-}
-
-.range::-moz-range-thumb {
-  width: var(--size-thumb);
-  height: var(--size-thumb);
-  anchor-name: --thumb;
-}
-
-.range-value {
-  position: absolute;
-  padding: var(--space-xs) var(--space-sm);
-  background: var(--layer);
-  border-radius: var(--radius-sm);
-  font-size: 0.875rem;
-  translate: 0 1.4rem;
-}
-
-/* Positionnement ancré au pouce du slider si supporté */
-@supports (position-anchor: initial) {
-  .range-value {
-    position-anchor: --thumb;
-    position-area: bottom;
-    translate: 0 0.3rem;
-  }
-}
-
-.range-value {
-  position: absolute;
-  right: 0;
-  font-size: 0.875rem;
-}
-
 .box-group {
   display: grid;
-  gap: 1rem;
-  margin-top: var(--space-lg);
+  gap: var(--spacing-m);
+  margin-top: var(--spacing-l);
 }
 
 .box {
   display: grid;
   align-content: start;
-  gap: var(--space-md);
-  padding: var(--space-md);
+  gap: var(--spacing-m);
+  padding: var(--spacing-m);
   background: var(--layer);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
@@ -263,8 +200,8 @@ a:focus {
 
 .contrast-info {
   display: grid;
-  gap: var(--space-sm);
-  padding: var(--space-md);
+  gap: var(--spacing-m);
+  padding: var(--spacing-m);
   background: var(--layer);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
@@ -286,7 +223,7 @@ a:focus {
 .box-half {
   display: grid;
   place-content: center;
-  padding: var(--space-sm);
+  padding: var(--spacing-m);
   text-align: center;
   overflow-wrap: break-word;
   word-break: break-all;
@@ -300,7 +237,7 @@ a:focus {
 
 .box-half .box-color-value .gamut-warning-inline {
   font-size: 0.8em;
-  margin-left: var(--space-xs);
+  margin-left: var(--spacing-m);
 }
 
 /* Couleurs d'arrière-plan pour la boîte utilisateur */
@@ -344,8 +281,8 @@ a:focus {
 
 .contrast-warning {
   font-size: 0.8em;
-  color: var(--color-accent);
-  margin-top: var(--space-xs);
+  color: var(--accent);
+  margin-top: var(--spacing-m);
 }
 
 .hex-value-container {
@@ -372,8 +309,8 @@ a:focus {
 .contrast-guide {
   width: min(100% - 2rem, 80rem);
   margin-inline: auto;
-  padding: var(--space-lg);
-  margin-top: var(--space-lg);
+  padding: var(--spacing-l);
+  margin-top: var(--spacing-l);
   background: var(--layer);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
@@ -381,20 +318,20 @@ a:focus {
 
 .contrast-guide h2 {
   margin-top: 0;
-  margin-bottom: var(--space-lg);
+  margin-bottom: var(--spacing-l);
   font-size: 1.5rem;
   text-align: center;
 }
 
 .contrast-guide h3 {
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--spacing-m);
   font-size: 1.25rem;
-  color: var(--color-accent);
+  color: var(--accent);
 }
 
 .threshold-grid {
   display: grid;
-  gap: var(--space-md);
+  gap: var(--spacing-m);
 
   @media (width >= 48rem) {
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -402,15 +339,15 @@ a:focus {
 }
 
 .threshold-item {
-  padding: var(--space-md);
+  padding: var(--spacing-m);
   background: var(--surface);
   border-radius: var(--radius-sm);
-  border-left: 4px solid var(--color-accent);
+  border-left: 4px solid var(--accent);
 }
 
 .threshold-item h4 {
   margin-top: 0;
-  margin-bottom: var(--space-sm);
+  margin-bottom: var(--spacing-m);
   font-size: 1rem;
   font-weight: 500;
   color: var(--on-surface);
@@ -418,12 +355,12 @@ a:focus {
 
 .threshold-item ul {
   margin: 0;
-  padding-left: var(--space-md);
+  padding-left: var(--spacing-m);
   list-style: none;
 }
 
 .threshold-item li {
-  margin-bottom: var(--space-xs);
+  margin-bottom: var(--spacing-m);
   font-size: 0.9rem;
   line-height: 1.4;
 }
@@ -433,13 +370,13 @@ a:focus {
 }
 
 .threshold-item strong {
-  color: var(--color-accent);
+  color: var(--accent);
   font-weight: 600;
 }
 
 .threshold-indicator {
   display: inline-block;
-  margin-left: var(--space-xs);
+  margin-left: var(--spacing-m);
   font-size: 1em;
 }
 
@@ -452,7 +389,7 @@ a:focus {
 }
 
 .footer {
-  margin-top: var(--space-lg);
+  margin-top: var(--spacing-l);
   text-align: center;
 
   & p {
@@ -484,14 +421,14 @@ a:focus {
     & .logo-alsacreations-pepins-outer,
     & .logo-alsacreations-alsa,
     & .logo-alsacreations-creations {
-      fill: var(--color-accent);
+      fill: var(--accent);
     }
   }
 }
 
 .color-example {
-  margin-block: var(--space-lg);
-  padding: var(--space-lg);
+  margin-block: var(--spacing-l);
+  padding: var(--spacing-l);
   background: var(--layer);
   border-radius: var(--radius-md);
 }
@@ -499,16 +436,16 @@ a:focus {
 .example-content {
   background: var(--ui-background);
   color: var(--ui-foreground);
-  padding: var(--space-lg);
+  padding: var(--spacing-l);
   border-radius: var(--radius-md);
-  margin-top: var(--space-md);
+  margin-top: var(--spacing-m);
 }
 
 .example-text-item {
   display: flex;
   align-items: flex-start;
-  gap: var(--space-md);
-  margin-bottom: var(--space-md);
+  gap: var(--spacing-m);
+  margin-bottom: var(--spacing-m);
 
   &:last-child {
     margin-bottom: 0;
@@ -518,12 +455,12 @@ a:focus {
 .size-indicator {
   display: flex;
   align-items: center;
-  gap: var(--space-xs);
+  gap: var(--spacing-m);
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--on-surface);
   background: var(--surface);
-  padding: var(--space-xs) var(--space-sm);
+  padding: var(--spacing-m) var(--spacing-m);
   border-radius: var(--radius-sm);
   white-space: nowrap;
   flex-shrink: 0;
