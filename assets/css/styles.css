@@ -108,7 +108,7 @@ a:focus {
 @media (width > 40rem) {
   .color-pickers-group {
     flex-direction: row;
-    align-items: center;
+    align-items: end;
   }
 }
 
@@ -119,23 +119,22 @@ a:focus {
   width: 2.5rem;
   height: 2.5rem;
   padding: 0;
-  background: var(--surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
+  background: transparent;
+  border: none;
   color: var(--on-surface);
-  font-size: 1.2rem;
+  box-shadow: none;
+  font-size: 2.2rem;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .color-swap-button:hover {
-  background: var(--layer);
-  border-color: var(--color-accent);
-  transform: scale(1.05);
+  scale: 1.05;
 }
 
 .color-swap-button:active {
-  transform: scale(0.95);
+  scale: 0.95;
 }
 
 .active-color-indicator {
@@ -577,4 +576,81 @@ a:focus {
   font-weight: 400;
   margin: 0;
   line-height: 1.4;
+}
+
+/* Theme switcher */
+.theme-switcher {
+  --theme-switcher-width: 42px;
+  --theme-switcher-radius: 40px;
+  --theme-switcher-padding: 4px;
+  --theme-switcher-outline-color: light-dark(#777, #bbb);
+  --theme-switcher-outline-size: 1px;
+  --theme-switcher-background: light-dark(#333, #777);
+  --theme-switcher-icon-size: 16px;
+  --theme-switcher-icon-color: #fff;
+  --theme-switcher-icon-background: light-dark(#777, #333);
+  --theme-switcher-transition: 0.25s;
+
+  display: inline-flex;
+  justify-content: start;
+  aspect-ratio: var(--theme-switcher-ratio);
+  width: var(--theme-switcher-width);
+  padding: var(--theme-switcher-padding);
+  border: 0;
+  outline: var(--theme-switcher-outline-size) solid
+    var(--theme-switcher-outline-color);
+  border-radius: var(--theme-switcher-radius);
+  background-color: var(--theme-switcher-background);
+  line-height: 0;
+  cursor: pointer;
+
+  &::before {
+    content: "";
+    flex: 0 0 0;
+    transition: var(--theme-switcher-transition) flex-grow;
+    will-change: flex-grow;
+  }
+
+  & * {
+    pointer-events: none;
+  }
+
+  & > .theme-icon {
+    padding: 2px;
+    border-radius: 50%;
+    color: var(--theme-switcher-icon-color);
+    background-color: var(--theme-switcher-icon-background);
+    rotate: 0deg;
+    transition: var(--theme-switcher-transition) rotate;
+  }
+
+  & [class^="theme-icon-"] {
+    width: var(--theme-switcher-icon-size);
+    height: var(--theme-switcher-icon-size);
+  }
+
+  &:focus-visible {
+    outline-color: currentcolor;
+    outline-offset: 2px;
+  }
+
+  &[aria-pressed="false"] {
+    & .theme-icon-dark {
+      display: none;
+    }
+  }
+
+  &[aria-pressed="true"] {
+    & .theme-icon-light {
+      display: none;
+    }
+
+    & > .theme-icon {
+      rotate: 240deg;
+    }
+
+    &::before {
+      flex: 1 0 0;
+    }
+  }
 }
