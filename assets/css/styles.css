@@ -10,7 +10,7 @@
   --color-user-2: oklch(var(--slider-l) var(--slider-c) var(--slider-h));
 
   /* Variables spécifiques aux composants */
-  --width-color-picker: 3rem;
+  --width-color-picker: 2rem;
   --size-thumb: 1.5rem;
 
   /* Alias pour compatibilité */
@@ -37,17 +37,6 @@
   gap: var(--spacing-m);
 }
 
-/* fonctionnalités principales */
-
-.oklch-controls .lch-sliders-group {
-  margin-top: 0;
-}
-
-.oklch-controls h2 {
-  margin: 0 0 var(--spacing-m) 0;
-  font-size: 1.25rem;
-}
-
 h1,
 h2,
 h3 {
@@ -64,29 +53,16 @@ a:focus {
   color: oklch(from var(--accent) calc(l + 0.1) c h);
 }
 
-.controls {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-l);
-}
-
-.control-group {
-  display: grid;
-  gap: var(--spacing-m);
-}
-
 .color-pickers-group {
-  display: flex;
+  display: grid;
   flex-direction: column;
-  gap: var(--spacing-m);
+  gap: var(--spacing-16);
   padding: var(--spacing-m);
   background: var(--layer);
   border-radius: var(--form-control-border-radius);
-}
 
-@media (width > 40rem) {
-  .color-pickers-group {
-    flex-direction: row;
+  @media (width >= 40rem) {
+    grid-template-columns: 1fr auto 1fr;
     align-items: end;
   }
 }
@@ -106,25 +82,19 @@ a:focus {
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-}
 
-.color-swap-button:hover {
-  scale: 1.05;
-}
+  &:hover {
+    scale: 1.05;
+  }
 
-.color-swap-button:active {
-  scale: 0.95;
-}
-
-.active-color-indicator {
-  font-size: 0.875rem;
-  color: var(--on-surface);
-  font-weight: 500;
-  text-align: center;
-  margin-bottom: var(--spacing-m);
+  &:active {
+    scale: 0.95;
+  }
 }
 
 .lch-sliders-group {
+  display: grid;
+  gap: var(--spacing-m);
   grid-template-areas:
     "lumi"
     "chroma"
@@ -180,7 +150,25 @@ a:focus {
 
 .color-inputs {
   display: flex;
-  gap: 0.5rem;
+  gap: var(--spacing-4);
+  align-items: start;
+
+  & [type="color"] {
+    appearance: none;
+    -webkit-appearance: none;
+    position: absolute;
+    translate: var(--spacing-8) var(--spacing-8);
+    flex-shrink: 0;
+    width: var(--width-color-picker);
+    height: var(--width-color-picker);
+    padding: var(--spacing-4);
+    background-color: transparent;
+  }
+
+  & :last-child {
+    flex-grow: 1;
+    padding-left: calc(var(--width-color-picker) + var(--spacing-16));
+  }
 }
 
 .box-group {
