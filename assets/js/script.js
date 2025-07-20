@@ -608,15 +608,7 @@ function updateOKLCHValues() {
               : "Échec";
           contrastRatioElement.dataset.level = level;
 
-          let color;
-          if (wcagContrast >= 4.5) {
-            color = "var(--success)";
-          } else if (wcagContrast >= 3) {
-            color = "var(--warning)";
-          } else {
-            color = "var(--error)";
-          }
-          contrastRatioElement.style.color = color;
+          // Suppression de l'application de couleur - le texte garde sa couleur naturelle
 
           // Utiliser le conteneur d'avertissement existant
           const wcagWarningContainer =
@@ -651,16 +643,7 @@ function updateOKLCHValues() {
             }</span>`;
           }
 
-          const absValue = Math.abs(apcaContrast);
-          let color;
-          if (absValue >= 75) {
-            color = "var(--success)";
-          } else if (absValue >= 60) {
-            color = "var(--warning)";
-          } else {
-            color = "var(--error)";
-          }
-          apcaContrastDisplay.style.color = color;
+          // Suppression de l'application de couleur - le texte garde sa couleur naturelle
         }
       } catch (error) {
         if (contrastRatioElement) {
@@ -672,7 +655,8 @@ function updateOKLCHValues() {
             contrastRatioElement.innerHTML =
               '<span class="visually-hidden">Contraste WCAG2 : </span><span class="contrast-ratio">0.00</span>';
           }
-          contrastRatioElement.style.color = "var(--error)";
+          // Suppression de l'application de couleur - le texte garde sa couleur naturelle
+          // contrastRatioElement.style.color = "var(--error)";
         }
         if (apcaContrastDisplay) {
           const apcaValueSpan =
@@ -693,7 +677,8 @@ function updateOKLCHValues() {
           contrastRatioElement.innerHTML =
             '<span class="visually-hidden">Contraste WCAG2 : </span><span class="contrast-ratio">0.00</span>';
         }
-        contrastRatioElement.style.color = "var(--error)";
+        // Suppression de l'application de couleur - le texte garde sa couleur naturelle
+        // contrastRatioElement.style.color = "var(--error)";
       }
       if (apcaContrastDisplay) {
         const apcaValueSpan =
