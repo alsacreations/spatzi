@@ -591,11 +591,13 @@ function updateOKLCHValues() {
           const wcagRatioSpan =
             contrastRatioElement.querySelector(".contrast-ratio");
           if (wcagRatioSpan) {
-            wcagRatioSpan.textContent = wcagContrast.toFixed(2);
-          } else {
-            contrastRatioElement.innerHTML = `<span class="visually-hidden">Contraste WCAG2 : </span><span class="contrast-ratio">${wcagContrast.toFixed(
+            wcagRatioSpan.innerHTML = `<span class="contrast-value">${wcagContrast.toFixed(
               2
-            )}</span>`;
+            )}</span>:1`;
+          } else {
+            contrastRatioElement.innerHTML = `<span class="visually-hidden">Contraste WCAG2 : </span><span class="contrast-ratio"><span class="contrast-value">${wcagContrast.toFixed(
+              2
+            )}</span>:1</span>`;
           }
 
           const level =
@@ -650,10 +652,11 @@ function updateOKLCHValues() {
           const wcagRatioSpan =
             contrastRatioElement.querySelector(".contrast-ratio");
           if (wcagRatioSpan) {
-            wcagRatioSpan.textContent = "0.00";
+            wcagRatioSpan.innerHTML =
+              '<span class="contrast-value">0.00</span>:1';
           } else {
             contrastRatioElement.innerHTML =
-              '<span class="visually-hidden">Contraste WCAG2 : </span><span class="contrast-ratio">0.00</span>';
+              '<span class="visually-hidden">Contraste WCAG2 : </span><span class="contrast-ratio"><span class="contrast-value">0.00</span>:1</span>';
           }
           // Suppression de l'application de couleur - le texte garde sa couleur naturelle
           // contrastRatioElement.style.color = "var(--error)";
@@ -672,10 +675,11 @@ function updateOKLCHValues() {
         const wcagRatioSpan =
           contrastRatioElement.querySelector(".contrast-ratio");
         if (wcagRatioSpan) {
-          wcagRatioSpan.textContent = "0.00";
+          wcagRatioSpan.innerHTML =
+            '<span class="contrast-value">0.00</span>:1';
         } else {
           contrastRatioElement.innerHTML =
-            '<span class="visually-hidden">Contraste WCAG2 : </span><span class="contrast-ratio">0.00</span>';
+            '<span class="visually-hidden">Contraste WCAG2 : </span><span class="contrast-ratio"><span class="contrast-value">0.00</span>:1</span>';
         }
         // Suppression de l'application de couleur - le texte garde sa couleur naturelle
         // contrastRatioElement.style.color = "var(--error)";

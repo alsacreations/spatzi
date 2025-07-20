@@ -9,8 +9,8 @@
     <link rel="stylesheet" href="app.css" />
   </head>
   <body class="liquid">
-    <header class="heading" role="banner">
-      <h1>Spätzi 🎨</h1>
+    <header class="header" role="banner">
+      <div>Alsacréations</div>
       <button
         class="theme-switcher js-theme-switcher"
         type="button"
@@ -55,6 +55,7 @@
           </svg>
         </span>
       </button>
+      <h1>Spätzi : contraste des couleurs</h1>
       <div class="subtitle">
         <p>
           Assistant de contraste des couleurs : obtenez les ratios de contraste
@@ -271,10 +272,9 @@
         </div>
 
         <!-- Guide des seuils de contraste -->
-        <div class="contrast-guide" aria-labelledby="contrast-guide-title">
-          <!-- Guide WCAG2 (visible par défaut) -->
+        <div class="contrast-guide">
           <div class="guide-content guide-content--wcag">
-            <h2>
+            <h2 class="visually-hidden">
               <abbr lang="en" title="Web Content Accessibility Guidelines"
                 >WCAG</abbr
               >
@@ -282,52 +282,53 @@
             </h2>
             <div class="threshold-grid">
               <div class="threshold-item">
-                <h3>Texte normal (< 24px ou < 19px gras)</h3>
+                <p>Texte normal <br /><small>(< 24px ou < 19px gras)</small></p>
                 <ul>
                   <li>
-                    <strong>AA :</strong> 4.5:1 minimum
                     <span
                       class="threshold-indicator"
                       data-threshold="4.5"
                     ></span>
+                    <strong>AA :</strong> 4.5:1
                   </li>
                   <li>
-                    <strong>AAA :</strong> 7:1 minimum
                     <span class="threshold-indicator" data-threshold="7"></span>
+                    <strong>AAA :</strong> 7:1
                   </li>
                 </ul>
               </div>
               <div class="threshold-item">
-                <h3>Texte large (≥ 24px ou ≥ 19px gras)</h3>
+                <p>Texte large <br /><small>(≥ 24px ou ≥ 19px gras)</small></p>
                 <ul>
                   <li>
-                    <strong>AA :</strong> 3:1 minimum
                     <span class="threshold-indicator" data-threshold="3"></span>
+                    <strong>AA :</strong> 3:1
                   </li>
                   <li>
-                    <strong>AAA :</strong> 4.5:1 minimum
                     <span
                       class="threshold-indicator"
                       data-threshold="4.5"
                     ></span>
+                    <strong>AAA :</strong> 4.5:1
                   </li>
                 </ul>
               </div>
               <div class="threshold-item">
-                <h3>Éléments graphiques</h3>
+                <p>
+                  Éléments graphiques <br /><small>(bordures, icônes)</small>
+                </p>
                 <ul>
                   <li>
-                    <strong>AA :</strong> 3:1 minimum (bordures, icônes)
                     <span class="threshold-indicator" data-threshold="3"></span>
+                    <strong>AA :</strong> 3:1
                   </li>
                 </ul>
               </div>
             </div>
           </div>
 
-          <!-- Guide APCA (masqué par défaut) -->
           <div class="guide-content guide-content--apca" style="display: none">
-            <h2>
+            <h2 class="visually-hidden">
               <abbr lang="en" title="Accessible Perceptual Contrast Algorithm"
                 >APCA</abbr
               >
@@ -335,41 +336,41 @@
             </h2>
             <div class="threshold-grid">
               <div class="threshold-item">
-                <h3>Texte normal</h3>
+                <p>Texte normal <br /><small>(< 24px ou < 16px gras)</small></p>
                 <ul>
                   <li>
-                    <strong>Minimum :</strong> Lc ≥ 75 (ou ≤ -75)
                     <span
                       class="threshold-indicator"
                       data-threshold="75"
                       data-type="apca"
                     ></span>
+                    <strong>Lc</strong> 75 (ou -75)
                   </li>
                 </ul>
               </div>
               <div class="threshold-item">
-                <h3>Texte moyen (≥ 24px ou ≥ 16px gras)</h3>
+                <p>Texte moyen <br /><small>(≥ 24px ou ≥ 16px gras)</small></p>
                 <ul>
                   <li>
-                    <strong>Minimum :</strong> Lc ≥ 60 (ou ≤ -60)
                     <span
                       class="threshold-indicator"
                       data-threshold="60"
                       data-type="apca"
                     ></span>
+                    <strong>Lc</strong> 60 (ou -60)
                   </li>
                 </ul>
               </div>
               <div class="threshold-item">
-                <h3>Texte large (≥ 36px ou ≥ 24px gras)</h3>
+                <p>Texte large <br /><small>(≥ 36px ou ≥ 24px gras)</small></p>
                 <ul>
                   <li>
-                    <strong>Minimum :</strong> Lc ≥ 45 (ou ≤ -45)
                     <span
                       class="threshold-indicator"
                       data-threshold="45"
                       data-type="apca"
                     ></span>
+                    <strong>Lc</strong> 45 (ou -45)
                   </li>
                 </ul>
               </div>
@@ -380,7 +381,7 @@
       <!-- Exemple d'application des couleurs -->
       <section class="color-example" aria-labelledby="color-example-title">
         <h2 id="color-example-title">
-          Exemple d'application des couleurs
+          Exemple d'application
           <span class="contrast-type-indicator">(WCAG)</span>
         </h2>
         <div class="example-content">

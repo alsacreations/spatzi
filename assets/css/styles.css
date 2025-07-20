@@ -19,6 +19,32 @@
 
 /* Généralités */
 
+h1,
+h2,
+h3 {
+  font-weight: 300;
+  color: var(--on-surface);
+}
+
+h1 {
+  font-size: var(--text-3xl);
+  font-weight: var(--font-weight-bold);
+}
+
+a {
+  color: var(--accent);
+}
+
+a:hover,
+a:focus {
+  color: oklch(from var(--accent) calc(l + 0.1) c h);
+}
+
+/* Header */
+.header {
+  margin-bottom: var(--spacing-l);
+}
+
 /* Main */
 .app {
   display: grid;
@@ -34,31 +60,16 @@
 .controls-group {
   display: grid;
   align-content: start;
+  padding: var(--spacing-m);
   gap: var(--spacing-m);
-}
-
-h1,
-h2,
-h3 {
-  font-weight: 300;
-  color: var(--accent);
-}
-
-a {
-  color: var(--accent);
-}
-
-a:hover,
-a:focus {
-  color: oklch(from var(--accent) calc(l + 0.1) c h);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-2xl);
 }
 
 .color-pickers-group {
   display: grid;
   flex-direction: column;
   gap: var(--spacing-16);
-  padding: var(--spacing-m);
-  background: var(--layer);
   border-radius: var(--form-control-border-radius);
 
   @media (width >= 40rem) {
@@ -180,26 +191,13 @@ a:focus {
   display: grid;
   align-content: start;
   gap: var(--spacing-m);
-  padding: var(--spacing-m);
-  background: var(--layer);
-  border-radius: var(--form-control-border-radius);
-}
-
-.contrast-info {
-  display: grid;
-  gap: var(--spacing-m);
-  padding: var(--spacing-m);
-  background: var(--layer);
-  border-radius: var(--form-control-border-radius);
-  text-align: center;
 }
 
 .box-body {
   display: grid;
-  grid-row: 1;
-  grid-column: 1 / -1;
   min-height: 6rem;
   overflow: hidden;
+  border-radius: var(--radius-2xl);
   @media (width > 40rem) {
     grid-template-columns: 1fr 1fr;
   }
@@ -210,6 +208,7 @@ a:focus {
   place-content: center;
   padding: var(--spacing-m);
   text-align: center;
+  font-weight: var(--font-weight-semibold);
   overflow-wrap: break-word;
   word-break: break-all;
 }
@@ -240,6 +239,12 @@ a:focus {
   color: var(--ui-foreground);
 }
 
+.contrast-info {
+  display: grid;
+  gap: var(--spacing-m);
+  text-align: center;
+}
+
 .color-value,
 .contrast-value {
   text-align: center;
@@ -254,9 +259,12 @@ a:focus {
   line-height: 1.1;
 }
 
+.contrast-ratio {
+  font-size: 80px;
+  font-weight: 400;
+}
 .contrast-value {
-  font-size: 1rem;
-  line-height: 1.4;
+  font-weight: 800;
 }
 
 .contrast-display {
@@ -264,9 +272,6 @@ a:focus {
 }
 
 .contrast-warning {
-  font-size: 0.8em;
-  color: var(--accent);
-  margin-top: var(--spacing-m);
 }
 
 .hex-value-container {
@@ -291,57 +296,34 @@ a:focus {
 }
 
 .contrast-guide {
-  padding: var(--spacing-l);
-  background: var(--layer);
-  border-radius: var(--form-control-border-radius);
-}
-
-.contrast-guide h2 {
-  margin-top: 0;
-  margin-bottom: var(--spacing-l);
-  font-size: 1.5rem;
-  text-align: center;
-}
-
-.contrast-guide h3 {
-  margin-bottom: var(--spacing-m);
-  font-size: 1.25rem;
-  color: var(--accent);
+  margin-top: var(--spacing-l);
+  padding-top: var(--spacing-m);
+  border-top: 1px solid var(--border-medium);
 }
 
 .threshold-grid {
   display: grid;
-  gap: var(--spacing-m);
+  gap: var(--spacing-l);
 
-  @media (width >= 48rem) {
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  @media (width >= 64rem) {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
 .threshold-item {
-  padding: var(--spacing-m);
   background: var(--surface);
-  border-left: 4px solid var(--accent);
-}
-
-.threshold-item h4 {
-  margin-top: 0;
-  margin-bottom: var(--spacing-m);
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--on-surface);
 }
 
 .threshold-item ul {
   margin: 0;
-  padding-left: var(--spacing-m);
+  padding: 0;
   list-style: none;
 }
 
 .threshold-item li {
-  margin-bottom: var(--spacing-m);
-  font-size: 0.9rem;
-  line-height: 1.4;
+  display: flex;
+  gap: var(--spacing-8);
+  margin-bottom: var(--spacing-8);
 }
 
 .threshold-item li:last-child {
@@ -349,13 +331,12 @@ a:focus {
 }
 
 .threshold-item strong {
-  color: var(--accent);
-  font-weight: 600;
+  flex-grow: 1;
+  font-weight: var(--font-weight-semibold);
 }
 
 .threshold-indicator {
   display: inline-block;
-  margin-left: var(--spacing-m);
   font-size: 1em;
 }
 
@@ -406,9 +387,9 @@ a:focus {
 }
 
 .color-example {
-  padding: var(--spacing-m);
-  background: var(--layer);
-  border-radius: var(--form-control-border-radius);
+  @media (width >= 64rem) {
+    padding: 0 0 0 var(--spacing-l);
+  }
 }
 
 .example-content {
