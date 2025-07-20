@@ -32,9 +32,9 @@
   --color-orange-700: oklch(49% 0.17 71);
 
   /* Slider variables, managed by JavaScript. Initial values are fallbacks. */
-  --slider-l: 0.75;
-  --slider-c: 0.1;
-  --slider-h: 180;
+  --slider-l: 0.5;
+  --slider-c: 0.01;
+  --slider-h: 0;
 
   /* OKLCH relative colors. For modifying colors (L: lightness, C: chroma, H: hue) */
   --color-text-user: #ffffff; /* Default for user text, synced with picker */

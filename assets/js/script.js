@@ -112,6 +112,18 @@ function toHex(colorStringInput) {
   }
 }
 
+/**
+ * Formate intelligemment un nombre en supprimant les zéros inutiles
+ * @param {number} number - Le nombre à formater
+ * @param {number} decimals - Le nombre de décimales maximum
+ * @returns {string} - Le nombre formaté
+ */
+function formatSmart(number, decimals) {
+  const formatted = parseFloat(number).toFixed(decimals);
+  // Supprime les zéros inutiles à la fin et le point décimal si pas nécessaire
+  return formatted.replace(/\.?0+$/, "");
+}
+
 // Simple validation of a color string
 function isValidColor(color) {
   return colorParsley(color) !== false;
@@ -381,13 +393,13 @@ function updateOKLCHValues() {
         (match, l, c, h, alpha) => {
           const lightness = l.includes("%")
             ? l
-            : `${(parseFloat(l) * 100).toFixed(0)}%`;
+            : `${formatSmart(parseFloat(l) * 100, 2)}%`;
           const chroma = c.includes("%")
-            ? `${parseFloat(c.replace("%", "")).toFixed(0)}%`
-            : `${parseFloat(c).toFixed(3)}`;
-          const hue = `${parseFloat(h).toFixed(0)}°`;
+            ? `${formatSmart(parseFloat(c.replace("%", "")), 0)}%`
+            : formatSmart(parseFloat(c), 3);
+          const hue = formatSmart(parseFloat(h), 2);
 
-          return `${lightness} ${chroma} ${hue}`;
+          return `oklch(${lightness} ${chroma} ${hue})`;
         }
       );
 
@@ -612,9 +624,9 @@ function updateColor(value, isPrimaryColor = true) {
   }
 
   if (isPrimaryColor) {
-    // Mettre à jour la couleur directement ET les variables slider
-    root.style.setProperty("--color-variant", value);
+    // Mettre à jour uniquement les variables slider pour que CSS construise la couleur
     if (colorText) colorText.value = value;
+    if (colorPicker) colorPicker.value = value;
 
     try {
       const colorObj = new Color(value);
@@ -639,6 +651,7 @@ function updateColor(value, isPrimaryColor = true) {
   } else {
     root.style.setProperty("--color-text-user", value);
     if (textColorText) textColorText.value = value;
+    if (textColorPicker) textColorPicker.value = value;
   }
   updateOKLCHValues();
 }
@@ -684,46 +697,46 @@ function updateSliderFromCSS(cssVarName, slider, valueDisplay) {
   if (cssVarName === "--slider-l") {
     let lightness = parseFloat(computedValue) * 100; // Convert from 0-1 to 0-100
     if (isNaN(lightness)) lightness = 75;
-    lightness = Math.round(lightness); // Arrondir à l'entier
     slider.value = lightness;
-    if (valueDisplay) valueDisplay.textContent = `${lightness}%`;
+    if (valueDisplay) {
+      valueDisplay.textContent = `${formatSmart(lightness, 2)}%`;
+    }
   } else if (cssVarName === "--slider-c") {
     let chroma = parseFloat(computedValue);
     if (isNaN(chroma)) chroma = 0.1;
     slider.value = chroma;
-    if (valueDisplay) valueDisplay.textContent = chroma.toFixed(3);
+    if (valueDisplay) valueDisplay.textContent = formatSmart(chroma, 3);
   } else if (cssVarName === "--slider-h") {
     let hue = parseFloat(computedValue);
     if (isNaN(hue)) hue = 180;
-    hue = Math.round(hue); // Arrondir à l'entier
     slider.value = hue;
-    if (valueDisplay) valueDisplay.textContent = `${hue}°`;
+    if (valueDisplay) valueDisplay.textContent = formatSmart(hue, 2);
   }
 }
 
 if (lSlider) {
   lSlider.addEventListener("input", () => {
-    const value = lSlider.value;
+    const value = parseFloat(lSlider.value);
     root.style.setProperty("--slider-l", (value / 100).toString()); // Convert from 0-100 to 0-1
-    if (lValueDisplay) lValueDisplay.textContent = `${value}%`;
+    if (lValueDisplay) lValueDisplay.textContent = `${formatSmart(value, 2)}%`;
     updateOKLCHValues();
   });
 }
 
 if (cSlider) {
   cSlider.addEventListener("input", () => {
-    const value = cSlider.value;
-    root.style.setProperty("--slider-c", value);
-    if (cValueDisplay) cValueDisplay.textContent = parseFloat(value).toFixed(3);
+    const value = parseFloat(cSlider.value);
+    root.style.setProperty("--slider-c", value.toString());
+    if (cValueDisplay) cValueDisplay.textContent = formatSmart(value, 3);
     updateOKLCHValues();
   });
 }
 
 if (hSlider) {
   hSlider.addEventListener("input", () => {
-    const value = hSlider.value;
-    root.style.setProperty("--slider-h", value);
-    if (hValueDisplay) hValueDisplay.textContent = `${value}°`;
+    const value = parseFloat(hSlider.value);
+    root.style.setProperty("--slider-h", value.toString());
+    if (hValueDisplay) hValueDisplay.textContent = formatSmart(value, 2);
     updateOKLCHValues();
   });
 }
