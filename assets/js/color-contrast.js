@@ -620,7 +620,7 @@ function updateOKLCHValues() {
           if (shouldShowWcagWarning) {
             if (wcagWarningContainer) {
               wcagWarningContainer.textContent =
-                " (ratio basé sur la couleur sRGB la plus proche)";
+                " (calculé sur la couleur sRGB la plus proche)";
             }
           } else {
             if (wcagWarningContainer) {
