@@ -410,7 +410,7 @@ a:focus {
 }
 
 .contrast-guide {
-  margin-top: var(--spacing-l);
+  margin-top: var(--spacing-m);
   padding-top: var(--spacing-m);
   border-top: 1px solid var(--border-medium);
 }
