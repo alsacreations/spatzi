@@ -25,16 +25,13 @@
   --slider-h: 0;
 
   --color-user-1: #eeeeee;
-  --ui-background: var(--color-user-2);
-  --ui-foreground: var(--color-user-1);
   --color-user-2: oklch(var(--slider-l) var(--slider-c) var(--slider-h));
+  --ui-foreground: var(--color-user-1);
+  --ui-background: var(--color-user-2);
 
   /* Variables spécifiques aux composants */
   --width-color-picker: 2rem;
   --size-thumb: 1.5rem;
-
-  /* Alias pour compatibilité */
-  --layer: var(--layer-2); /* Utilise le token layer-2 */
 }
 
 /* Généralités */
@@ -200,7 +197,7 @@ a:focus {
 .range-value {
   position: absolute;
   left: 0;
-  padding: 4px 8px;
+  padding: 0;
   border-radius: var(--form-control-border-radius, 4px);
   background-color: var(--form-control-background, Field);
   font-size: var(--text-14, 0.875rem);
@@ -320,12 +317,14 @@ a:focus {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: var(--spacing-8);
+  gap: var(--spacing-4);
 }
 
 .contrast-switcher {
+  margin-inline: var(--spacing-16);
   --switch-width: 2.7rem;
   --switch-height: 1.7rem;
+  --switch-thumb-color: var(--on-surface);
   --switch-track-color: light-dark(
     var(--color-gray-100),
     var(--color-gray-800)
@@ -344,6 +343,44 @@ a:focus {
 
 .switcher-label[data-state="unselected"] {
   font-weight: var(--font-weight-regular);
+}
+
+.tooltip-button {
+  padding: var(--spacing-4);
+  box-shadow: none;
+  background-color: transparent;
+  cursor: help;
+}
+
+[popover] {
+  width: 300px;
+  margin: 0;
+  padding: var(--spacing-8);
+  /* se place en bas de l'élément source */
+  position-area: none;
+  background-color: var(--contrast);
+  color: var(--on-contrast);
+  border-radius: var(--radius-lg);
+  text-align: start;
+
+  @media (width >= 64rem) {
+    width: 400px;
+    /* se place à droite de l'élément source */
+    position-area: right center;
+  }
+}
+
+/* Animation */
+[popover]:popover-open {
+  opacity: 1;
+  translate: 4px 0;
+  transition: 0.3s;
+  transition-property: opacity, translate;
+
+  @starting-style {
+    opacity: 0;
+    translate: -12px 0;
+  }
 }
 
 .contrast-info {
@@ -451,7 +488,7 @@ a:focus {
 
 .threshold-item strong {
   flex-grow: 1;
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-bold);
 }
 
 .threshold-indicator {
@@ -513,40 +550,55 @@ a:focus {
 }
 
 .example-content {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--spacing-m);
   padding: var(--spacing-m);
   background: var(--ui-background);
   color: var(--ui-foreground);
-  border-radius: var(--form-control-border-radius);
+  border-radius: var(--radius-2xl);
 }
 
 .example-text-item {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--spacing-m);
-  margin-bottom: var(--spacing-m);
-
-  &:last-child {
-    margin-bottom: 0;
-  }
+  position: relative;
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-column: 1 / -1;
+  gap: var(--spacing-16);
+  align-content: start;
+  align-items: start;
 }
 
 .size-indicator {
   display: flex;
   align-items: center;
-  gap: var(--spacing-8);
-  font-size: var(--text-12);
-  background: var(--contrast);
-  color: var(--on-contrast);
+  justify-self: end;
+  gap: var(--spacing-4);
+  background: var(--layer-1);
+  color: var(--on-surface);
   padding: var(--spacing-4);
   white-space: nowrap;
   flex-shrink: 0;
   justify-content: center;
   border-radius: var(--form-control-border-radius);
+  font-size: var(--text-12);
+  font-weight: var(--font-weight-bold);
 
   @media (width >= 64rem) {
     position: absolute;
+    left: 0;
     translate: -120% 0;
+    font-size: var(--text-14);
   }
+}
+
+/* États des indicateurs de taille selon le seuil de contraste */
+.size-indicator[data-passed="true"] {
+  background: var(--success-faded);
+}
+
+.size-indicator[data-passed="false"] {
+  background: var(--error-faded);
 }
 
 .threshold-status {
@@ -555,8 +607,8 @@ a:focus {
 }
 
 .example-title {
-  font-size: 36px;
-  font-weight: 300;
+  font-size: 30px;
+  font-weight: 400;
   margin: 0;
   line-height: 1.2;
 }
@@ -586,7 +638,36 @@ a:focus {
   font-size: 16px;
   font-weight: 400;
   margin: 0;
+  padding-left: 1rem;
   line-height: 1.5;
+}
+
+.example-normal ul {
+  margin: 0;
+  padding-left: var(--spacing-m);
+}
+
+.example-normal li {
+  margin-bottom: var(--spacing-4);
+}
+
+.example-normal li:last-child {
+  margin-bottom: 0;
+}
+
+.example-icons {
+  display: flex;
+  gap: var(--spacing-32);
+  align-items: center;
+  justify-content: center;
+}
+
+.example-icon {
+  border-radius: var(--radius-full);
+  padding: var(--spacing-8);
+  width: 3rem;
+  height: 3rem;
+  border: 2px solid currentColor;
 }
 
 .example-small {

@@ -411,6 +411,7 @@ function updateExampleIndicators() {
   exampleItems.forEach((item) => {
     const size = parseInt(item.dataset.size);
     const weight = item.dataset.weight;
+    const type = item.dataset.type; // Nouveau : type graphique
     const statusElement = item.querySelector(".threshold-status");
 
     if (!statusElement) return;
@@ -422,9 +423,12 @@ function updateExampleIndicators() {
       if (apcaRatioElement) {
         const apcaValue = Math.abs(parseFloat(apcaRatioElement.textContent));
 
-        // Seuils APCA selon la taille
+        // Seuils APCA selon la taille et le type
         let threshold = 75;
-        if ((size >= 24 && weight === "bold") || size >= 36) {
+        if (type === "graphic") {
+          // Éléments graphiques = Texte large en APCA
+          threshold = 45;
+        } else if ((size >= 24 && weight === "bold") || size >= 36) {
           threshold = 45;
         } else if (size >= 24 || (size >= 16 && weight === "bold")) {
           threshold = 60;
@@ -437,9 +441,12 @@ function updateExampleIndicators() {
       if (wcagRatioElement) {
         const wcagRatio = parseFloat(wcagRatioElement.textContent);
 
-        // Seuils WCAG2 selon la taille (niveau AA)
+        // Seuils WCAG2 selon la taille et le type (niveau AA)
         let threshold = 4.5;
-        if ((size >= 18 && weight === "bold") || size >= 24) {
+        if (type === "graphic") {
+          // Éléments graphiques = seuil 3:1
+          threshold = 3;
+        } else if ((size >= 18 && weight === "bold") || size >= 24) {
           threshold = 3;
         }
 
@@ -450,6 +457,12 @@ function updateExampleIndicators() {
     statusElement.innerHTML = isPassed
       ? '✅<span class="visually-hidden"> accessible</span>'
       : '❌<span class="visually-hidden"> non accessible</span>';
+
+    // Applique l'état au size-indicator parent
+    const sizeIndicator = item.querySelector(".size-indicator");
+    if (sizeIndicator) {
+      sizeIndicator.dataset.passed = isPassed.toString();
+    }
   });
 }
 
