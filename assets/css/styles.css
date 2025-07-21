@@ -228,6 +228,7 @@ a:focus {
     padding: 0;
     box-shadow: none;
     background-color: transparent;
+    cursor: pointer;
   }
 
   & :last-child {
