@@ -438,6 +438,8 @@ a:focus {
 
 .footer {
   margin-top: var(--spacing-l);
+  padding-top: var(--spacing-m);
+  border-top: 1px solid var(--border-medium);
   text-align: center;
 
   & p {
