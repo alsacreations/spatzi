@@ -39,6 +39,8 @@ contrastSwitcher.addEventListener("change", (e) => {
   const contrastTypeIndicator = document.querySelector(
     ".contrast-type-indicator"
   );
+  const wcagLabel = document.querySelector(".switcher-label-left");
+  const apcaLabel = document.querySelector(".switcher-label-right");
 
   if (e.target.checked) {
     wcagDisplay.style.display = "none";
@@ -46,6 +48,18 @@ contrastSwitcher.addEventListener("change", (e) => {
 
     wcagGuide.style.display = "none";
     apcaGuide.style.display = "block";
+
+    // Mettre à jour les états des labels
+    if (wcagLabel) {
+      wcagLabel.setAttribute("data-state", "unselected");
+      const wcagStatus = wcagLabel.querySelector(".switcher-status");
+      if (wcagStatus) wcagStatus.textContent = "(non sélectionné)";
+    }
+    if (apcaLabel) {
+      apcaLabel.setAttribute("data-state", "selected");
+      const apcaStatus = apcaLabel.querySelector(".switcher-status");
+      if (apcaStatus) apcaStatus.textContent = "(sélectionné)";
+    }
 
     if (contrastTypeIndicator) {
       contrastTypeIndicator.textContent = "(APCA)";
@@ -56,6 +70,18 @@ contrastSwitcher.addEventListener("change", (e) => {
 
     wcagGuide.style.display = "block";
     apcaGuide.style.display = "none";
+
+    // Mettre à jour les états des labels
+    if (wcagLabel) {
+      wcagLabel.setAttribute("data-state", "selected");
+      const wcagStatus = wcagLabel.querySelector(".switcher-status");
+      if (wcagStatus) wcagStatus.textContent = "(sélectionné)";
+    }
+    if (apcaLabel) {
+      apcaLabel.setAttribute("data-state", "unselected");
+      const apcaStatus = apcaLabel.querySelector(".switcher-status");
+      if (apcaStatus) apcaStatus.textContent = "(non sélectionné)";
+    }
 
     if (contrastTypeIndicator) {
       contrastTypeIndicator.textContent = "(WCAG)";
@@ -593,11 +619,11 @@ function updateOKLCHValues() {
           if (wcagRatioSpan) {
             wcagRatioSpan.innerHTML = `<span class="contrast-value">${wcagContrast.toFixed(
               2
-            )}</span>:1`;
+            )}</span><span class="contrast-unit">:1</span>`;
           } else {
             contrastRatioElement.innerHTML = `<span class="visually-hidden">Contraste WCAG2 : </span><span class="contrast-ratio"><span class="contrast-value">${wcagContrast.toFixed(
               2
-            )}</span>:1</span>`;
+            )}</span><span class="contrast-unit">:1</span></span>`;
           }
 
           const level =
@@ -653,10 +679,10 @@ function updateOKLCHValues() {
             contrastRatioElement.querySelector(".contrast-ratio");
           if (wcagRatioSpan) {
             wcagRatioSpan.innerHTML =
-              '<span class="contrast-value">0.00</span>:1';
+              '<span class="contrast-value">0.00</span><span class="contrast-unit">:1</span>';
           } else {
             contrastRatioElement.innerHTML =
-              '<span class="visually-hidden">Contraste WCAG2 : </span><span class="contrast-ratio"><span class="contrast-value">0.00</span>:1</span>';
+              '<span class="visually-hidden">Contraste WCAG2 : </span><span class="contrast-ratio"><span class="contrast-value">0.00</span><span class="contrast-unit">:1</span></span>';
           }
           // Suppression de l'application de couleur - le texte garde sa couleur naturelle
           // contrastRatioElement.style.color = "var(--error)";
@@ -676,10 +702,10 @@ function updateOKLCHValues() {
           contrastRatioElement.querySelector(".contrast-ratio");
         if (wcagRatioSpan) {
           wcagRatioSpan.innerHTML =
-            '<span class="contrast-value">0.00</span>:1';
+            '<span class="contrast-value">0.00</span><span class="contrast-unit">:1</span>';
         } else {
           contrastRatioElement.innerHTML =
-            '<span class="visually-hidden">Contraste WCAG2 : </span><span class="contrast-ratio"><span class="contrast-value">0.00</span>:1</span>';
+            '<span class="visually-hidden">Contraste WCAG2 : </span><span class="contrast-ratio"><span class="contrast-value">0.00</span><span class="contrast-unit">:1</span></span>';
         }
         // Suppression de l'application de couleur - le texte garde sa couleur naturelle
         // contrastRatioElement.style.color = "var(--error)";

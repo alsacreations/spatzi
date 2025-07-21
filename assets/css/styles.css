@@ -160,14 +160,14 @@ a:focus {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2.5rem;
+  width: 2rem;
   height: 2.5rem;
   padding: 0;
   background: transparent;
   border: none;
   color: var(--on-surface);
   box-shadow: none;
-  font-size: 2.2rem;
+  font-size: var(--text-20);
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -316,6 +316,13 @@ a:focus {
   color: var(--ui-foreground);
 }
 
+.contrast-switcher-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-8);
+}
+
 .contrast-switcher {
   --switch-width: 2.7rem;
   --switch-height: 1.7rem;
@@ -323,6 +330,20 @@ a:focus {
     var(--color-gray-100),
     var(--color-gray-800)
   );
+}
+
+.switcher-label {
+  cursor: pointer;
+  user-select: none;
+  transition: font-weight 0.2s ease;
+}
+
+.switcher-label[data-state="selected"] {
+  font-weight: var(--font-weight-bold);
+}
+
+.switcher-label[data-state="unselected"] {
+  font-weight: var(--font-weight-regular);
 }
 
 .contrast-info {
@@ -340,7 +361,6 @@ a:focus {
 
 .color-value {
   display: block;
-  font-family: monospace;
   font-size: 1rem;
   overflow-wrap: break-word;
   line-height: 1.1;
@@ -348,11 +368,17 @@ a:focus {
 
 .contrast-ratio {
   font-size: 80px;
-  font-weight: 400;
   line-height: 1;
 }
+
 .contrast-value {
-  font-weight: 800;
+  font-weight: var(--font-weight-bold);
+}
+
+.contrast-unit {
+  opacity: 0.7;
+  font-size: 0.9em;
+  font-weight: 400;
 }
 
 .contrast-display {

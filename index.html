@@ -328,23 +328,45 @@
             </div>
 
             <!-- Switcher pour choisir le type de contraste -->
-            <div class="contrast-switcher">
-              <span class="switcher-label-left">WCAG2</span>
+            <div
+              class="contrast-switcher-group"
+              role="group"
+              aria-labelledby="contrast-type-label"
+            >
+              <span id="contrast-type-label" class="visually-hidden"
+                >Type de contraste</span
+              >
+              <label
+                for="switch_contrast"
+                class="switcher-label switcher-label-left"
+                data-state="selected"
+              >
+                WCAG2
+                <span class="visually-hidden switcher-status"
+                  >(sélectionné)</span
+                >
+              </label>
               <input
                 type="checkbox"
                 role="switch"
                 id="switch_contrast"
                 name="switch_contrast"
                 class="contrast-switcher"
-                aria-describedby="switch_help"
+                aria-describedby="contrast-type-description"
               />
-              <label for="switch_contrast" class="visually-hidden"
-                >Basculer entre WCAG2 et APCA</label
+              <span id="contrast-type-description" class="visually-hidden"
+                >Bascule entre les méthodes de calcul WCAG2 et APCA</span
               >
-              <span class="switcher-label-right">APCA Lc</span>
-              <div id="switch_help" class="visually-hidden">
-                Basculer entre WCAG2 et APCA
-              </div>
+              <label
+                for="switch_contrast"
+                class="switcher-label switcher-label-right"
+                data-state="unselected"
+              >
+                APCA Lc
+                <span class="visually-hidden switcher-status"
+                  >(non sélectionné)</span
+                >
+              </label>
             </div>
           </div>
         </div>
