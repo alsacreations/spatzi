@@ -40,6 +40,7 @@
 /* Généralités */
 
 body {
+  margin-block: var(--spacing-m);
   font-family: var(--font-poppins);
   background-color: var(--surface);
   color: var(--on-surface);
@@ -66,12 +67,39 @@ a:focus {
   color: oklch(from var(--accent) calc(l + 0.1) c h);
 }
 
-/* Header */
+/* ----------------------------------
+ * Header
+ * ----------------------------------
+ */
 .header {
   margin-bottom: var(--spacing-l);
 }
 
-/* Main */
+.header-top {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  place-items: center;
+
+  @media (width >= 64rem) {
+    grid-template-columns: auto auto auto;
+    justify-content: space-between;
+  }
+}
+
+.btn-cta {
+  border-radius: var(--radius-full);
+  color: var(--on-primary);
+  &:hover,
+  &:focus,
+  &:active {
+    color: var(--on-primary);
+  }
+}
+
+/* ----------------------------------
+ * Main
+ * ----------------------------------
+ */
 .app {
   display: grid;
 
@@ -318,7 +346,6 @@ a:focus {
 
 .subtitle p {
   margin: 0;
-  font-size: 1.2rem;
 }
 
 .contrast-guide {
