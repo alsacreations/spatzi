@@ -98,6 +98,28 @@ a:focus {
   }
 }
 
+/* Logo */
+
+.logo-alsacreations {
+  display: block;
+  width: 180px;
+  --logo-color-pepins-outer: #acc737;
+  --logo-color-pepins-inner: #333;
+  --logo-color-alsa: #acc737;
+  --logo-color-creations: light-dark(#4b4a4a, #fff);
+}
+.logo-alsacreations-alsa {
+  fill: var(--logo-color-alsa);
+}
+.logo-alsacreations-creations {
+  fill: var(--logo-color-creations);
+}
+.logo-alsacreations-pepins-outer {
+  fill: var(--logo-color-pepins-outer);
+}
+.logo-alsacreations-pepins-inner {
+  fill: var(--logo-color-pepins-inner);
+}
 /* ----------------------------------
  * Main
  * ----------------------------------
@@ -422,20 +444,19 @@ a:focus {
     margin: 0;
     font-size: 0.8rem;
   }
-}
 
-.logo-alsacreations {
-  display: block;
-  width: 150px;
-  margin: auto;
-}
-.logo-alsacreations-pepins-inner {
-  fill: var(--surface);
-}
-.logo-alsacreations-pepins-outer,
-.logo-alsacreations-alsa,
-.logo-alsacreations-creations {
-  fill: var(--on-surface);
+  & .logo-alsacreations {
+    width: 150px;
+  }
+
+  & .logo-alsacreations-pepins-inner {
+    fill: var(--surface);
+  }
+  & .logo-alsacreations-pepins-outer,
+  & .logo-alsacreations-alsa,
+  & .logo-alsacreations-creations {
+    fill: var(--on-surface);
+  }
 }
 
 .logo-link {
