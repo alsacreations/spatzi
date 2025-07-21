@@ -540,7 +540,7 @@ a:focus {
 
 /* Theme switcher */
 .theme-switcher {
-  --theme-switcher-width: 44px;
+  --theme-switcher-width: 48px;
   --theme-switcher-radius: 40px;
   --theme-switcher-padding: 4px;
   --theme-switcher-border-color: light-dark(#111827, #d4d4d4);
