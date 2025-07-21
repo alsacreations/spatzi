@@ -313,15 +313,13 @@ a:focus {
   place-content: center;
   padding: var(--spacing-m);
   text-align: center;
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-bold);
   overflow-wrap: break-word;
   word-break: break-all;
 }
 
 .box-half .box-color-value {
   display: grid;
-  font-size: 0.9rem;
-  font-family: monospace;
 }
 
 .box-half .box-color-value .gamut-warning-inline {
