@@ -150,12 +150,9 @@ a:focus {
   cursor: pointer;
   transition: all 0.2s ease;
 
-  &:hover {
-    scale: 1.05;
-  }
-
-  &:active {
-    scale: 0.95;
+  &:hover,
+  &:focus {
+    color: var(--primary);
   }
 }
 
@@ -228,7 +225,8 @@ a:focus {
     flex-shrink: 0;
     width: var(--width-color-picker);
     height: var(--width-color-picker);
-    padding: var(--spacing-4);
+    padding: 0;
+    box-shadow: none;
     background-color: transparent;
   }
 
