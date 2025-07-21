@@ -24,7 +24,7 @@
   --slider-c: 0;
   --slider-h: 0;
 
-  --color-user-1: #ffffff;
+  --color-user-1: #eeeeee;
   --ui-background: var(--color-user-2);
   --ui-foreground: var(--color-user-1);
   --color-user-2: oklch(var(--slider-l) var(--slider-c) var(--slider-h));
@@ -54,7 +54,7 @@ h3 {
 }
 
 h1 {
-  font-size: var(--text-3xl);
+  font-size: var(--text-4xl);
   font-weight: var(--font-weight-bold);
 }
 
@@ -78,11 +78,13 @@ a:focus {
 .header-top {
   display: grid;
   grid-template-columns: 1fr auto;
-  place-items: center;
+  gap: var(--spacing-m);
+  place-items: start;
 
   @media (width >= 64rem) {
     grid-template-columns: auto auto auto;
     justify-content: space-between;
+    place-items: center;
   }
 }
 
@@ -293,9 +295,16 @@ a:focus {
   color: var(--ui-foreground);
 }
 
+.contrast-switcher {
+  --switch-width: 2.7rem;
+  --switch-height: 1.7rem;
+  --switch-track-color: var(--color-gray-100);
+}
+
 .contrast-info {
   display: grid;
   gap: var(--spacing-m);
+  margin-top: var(--spacing-m);
   text-align: center;
 }
 
@@ -316,6 +325,7 @@ a:focus {
 .contrast-ratio {
   font-size: 80px;
   font-weight: 400;
+  line-height: 1;
 }
 .contrast-value {
   font-weight: 800;
@@ -326,6 +336,7 @@ a:focus {
 }
 
 .contrast-warning {
+  font-size: 0.8em;
 }
 
 .hex-value-container {
@@ -531,7 +542,7 @@ a:focus {
 
 /* Theme switcher */
 .theme-switcher {
-  --theme-switcher-width: 42px;
+  --theme-switcher-width: 44px;
   --theme-switcher-radius: 40px;
   --theme-switcher-padding: 4px;
   --theme-switcher-border-color: light-dark(#111827, #d4d4d4);

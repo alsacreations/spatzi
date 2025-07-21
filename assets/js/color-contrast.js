@@ -448,10 +448,10 @@ function updateOKLCHValues() {
 
     // Fallback si les variables CSS ne sont pas encore définies
     if (!actualBgColor || actualBgColor === "") {
-      actualBgColor = isTextColorPrimary ? "#ffffff" : "#ff69b4";
+      actualBgColor = isTextColorPrimary ? "#eeeeee" : "#ff69b4";
     }
     if (!actualTextColor || actualTextColor === "") {
-      actualTextColor = isTextColorPrimary ? "#ff69b4" : "#ffffff";
+      actualTextColor = isTextColorPrimary ? "#ff69b4" : "#eeeeee";
     }
     if (!colorToDisplayInBox || colorToDisplayInBox === "") {
       colorToDisplayInBox = isTextColorPrimary ? "#ff69b4" : "#ff69b4";
@@ -911,7 +911,7 @@ function initializePage() {
     : "#ff69b4";
   const initialTextColor = foregroundColorPicker
     ? foregroundColorPicker.value
-    : "#ffffff";
+    : "#eeeeee";
 
   root.style.setProperty("--color-user-1", initialTextColor);
   root.style.setProperty("--ui-background", initialBgColor);
@@ -951,7 +951,7 @@ initializePage();
  */
 function syncInitialValues() {
   const defaultBgColor = "#ff69b4";
-  const defaultTextColor = "#ffffff";
+  const defaultTextColor = "#eeeeee";
 
   updateColor(defaultBgColor, true);
   root.style.setProperty("--color-user-1", defaultTextColor);
