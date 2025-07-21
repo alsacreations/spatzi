@@ -147,7 +147,7 @@ a:focus {
   gap: var(--spacing-16);
   border-radius: var(--form-control-border-radius);
 
-  @media (width >= 40rem) {
+  @media (width >= 48rem) {
     grid-template-columns: 1fr auto 1fr;
     align-items: end;
   }
@@ -300,10 +300,10 @@ a:focus {
 
 .box-body {
   display: grid;
-  min-height: 6rem;
+  min-height: 7rem;
   overflow: hidden;
   border-radius: var(--radius-2xl);
-  @media (width > 40rem) {
+  @media (width >= 48rem) {
     grid-template-columns: 1fr 1fr;
   }
 }
