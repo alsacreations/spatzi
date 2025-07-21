@@ -20,9 +20,9 @@
  */
 :root {
   /* Variables dynamiques, gérées par JavaScript */
-  --slider-l: 0.3;
-  --slider-c: 0;
-  --slider-h: 0;
+  --slider-l: 0.75;
+  --slider-c: 0.1;
+  --slider-h: 180;
 
   --color-user-1: #eeeeee;
   --color-user-2: oklch(var(--slider-l) var(--slider-c) var(--slider-h));
@@ -231,6 +231,37 @@ a:focus {
   grid-area: hue;
 }
 
+/* Bouton de réinitialisation */
+.reset-button {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  margin-top: var(--spacing-m);
+  padding: var(--spacing-8) var(--spacing-12);
+  background: transparent;
+  color: var(--on-surface);
+  border: none;
+  border-radius: var(--form-control-border-radius);
+  font-size: var(--text-14);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  justify-self: center;
+
+  &:hover,
+  &:focus {
+    background: var(--layer-1);
+  }
+
+  &:active {
+    background: var(--layer-2);
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
 .color-inputs {
   display: flex;
   gap: var(--spacing-4);
@@ -346,6 +377,8 @@ a:focus {
 }
 
 .tooltip-button {
+  width: 26px;
+  height: 26px;
   padding: var(--spacing-4);
   box-shadow: none;
   background-color: transparent;
@@ -362,6 +395,7 @@ a:focus {
   color: var(--on-contrast);
   border-radius: var(--radius-lg);
   text-align: start;
+  font-size: var(--text-14);
 
   @media (width >= 64rem) {
     width: 400px;

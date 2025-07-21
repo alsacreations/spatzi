@@ -1028,3 +1028,43 @@ syncInitialValues();
 
 updateColorControlsOrder();
 updateActiveColorIndicator();
+
+/**
+ * Réinitialise toutes les couleurs aux valeurs par défaut
+ */
+function resetToDefaultColors() {
+  // Valeurs par défaut depuis le HTML
+  const defaultTextColor = "#eeeeee";
+  const defaultBgColor = "#ff69b4";
+
+  // Utiliser la même logique qu'au chargement initial pour synchroniser tout
+  updateColor(defaultBgColor, true); // Met à jour automatiquement les sliders OKLCH
+  root.style.setProperty("--color-user-1", defaultTextColor);
+
+  // Réinitialiser les champs de saisie de couleur
+  if (foregroundColorPicker) foregroundColorPicker.value = defaultTextColor;
+  if (foregroundColorText) foregroundColorText.value = defaultTextColor;
+  if (backgroundColorPicker) backgroundColorPicker.value = defaultBgColor;
+  if (backgroundColorText) backgroundColorText.value = defaultBgColor;
+
+  // Remettre les attributs data aux valeurs par défaut
+  root.removeAttribute("data-primary-color-out-of-gamut");
+  root.removeAttribute("data-background-color-out-of-gamut");
+
+  // Réinitialiser l'état du swap de couleurs
+  isTextColorPrimary = false;
+  updateActiveColorIndicator();
+  updateColorControlsOrder();
+
+  // Réinitialiser le contraste switcher en mode WCAG
+  if (contrastSwitcher) {
+    contrastSwitcher.checked = false;
+    // L'event listener se chargera de mettre à jour les labels
+  }
+}
+
+// Event listener pour le bouton de réinitialisation
+const resetButton = document.getElementById("reset-colors");
+if (resetButton) {
+  resetButton.addEventListener("click", resetToDefaultColors);
+}
