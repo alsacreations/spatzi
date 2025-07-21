@@ -296,7 +296,10 @@ a:focus {
 .contrast-switcher {
   --switch-width: 2.7rem;
   --switch-height: 1.7rem;
-  --switch-track-color: var(--color-gray-100);
+  --switch-track-color: light-dark(
+    var(--color-gray-100),
+    var(--color-gray-800)
+  );
 }
 
 .contrast-info {
