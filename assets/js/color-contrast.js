@@ -499,13 +499,13 @@ function updateOKLCHValues() {
 
     // Fallback si les variables CSS ne sont pas encore définies
     if (!actualBgColor || actualBgColor === "") {
-      actualBgColor = isTextColorPrimary ? "#eeeeee" : "#ff69b4";
+      actualBgColor = isTextColorPrimary ? "#eeeeee" : "#e5508a";
     }
     if (!actualTextColor || actualTextColor === "") {
-      actualTextColor = isTextColorPrimary ? "#ff69b4" : "#eeeeee";
+      actualTextColor = isTextColorPrimary ? "#e5508a" : "#eeeeee";
     }
     if (!colorToDisplayInBox || colorToDisplayInBox === "") {
-      colorToDisplayInBox = isTextColorPrimary ? "#ff69b4" : "#ff69b4";
+      colorToDisplayInBox = isTextColorPrimary ? "#e5508a" : "#e5508a";
     }
 
     // La boîte affiche toujours la couleur contrôlée par les sliders
@@ -959,7 +959,7 @@ if (hSlider) {
 function initializePage() {
   const initialBgColor = backgroundColorPicker
     ? backgroundColorPicker.value
-    : "#ff69b4";
+    : "#e5508a";
   const initialTextColor = foregroundColorPicker
     ? foregroundColorPicker.value
     : "#eeeeee";
@@ -1001,7 +1001,7 @@ initializePage();
  * Synchronise les valeurs initiales au chargement
  */
 function syncInitialValues() {
-  const defaultBgColor = "#ff69b4";
+  const defaultBgColor = "#e5508a";
   const defaultTextColor = "#eeeeee";
 
   updateColor(defaultBgColor, true);
@@ -1035,7 +1035,7 @@ updateActiveColorIndicator();
 function resetToDefaultColors() {
   // Valeurs par défaut depuis le HTML
   const defaultTextColor = "#eeeeee";
-  const defaultBgColor = "#ff69b4";
+  const defaultBgColor = "#e5508a";
 
   // Utiliser la même logique qu'au chargement initial pour synchroniser tout
   updateColor(defaultBgColor, true); // Met à jour automatiquement les sliders OKLCH

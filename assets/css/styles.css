@@ -20,9 +20,9 @@
  */
 :root {
   /* Variables dynamiques, gérées par JavaScript */
-  --slider-l: 0.75;
-  --slider-c: 0.1;
-  --slider-h: 180;
+  --slider-l: 0.649;
+  --slider-c: 0.19;
+  --slider-h: 360;
 
   --color-user-1: #eeeeee;
   --color-user-2: oklch(var(--slider-l) var(--slider-c) var(--slider-h));
@@ -629,10 +629,12 @@ a:focus {
 /* États des indicateurs de taille selon le seuil de contraste */
 .size-indicator[data-passed="true"] {
   background: var(--success-faded);
+  color: var(--color-gray-900);
 }
 
 .size-indicator[data-passed="false"] {
   background: var(--error-faded);
+  color: var(--color-gray-900);
 }
 
 .threshold-status {
