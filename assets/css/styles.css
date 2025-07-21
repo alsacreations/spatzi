@@ -424,20 +424,25 @@ a:focus {
   }
 }
 
-.threshold-item {
-  background: var(--surface);
-}
-
-.threshold-item ul {
+.threshold-group ul {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.threshold-item li {
+.threshold-item {
   display: flex;
   gap: var(--spacing-8);
   margin-bottom: var(--spacing-8);
+}
+
+/* État des seuils selon le ratio de contraste */
+.threshold-item[data-passed="true"] {
+  color: var(--success);
+}
+
+.threshold-item[data-passed="false"] {
+  color: var(--error);
 }
 
 .threshold-item li:last-child {

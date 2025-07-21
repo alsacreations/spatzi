@@ -33,7 +33,7 @@
   --accent-invert: light-dark(var(--color-blue-300), var(--primary));
   --warning: light-dark(var(--color-orange-500), var(--color-orange-300));
   --error: light-dark(var(--color-red-500), var(--color-red-300));
-  --success: light-dark(var(--color-green-300), var(--color-green-500));
+  --success: light-dark(var(--color-green-500), var(--color-green-300));
   --border-light: var(--color-gray-200);
   --border-medium: var(--color-gray-300);
   --border-dark: var(--color-gray-500);

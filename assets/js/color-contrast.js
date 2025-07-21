@@ -367,6 +367,12 @@ function updateThresholdIndicators() {
         ? '✅<span class="visually-hidden"> accessible</span>'
         : '❌<span class="visually-hidden"> non accessible</span>';
       indicator.dataset.passed = isPassed.toString();
+
+      // Applique l'état au threshold-item parent
+      const thresholdItem = indicator.closest(".threshold-item");
+      if (thresholdItem) {
+        thresholdItem.dataset.passed = isPassed.toString();
+      }
     });
   }
 
@@ -385,6 +391,12 @@ function updateThresholdIndicators() {
         ? '✅<span class="visually-hidden"> accessible</span>'
         : '❌<span class="visually-hidden"> non accessible</span>';
       indicator.dataset.passed = isPassed.toString();
+
+      // Applique l'état au threshold-item parent
+      const thresholdItem = indicator.closest(".threshold-item");
+      if (thresholdItem) {
+        thresholdItem.dataset.passed = isPassed.toString();
+      }
     });
   }
 }
