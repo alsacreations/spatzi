@@ -191,9 +191,6 @@ a:focus {
   }
 }
 
-.range-wrapper {
-  position: relative;
-}
 .range-value {
   position: absolute;
   left: 0;
