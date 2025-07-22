@@ -192,13 +192,10 @@ a:focus {
 }
 
 [type="range"] {
-  color: var(--primary);
-}
-[type="range"]::-webkit-slider-thumb {
-  background-color: var(--primary);
-}
-[type="range"]::-moz-range-thumb {
-  background-color: var(--primary);
+  --range-track-color: var(--layer-3);
+  --range-thumb-border-color: var(--on-contrast);
+  --range-thumb-size: 28px;
+  color: var(--contrast);
 }
 
 .range-value {
