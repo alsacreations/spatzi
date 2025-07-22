@@ -178,6 +178,7 @@
                     id="backgroundColorText"
                     name="backgroundColorText"
                     value="#e5508a"
+                    aria-labelledby="backgroundColorPicker"
                   />
                 </div>
               </div>
@@ -212,6 +213,7 @@
                     id="foregroundColorText"
                     name="foregroundColorText"
                     value="#eeeeee"
+                    aria-labelledby="foregroundColorPicker"
                   />
                 </div>
               </div>
@@ -243,7 +245,7 @@
         </div>
 
         <!-- Contrôles OKLCH -->
-        <div class="oklch-controls" aria-labelledby="oklch-controls-title">
+        <div class="oklch-controls">
           <h2 class="visually-hidden">Contrôles OKLCH</h2>
           <div class="lch-sliders-group">
             <!-- Luminosity : modifie le composant L -->
@@ -389,6 +391,7 @@
                 >Type de contraste</span
               >
               <label
+                id="switch_contrast-wcag"
                 for="switch_contrast"
                 class="switcher-label switcher-label-left"
                 data-state="selected"
@@ -441,12 +444,14 @@
                 name="switch_contrast"
                 class="contrast-switcher"
                 aria-describedby="contrast-type-description"
+                aria-labelledby="switch_contrast-wcag switch_contrast-apca"
               />
               <span id="contrast-type-description" class="visually-hidden"
                 >Bascule entre les méthodes de calcul WCAG2 et APCA</span
               >
               <label
                 for="switch_contrast"
+                id="switch_contrast-apca"
                 class="switcher-label switcher-label-right"
                 data-state="unselected"
               >
