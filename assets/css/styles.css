@@ -578,11 +578,7 @@ a:focus {
   @media (width >= 48rem) {
     &:focus,
     &:hover {
-      transform-origin: 50% 50%;
-      animation-name: spaceboots;
-      animation-duration: 2s;
-      animation-timing-function: linear;
-      animation-iteration-count: infinite;
+      animation: spaceboots 2s linear infinite alternate;
     }
   }
 }
