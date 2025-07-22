@@ -1037,7 +1037,12 @@ function resetToDefaultColors() {
   const defaultTextColor = "#eeeeee";
   const defaultBgColor = "#e5508a";
 
-  // Utiliser la même logique qu'au chargement initial pour synchroniser tout
+  // IMPORTANT : Réinitialiser l'état du swap AVANT d'appliquer les couleurs
+  isTextColorPrimary = false;
+  updateActiveColorIndicator();
+  updateColorControlsOrder();
+
+  // Maintenant appliquer les couleurs avec la logique normale
   updateColor(defaultBgColor, true); // Met à jour automatiquement les sliders OKLCH
   root.style.setProperty("--color-user-1", defaultTextColor);
 
@@ -1051,15 +1056,11 @@ function resetToDefaultColors() {
   root.removeAttribute("data-primary-color-out-of-gamut");
   root.removeAttribute("data-background-color-out-of-gamut");
 
-  // Réinitialiser l'état du swap de couleurs
-  isTextColorPrimary = false;
-  updateActiveColorIndicator();
-  updateColorControlsOrder();
-
   // Réinitialiser le contraste switcher en mode WCAG
   if (contrastSwitcher) {
     contrastSwitcher.checked = false;
-    // L'event listener se chargera de mettre à jour les labels
+    // Déclencher manuellement l'événement change pour mettre à jour l'affichage
+    contrastSwitcher.dispatchEvent(new Event("change"));
   }
 }
 
