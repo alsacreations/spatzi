@@ -191,6 +191,16 @@ a:focus {
   }
 }
 
+[type="range"] {
+  color: var(--primary);
+}
+[type="range"]::-webkit-slider-thumb {
+  background-color: var(--primary);
+}
+[type="range"]::-moz-range-thumb {
+  background-color: var(--primary);
+}
+
 .range-value {
   position: absolute;
   left: 0;
@@ -199,14 +209,6 @@ a:focus {
   background-color: var(--form-control-background, Field);
   font-size: var(--text-14, 0.875rem);
   translate: 0 1.4rem;
-}
-
-@supports (position-anchor: initial) {
-  .range-value {
-    position-anchor: auto;
-    position-area: none;
-    translate: 0 1.4rem;
-  }
 }
 
 .control {
