@@ -1068,3 +1068,186 @@ const resetButton = document.getElementById("reset-colors");
 if (resetButton) {
   resetButton.addEventListener("click", resetToDefaultColors);
 }
+
+/**
+ * Teste une valeur de luminosité pour vérifier si elle atteint les seuils requis
+ */
+function testLuminosity(lightness, chroma, hue, targetColor) {
+  try {
+    // Créer la couleur de test avec la nouvelle luminosité
+    const testColorOklch = `oklch(${lightness / 100} ${chroma} ${hue}deg)`;
+    const testColorHex = toHex(testColorOklch);
+
+    // Calculer les contrastes selon l'ordre correct (texte, arrière-plan)
+    let wcagRatio, apcaValue;
+
+    if (isTextColorPrimary) {
+      // Mode swap : sliders contrôlent le texte, donc testColor = texte, targetColor = arrière-plan
+      wcagRatio = getContrastRatio(testColorHex, targetColor);
+      apcaValue = Math.abs(getAPCAContrast(testColorHex, targetColor));
+    } else {
+      // Mode normal : sliders contrôlent l'arrière-plan, donc testColor = arrière-plan, targetColor = texte
+      wcagRatio = getContrastRatio(targetColor, testColorHex);
+      apcaValue = Math.abs(getAPCAContrast(targetColor, testColorHex));
+    }
+
+    // Vérifier si les seuils sont atteints
+    const wcagPassed = wcagRatio >= 4.5;
+    const apcaPassed = apcaValue >= 60;
+
+    return {
+      wcagRatio,
+      apcaValue,
+      wcagPassed,
+      apcaPassed,
+      success: wcagPassed && apcaPassed,
+    };
+  } catch (e) {
+    return {
+      wcagRatio: 0,
+      apcaValue: 0,
+      wcagPassed: false,
+      apcaPassed: false,
+      success: false,
+    };
+  }
+}
+
+/**
+ * Ajuste automatiquement la luminosité pour atteindre les seuils d'accessibilité
+ */
+function makeColorAccessible() {
+  try {
+    // Obtenir les valeurs actuelles des sliders
+    const currentL = parseFloat(lSlider.value);
+    const currentC = parseFloat(cSlider.value);
+    const currentH = parseFloat(hSlider.value);
+
+    // Déterminer la couleur cible (celle qui ne sera pas modifiée)
+    let targetColorRaw;
+    if (isTextColorPrimary) {
+      // Mode swap : sliders contrôlent le texte, la couleur cible est l'arrière-plan
+      targetColorRaw =
+        getComputedStyle(root).getPropertyValue("--color-user-1").trim() ||
+        "#eeeeee";
+    } else {
+      // Mode normal : sliders contrôlent l'arrière-plan, la couleur cible est le texte
+      targetColorRaw =
+        getComputedStyle(root).getPropertyValue("--color-user-1").trim() ||
+        "#eeeeee";
+    }
+
+    // Convertir la couleur cible en hex si nécessaire
+    const targetColor = targetColorRaw.startsWith("#")
+      ? targetColorRaw
+      : toHex(targetColorRaw);
+
+    console.log(
+      `Mode: ${isTextColorPrimary ? "Texte primaire" : "Arrière-plan primaire"}`
+    );
+    console.log(`Couleur cible: ${targetColor}`);
+    console.log(`Luminosité actuelle: ${currentL.toFixed(1)}%`);
+
+    // Tester d'abord la valeur actuelle
+    const currentTest = testLuminosity(
+      currentL,
+      currentC,
+      currentH,
+      targetColor
+    );
+    if (currentTest.success) {
+      console.log(
+        "La couleur actuelle respecte déjà les seuils d'accessibilité"
+      );
+      return;
+    }
+
+    console.log(
+      `État actuel: WCAG ${currentTest.wcagRatio.toFixed(2)} (${
+        currentTest.wcagPassed ? "✅" : "❌"
+      }), APCA ${currentTest.apcaValue.toFixed(1)} (${
+        currentTest.apcaPassed ? "✅" : "❌"
+      })`
+    );
+
+    // Recherche optimisée : trouver la valeur la plus proche des seuils idéaux
+    let bestLightness = null;
+    let bestResult = null;
+    let minDistance = Infinity;
+    let bestScore = Infinity; // Score combiné : distance aux seuils idéaux
+
+    // Recherche fine avec incréments de 0.1% pour plus de précision
+    for (let l = 0; l <= 100; l += 0.1) {
+      const result = testLuminosity(l, currentC, currentH, targetColor);
+
+      if (result.success) {
+        // Calculer la distance à la luminosité originale
+        const distanceFromOriginal = Math.abs(l - currentL);
+
+        // Calculer la distance aux seuils idéaux (4.5 pour WCAG, 60 pour APCA)
+        const wcagDistance = Math.abs(result.wcagRatio - 4.5);
+        const apcaDistance = Math.abs(result.apcaValue - 60);
+
+        // Score combiné : priorité à la proximité des seuils idéaux, puis distance originale
+        const idealScore =
+          wcagDistance * 2 + apcaDistance * 0.1 + distanceFromOriginal * 0.01;
+
+        // Garder la meilleure solution
+        if (
+          idealScore < bestScore ||
+          (idealScore === bestScore && distanceFromOriginal < minDistance)
+        ) {
+          bestLightness = l;
+          bestResult = result;
+          minDistance = distanceFromOriginal;
+          bestScore = idealScore;
+        }
+      }
+    }
+
+    if (bestLightness !== null && bestResult && bestResult.success) {
+      console.log(
+        `Meilleure luminosité trouvée: ${bestLightness.toFixed(
+          1
+        )}% (distance: ${minDistance.toFixed(1)}%)`
+      );
+      console.log(
+        `Nouveaux contrastes: WCAG ${bestResult.wcagRatio.toFixed(2)} (${
+          bestResult.wcagPassed ? "✅" : "❌"
+        }), APCA ${bestResult.apcaValue.toFixed(1)} (${
+          bestResult.apcaPassed ? "✅" : "❌"
+        })`
+      );
+      console.log(
+        `Distances aux seuils idéaux: WCAG ${Math.abs(
+          bestResult.wcagRatio - 4.5
+        ).toFixed(2)}, APCA ${Math.abs(bestResult.apcaValue - 60).toFixed(1)}`
+      );
+
+      // Appliquer la nouvelle luminosité
+      lSlider.value = bestLightness;
+      root.style.setProperty("--slider-l", (bestLightness / 100).toString());
+      if (lValueDisplay) {
+        lValueDisplay.textContent = `${formatSmart(bestLightness, 1)}%`;
+      }
+      updateSliderColor();
+      updateOKLCHValues();
+    } else {
+      console.log(
+        "Impossible de trouver une luminosité qui respecte les deux seuils d'accessibilité"
+      );
+      alert(
+        "Impossible de trouver une luminosité accessible avec cette combinaison de couleurs. Essayez de changer la couleur de texte ou la saturation."
+      );
+    }
+  } catch (error) {
+    console.error("Erreur lors de l'ajustement automatique:", error);
+    alert("Une erreur s'est produite lors de l'ajustement automatique.");
+  }
+}
+
+// Event listener pour le bouton "Couleur proche accessible"
+const accessibleButton = document.getElementById("make-accessible");
+if (accessibleButton) {
+  accessibleButton.addEventListener("click", makeColorAccessible);
+}

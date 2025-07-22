@@ -32,6 +32,13 @@
   /* Variables spécifiques aux composants */
   --width-color-picker: 2rem;
   --size-thumb: 1.5rem;
+
+  /* Couleurs pour le bouton accessible */
+  --color-green-50: #f0fdf4;
+  --color-green-100: #dcfce7;
+  --color-green-200: #bbf7d0;
+  --color-green-300: #86efac;
+  --color-green-700: #15803d;
 }
 
 /* Généralités */
@@ -227,12 +234,20 @@ a:focus {
   grid-area: hue;
 }
 
-/* Bouton de réinitialisation */
-.reset-button {
+/* Boutons d'action */
+.action-buttons {
+  display: flex;
+  gap: var(--spacing-8);
+  margin-top: var(--spacing-m);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.reset-button,
+.accessible-button {
   display: flex;
   align-items: center;
   gap: var(--spacing-4);
-  margin-top: var(--spacing-m);
   padding: var(--spacing-8) var(--spacing-12);
   background: transparent;
   color: var(--on-surface);
@@ -242,7 +257,6 @@ a:focus {
   font-weight: var(--font-weight-medium);
   cursor: pointer;
   transition: all 0.2s ease;
-  justify-self: center;
 
   &:hover,
   &:focus {
