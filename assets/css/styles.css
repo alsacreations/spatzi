@@ -44,6 +44,7 @@
 /* Généralités */
 
 body {
+  --liquid-min-margin: clamp(1rem, -0.0435rem + 5.2174vw, 4rem);
   margin-block: var(--spacing-m);
   font-family: var(--font-poppins);
   background-color: var(--surface);
@@ -621,13 +622,12 @@ a:focus {
 
 .color-example {
   @media (width >= 64rem) {
-    padding: 0 0 0 var(--spacing-l);
+    padding: 0 var(--spacing-l) 0 0;
   }
 }
 
 .example-content {
   display: grid;
-  grid-template-columns: auto 1fr;
   gap: var(--spacing-m);
   padding: var(--spacing-m);
   background: var(--ui-background);
@@ -638,8 +638,6 @@ a:focus {
 .example-text-item {
   position: relative;
   display: grid;
-  grid-template-columns: subgrid;
-  grid-column: 1 / -1;
   gap: var(--spacing-16);
   align-content: start;
   align-items: start;
@@ -662,8 +660,7 @@ a:focus {
 
   @media (width >= 64rem) {
     position: absolute;
-    left: 0;
-    translate: -120% 0;
+    left: calc(100% + 0.5rem);
     font-size: var(--text-14);
   }
 }
