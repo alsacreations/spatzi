@@ -83,8 +83,8 @@ a:focus {
 .header-top {
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: var(--spacing-m);
-  place-items: start;
+  gap: var(--spacing-16);
+  place-items: center start;
 
   @media (width >= 64rem) {
     grid-template-columns: auto auto auto;
@@ -96,10 +96,15 @@ a:focus {
 .btn-cta {
   border-radius: var(--radius-full);
   color: var(--on-primary);
+
   &:hover,
   &:focus,
   &:active {
     color: var(--on-primary);
+  }
+
+  @media (width < 64rem) {
+    grid-column: 2;
   }
 }
 
@@ -466,6 +471,7 @@ a:focus {
 }
 
 .contrast-warning {
+  min-height: 1lh;
   font-size: 0.8em;
 }
 
@@ -550,7 +556,7 @@ a:focus {
 .footer {
   margin-top: var(--spacing-l);
   padding-top: var(--spacing-m);
-  border-top: 1px solid var(--border-medium);
+  /* border-top: 1px solid var(--border-medium); */
   text-align: center;
 
   & p {
@@ -776,6 +782,10 @@ a:focus {
   background-color: var(--theme-switcher-background);
   line-height: 0;
   cursor: pointer;
+
+  @media (width < 64rem) {
+    justify-self: end;
+  }
 
   &::before {
     content: "";
