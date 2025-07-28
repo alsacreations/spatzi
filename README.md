@@ -4,13 +4,14 @@ Spätzi est un outil interactif conçu pour aider les designers et développeurs
 
 ## Fonctionnalités principales
 
-- **Informations d'accessibilité :** Obtenez les taux de contraste entre la couleur de fond et la couleur de texte selon les normes WCAG 2.1 et APCA.
-- **Exemples d'application en temps réel :** Une démonstration (recette de cuisine) montre comment vos couleurs s'appliquent sur du texte de différentes tailles et des éléments graphiques, avec des indicateurs visuels de conformité (✅/❌).
-- **Couleur proche accessible :** Trouve automatiquement la couleur la plus proche qui respecte les seuils d'accessibilité WCAG (4.5:1) ou APCA (60) selon le mode sélectionné
-- **Échange de couleurs :** Bouton de permutation pour échanger instantanément la couleur de fond et la couleur de texte.
-- **Réinitialiser :** Remet les couleurs à leurs valeurs par défaut
-- **Visualisation des contrastes :**
-- Un avertissement "(closest sRGB color)" apparaît si une couleur OKLCH choisie ou générée est en dehors du gamut sRGB. La valeur HEX affichée est la couleur sRGB la plus proche.
+- ℹ️ **Informations d'accessibilité :** obtenez les taux de contraste entre la couleur de fond et la couleur de texte selon les normes WCAG 2.1 et APCA.
+- 🎨 **Aperçu en direct :** visualisation directe du rendu texte/fond selon les combinaisons choisies.
+- 👁️ **Exemples d'application en temps réel :** une démonstration (recette de cuisine) montre comment vos couleurs s'appliquent sur du texte de différentes tailles et des éléments graphiques, avec des indicateurs visuels de conformité (✅/❌).
+- 🎯 **Couleur proche accessible :** trouve automatiquement la couleur la plus proche qui respecte les seuils d'accessibilité WCAG (4.5:1) ou APCA (60) selon le mode sélectionné
+- ⚖️ **Guides d’accessibilité intégrés** : indications sur les seuils requis pour AA, AAA ou APCA lisibilité renforcée.
+- ↔️ **Échange de couleurs :** bouton de permutation pour échanger instantanément la couleur de fond et la couleur de texte.
+- 🧽 **Réinitialiser :** remet les couleurs à leurs valeurs par défaut
+- ⚠️ Un avertissement "(sRGB la plus proche)" apparaît si une couleur OKLCH choisie ou générée est en dehors du champ sRGB. La valeur HEX affichée correspond alors à la couleur sRGB la plus proche.
 
 ## Comment utiliser cet outil ?
 
