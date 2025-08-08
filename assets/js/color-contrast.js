@@ -1,890 +1,598 @@
-import { APCAcontrast, sRGBtoY } from "https://esm.sh/apca-w3";
-import { colorParsley } from "https://esm.sh/colorparsley";
+import {
+  APCAcontrast,
+  sRGBtoY,
+} from "https://cdn.jsdelivr.net/npm/apca-w3/+esm";
 import Color from "https://esm.sh/colorjs.io";
 
-const $ = document.querySelector.bind(document);
-const $$ = document.querySelectorAll.bind(document);
+// DOM helpers
+const $ = (sel) => document.querySelector(sel);
 
-const form = $("#controls");
+// Elements
 const root = document.documentElement;
 const backgroundColorPicker = $("#backgroundColorPicker");
 const backgroundColorText = $("#backgroundColorText");
 const foregroundColorPicker = $("#foregroundColorPicker");
 const foregroundColorText = $("#foregroundColorText");
-
 const swapColorsButton = $("#swapColorsButton");
+const textControl = document.getElementById("text-color-control");
+const bgControl = document.getElementById("bg-color-control");
+const pickersGroup = document.querySelector(".color-pickers-group");
 const activeColorIndicator = $("#activeColorIndicator");
-const bgColorControl = $("#bg-color-control");
-const textColorControl = $("#text-color-control");
-
-let isTextColorPrimary = false;
-
 const lSlider = $("#lumi");
 const cSlider = $("#chroma");
 const hSlider = $("#hue");
 const lValueDisplay = document.querySelector('output[for="lumi"]');
 const cValueDisplay = document.querySelector('output[for="chroma"]');
 const hValueDisplay = document.querySelector('output[for="hue"]');
-
 const contrastSwitcher = $("#switch_contrast");
-const wcagDisplay = $(".contrast-display--wcag");
-const apcaDisplay = $(".contrast-display--apca");
+const wcagDisplay = document.querySelector(".contrast-display--wcag");
+const apcaDisplay = document.querySelector(".contrast-display--apca");
+const wcagGuide = document.querySelector(".guide-content--wcag");
+const apcaGuide = document.querySelector(".guide-content--apca");
 
-const wcagGuide = $(".guide-content--wcag");
-const apcaGuide = $(".guide-content--apca");
+// State: sliders contrôlent le texte
+let isTextColorPrimary = true;
 
-form.addEventListener("submit", (e) => e.preventDefault());
-
-contrastSwitcher.addEventListener("change", (e) => {
-  const contrastTypeIndicator = document.querySelector(
-    ".contrast-type-indicator"
+// Calcule les hex UI à partir des variables (sliders et --color-user-1)
+function getUiHexColors() {
+  const lVar = parseFloat(
+    getComputedStyle(root).getPropertyValue("--slider-l").trim()
   );
-  const wcagLabel = document.querySelector(".switcher-label-left");
-  const apcaLabel = document.querySelector(".switcher-label-right");
+  const cVar = parseFloat(
+    getComputedStyle(root).getPropertyValue("--slider-c").trim()
+  );
+  const hVar = parseFloat(
+    getComputedStyle(root).getPropertyValue("--slider-h").trim()
+  );
+  const l = Number.isFinite(lVar) ? lVar : 0;
+  // Évite la notation scientifique (ex: 3.88e-16) non valide en CSS
+  const cRaw = Number.isFinite(cVar) ? cVar : 0;
+  const c = Math.abs(cRaw) < 1e-6 ? 0 : cRaw;
+  const h = Number.isFinite(hVar) ? hVar : 0;
+  const sliderHex = toNormalizedHex(safeOklchString(l, c, h));
+  const user1Hex = getCssVarHex("--color-user-1");
+  const textHex = isTextColorPrimary ? sliderHex : user1Hex;
+  const bgHex = isTextColorPrimary ? user1Hex : sliderHex;
+  return { textHex, bgHex };
+}
 
-  if (e.target.checked) {
-    wcagDisplay.style.display = "none";
-    apcaDisplay.style.display = "block";
+// Synchronise les color pickers et champs texte avec les couleurs UI rendues
+// Déférée d'un frame pour éviter les états transitoires (race de CSS vars)
+function syncPickersFromUI(options = { defer: true, label: "sync" }) {
+  const run = () => {
+    // Valeurs calculées (sliders + user-1)
+    const calc = getUiHexColors();
+    // Valeurs réellement rendues (var(--ui-foreground/background) résolues)
+    const resolved = getResolvedUiColors();
 
-    wcagGuide.style.display = "none";
-    apcaGuide.style.display = "block";
-
-    // Mettre à jour les états des labels
-    if (wcagLabel) {
-      wcagLabel.setAttribute("data-state", "unselected");
-      const wcagStatus = wcagLabel.querySelector(".switcher-status");
-      if (wcagStatus) wcagStatus.textContent = "(non sélectionné)";
+    // Logs de debug compacts
+    if (document.documentElement.dataset.debug === "true") {
+      try {
+        const cs = getComputedStyle(root);
+        const l = cs.getPropertyValue("--slider-l").trim();
+        const c = cs.getPropertyValue("--slider-c").trim();
+        const h = cs.getPropertyValue("--slider-h").trim();
+        const user1 = cs.getPropertyValue("--color-user-1").trim();
+        const uiFg = cs.getPropertyValue("--ui-foreground").trim();
+        const uiBg = cs.getPropertyValue("--ui-background").trim();
+        // eslint-disable-next-line no-console
+        console.groupCollapsed(
+          `[syncPickersFromUI:${options.label}] isTextColorPrimary=${isTextColorPrimary}`
+        );
+        // eslint-disable-next-line no-console
+        console.log("vars", { l, c, h, user1, uiFg, uiBg });
+        // eslint-disable-next-line no-console
+        console.log("calc", calc, "resolved", resolved);
+        // eslint-disable-next-line no-console
+        console.groupEnd();
+      } catch {}
     }
-    if (apcaLabel) {
-      apcaLabel.setAttribute("data-state", "selected");
-      const apcaStatus = apcaLabel.querySelector(".switcher-status");
-      if (apcaStatus) apcaStatus.textContent = "(sélectionné)";
-    }
 
-    if (contrastTypeIndicator) {
-      contrastTypeIndicator.textContent = "(APCA)";
-    }
+    const textHex = resolved.textHex || calc.textHex;
+    const bgHex = resolved.bgHex || calc.bgHex;
+    if (backgroundColorPicker) backgroundColorPicker.value = toInputHex(bgHex);
+    if (backgroundColorText) backgroundColorText.value = toNormalizedHex(bgHex);
+    if (foregroundColorPicker)
+      foregroundColorPicker.value = toInputHex(textHex);
+    if (foregroundColorText)
+      foregroundColorText.value = toNormalizedHex(textHex);
+  };
+  if (options && options.defer) {
+    requestAnimationFrame(run);
   } else {
-    wcagDisplay.style.display = "block";
-    apcaDisplay.style.display = "none";
-
-    wcagGuide.style.display = "block";
-    apcaGuide.style.display = "none";
-
-    // Mettre à jour les états des labels
-    if (wcagLabel) {
-      wcagLabel.setAttribute("data-state", "selected");
-      const wcagStatus = wcagLabel.querySelector(".switcher-status");
-      if (wcagStatus) wcagStatus.textContent = "(sélectionné)";
-    }
-    if (apcaLabel) {
-      apcaLabel.setAttribute("data-state", "unselected");
-      const apcaStatus = apcaLabel.querySelector(".switcher-status");
-      if (apcaStatus) apcaStatus.textContent = "(non sélectionné)";
-    }
-
-    if (contrastTypeIndicator) {
-      contrastTypeIndicator.textContent = "(WCAG)";
-    }
-  }
-
-  updateThresholdIndicators();
-  updateExampleIndicators();
-});
-
-/**
- * Inverse les couleurs et reconfigure les sliders pour contrôler l'autre couleur
- */
-function swapColors() {
-  const currentBgColor = backgroundColorPicker.value;
-  const currentTextColor = foregroundColorPicker.value;
-
-  isTextColorPrimary = !isTextColorPrimary;
-
-  updateColorControlsOrder();
-  updateActiveColorIndicator();
-
-  if (isTextColorPrimary) {
-    // Mode swap : sliders contrôlent le texte
-    root.style.setProperty("--color-user-1", currentTextColor);
-    updateColor(currentBgColor, true);
-
-    if (foregroundColorText) foregroundColorText.value = currentBgColor;
-    if (foregroundColorPicker) foregroundColorPicker.value = currentBgColor;
-    if (backgroundColorText) backgroundColorText.value = currentTextColor;
-    if (backgroundColorPicker) backgroundColorPicker.value = currentTextColor;
-
-    root.style.setProperty("--ui-background", "var(--color-user-1)");
-    root.style.setProperty("--ui-foreground", "var(--color-user-2)");
-  } else {
-    // Mode normal : sliders contrôlent l'arrière-plan
-    root.style.setProperty("--color-user-1", currentBgColor);
-    updateColor(currentTextColor, true);
-
-    if (backgroundColorText) backgroundColorText.value = currentTextColor;
-    if (backgroundColorPicker) backgroundColorPicker.value = currentTextColor;
-    if (foregroundColorText) foregroundColorText.value = currentBgColor;
-    if (foregroundColorPicker) foregroundColorPicker.value = currentBgColor;
-
-    root.style.setProperty("--ui-background", "var(--color-user-2)");
-    root.style.setProperty("--ui-foreground", "var(--color-user-1)");
-  }
-
-  setTimeout(() => {
-    updateOKLCHValues();
-  }, 10);
-}
-
-/**
- * Met à jour l'ordre visuel des contrôles selon le mode actif
- */
-function updateColorControlsOrder() {
-  if (isTextColorPrimary) {
-    textColorControl.style.order = "1";
-    bgColorControl.style.order = "3";
-    swapColorsButton.style.order = "2";
-  } else {
-    bgColorControl.style.order = "1";
-    swapColorsButton.style.order = "2";
-    textColorControl.style.order = "3";
+    run();
   }
 }
 
-/**
- * Met à jour le texte de l'indicateur de couleur active
- */
-function updateActiveColorIndicator() {
-  if (activeColorIndicator) {
-    activeColorIndicator.textContent = isTextColorPrimary
-      ? "Couleur de texte"
-      : "Couleur d'arrière-plan";
-  }
+// Utils
+function formatSmart(value, digits = 2) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return "0";
+  const fixed = n.toFixed(digits);
+  return String(parseFloat(fixed));
 }
 
-if (swapColorsButton) {
-  swapColorsButton.addEventListener("click", swapColors);
+function clamp01(x) {
+  return Math.min(1, Math.max(0, x));
 }
 
-/**
- * Convertit une couleur OKLCH ou autre format vers hexadécimal
- */
-function toHex(colorStringInput) {
-  const originalColorString = String(colorStringInput);
+// Construit une chaîne OKLCH sûre (évite la notation scientifique pour C quasi nulle)
+function safeOklchString(l, c, h) {
+  const L = Number.isFinite(l) ? clamp01(l) : 0;
+  const Cn = Number.isFinite(c) ? Math.max(0, c) : 0;
+  const C = Math.abs(Cn) < 1e-6 ? 0 : Cn;
+  const H = Number.isFinite(h) ? h : 0;
+  return `oklch(${L} ${C} ${H})`;
+}
 
+function toHex(inputColor) {
   try {
-    let color = originalColorString;
-
-    if (color.toLowerCase().startsWith("oklch(")) {
-      const oklchRegex =
-        /oklch\(\s*([\d.%]+)\s+([\d.%]+)\s+([\d.]+)\s*(?:\/\s*([\d.%]+))?\s*\)/i;
-      const match = color.match(oklchRegex);
-      if (match) {
-        let [, l, c, h, alpha] = match;
-
-        if (!l.includes("%")) {
-          const lNum = parseFloat(l);
-          if (!isNaN(lNum) && lNum >= 0 && lNum <= 1) {
-            l = (lNum * 100).toString() + "%";
-          }
-        }
-
-        color = `oklch(${l} ${c} ${h}${alpha ? ` / ${alpha}` : ""})`;
-      }
-    }
-
-    const colorObj = new Color(color);
-    const srgbColor = colorObj.to("srgb");
-
-    if (!srgbColor.inGamut("srgb")) {
-      srgbColor.toGamut({ method: "clip" });
-    }
-
-    const hex = srgbColor.to("srgb").toString({ format: "hex" });
-    return hex;
-  } catch (e) {
+    const c = new Color(inputColor).to("srgb");
+    const r = Math.round(clamp01(c.coords[0]) * 255);
+    const g = Math.round(clamp01(c.coords[1]) * 255);
+    const b = Math.round(clamp01(c.coords[2]) * 255);
+    const hex = `#${r.toString(16).padStart(2, "0")}${g
+      .toString(16)
+      .padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+    return hex.toUpperCase();
+  } catch {
     return "#000000";
   }
 }
 
-/**
- * Formate intelligemment un nombre en supprimant les zéros inutiles
- */
-function formatSmart(number, decimals) {
-  const formatted = parseFloat(number).toFixed(decimals);
-  return formatted.replace(/\.?0+$/, "");
+function toNormalizedHex(inputColor) {
+  return toHex(inputColor).toUpperCase();
 }
 
-/**
- * Valide qu'une chaîne représente une couleur valide
- */
-function isValidColor(color) {
-  return colorParsley(color) !== false;
+// Certains navigateurs sont pointilleux sur input[type=color]
+// Utiliser un hex valide minuscule (#rrggbb)
+function toInputHex(value) {
+  // Si la valeur est déjà un hex 6 chiffres, renvoie la version minuscule
+  if (typeof value === "string" && /^#[0-9a-fA-F]{6}$/.test(value)) {
+    return value.toLowerCase();
+  }
+  try {
+    const hex = toHex(value);
+    return /^#[0-9A-F]{6}$/i.test(hex) ? hex.toLowerCase() : "#000000";
+  } catch {
+    return "#000000";
+  }
 }
 
-/**
- * Calcule la luminance relative d'une couleur selon sRGB
- */
+function isValidColor(value) {
+  // Accepte immédiatement les hex #rrggbb (inputs color)
+  if (typeof value === "string" && /^#[0-9a-fA-F]{6}$/.test(value)) return true;
+  // Valide via colorjs.io (gère pink, oklch(...), rgb(...), etc.) sans bruit console
+  try {
+    new Color(value);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function getCssVarHex(varName) {
+  try {
+    // Résout la variable via un élément sonde pour obtenir une couleur réelle
+    const probe = document.createElement("div");
+    probe.style.position = "absolute";
+    probe.style.left = "-9999px";
+    probe.style.top = "-9999px";
+    probe.style.backgroundColor = `var(${varName})`;
+    document.body.appendChild(probe);
+    const cs = getComputedStyle(probe).backgroundColor;
+    probe.remove();
+    return toNormalizedHex(cs);
+  } catch {
+    return "#000000";
+  }
+}
+
+function getResolvedUiColors() {
+  const probe = document.createElement("div");
+  probe.style.position = "absolute";
+  probe.style.left = "-9999px";
+  probe.style.top = "-9999px";
+  probe.style.color = "var(--ui-foreground)";
+  probe.style.backgroundColor = "var(--ui-background)";
+  document.body.appendChild(probe);
+  const cs = getComputedStyle(probe);
+  const textHex = toNormalizedHex(cs.color);
+  const bgHex = toNormalizedHex(cs.backgroundColor);
+  probe.remove();
+  return { textHex, bgHex };
+}
+
+// Contrast
 function getLuminance(colorString) {
   try {
-    const colorObj = new Color(colorString);
-    const srgbColor = colorObj.to("srgb");
-
-    const [r, g, b] = srgbColor.coords.map((c) => {
-      if (c <= 0.04045) {
-        return c / 12.92;
-      } else {
-        return Math.pow((c + 0.055) / 1.055, 2.4);
-      }
+    const colorObj = new Color(colorString).to("srgb");
+    const [r, g, b] = colorObj.coords.map((c) => {
+      if (c <= 0.04045) return c / 12.92;
+      return Math.pow((c + 0.055) / 1.055, 2.4);
     });
-
-    const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-    return luminance;
-  } catch (e) {
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  } catch {
     return 0;
   }
 }
 
-/**
- * Calcule le ratio de contraste WCAG 2.1 entre deux couleurs
- */
 function getContrastRatio(color1, color2) {
   try {
     const lum1 = getLuminance(color1);
     const lum2 = getLuminance(color2);
-    if (isNaN(lum1) || isNaN(lum2)) {
-      return 0;
-    }
+    if (!Number.isFinite(lum1) || !Number.isFinite(lum2)) return 0;
     const contrast =
       (Math.max(lum1, lum2) + 0.05) / (Math.min(lum1, lum2) + 0.05);
     return parseFloat(contrast.toFixed(2));
-  } catch (e) {
+  } catch {
     return 0;
   }
 }
 
 /**
- * Calcule le contraste APCA entre une couleur de texte et d'arrière-plan
+ * Calcule l’APCA (Lc) entre un texte et un fond.
+ *
+ * Contrat
+ * - Entrées: textColor et backgroundColor en CSS (hex, oklch, rgb…).
+ * - Conversion: sRGB 8‑bit -> luminances relatives Y via sRGBtoY([r,g,b]).
+ * - APCA: appel APCAcontrast(textY, bgY) comme recommandé par la lib ESM jsDelivr.
+ * - Signe: négatif si le texte est plus clair que le fond; positif sinon.
+ * - Sortie: nombre à 0.1 près; fallback sur delta Y signé si la lib est indisponible.
+ *
+ * Réf: https://github.com/Myndex/SAPC-APCA/tree/master/documentation
  */
 function getAPCAContrast(textColor, backgroundColor) {
   try {
-    const colorTextObj = new Color(textColor).to("srgb");
-    const colorBgObj = new Color(backgroundColor).to("srgb");
+    const text = new Color(textColor).to("srgb");
+    const bg = new Color(backgroundColor).to("srgb");
+    const rT = Math.round(clamp01(text.coords[0]) * 255);
+    const gT = Math.round(clamp01(text.coords[1]) * 255);
+    const bT = Math.round(clamp01(text.coords[2]) * 255);
+    const rB = Math.round(clamp01(bg.coords[0]) * 255);
+    const gB = Math.round(clamp01(bg.coords[1]) * 255);
+    const bB = Math.round(clamp01(bg.coords[2]) * 255);
 
-    if (!colorTextObj || !colorTextObj.coords) {
-      return 0;
-    }
-    if (!colorBgObj || !colorBgObj.coords) {
-      return 0;
-    }
-
-    const rT = Math.round(colorTextObj.coords[0] * 255);
-    const gT = Math.round(colorTextObj.coords[1] * 255);
-    const bT = Math.round(colorTextObj.coords[2] * 255);
-
-    const rB = Math.round(colorBgObj.coords[0] * 255);
-    const gB = Math.round(colorBgObj.coords[1] * 255);
-    const bB = Math.round(colorBgObj.coords[2] * 255);
-
-    try {
-      const result = APCAcontrast([rT, gT, bT], [rB, gB, bB]);
-      if (result !== 0 && !isNaN(result)) {
-        return parseFloat(result.toFixed(1));
-      }
-    } catch (e) {
-      // Fallback vers implémentation manuelle
-    }
-
-    // Implémentation APCA 0.1.9 4g selon la documentation officielle
+    // APCAcontrast attend des luminances Y (0..1), pas des tableaux sRGB
     const textY = sRGBtoY([rT, gT, bT]);
     const bgY = sRGBtoY([rB, gB, bB]);
-
-    // Constantes APCA 0.0.98G-4g officielles
-    const Strc = 2.4;
-    const Ntx = 0.57;
-    const Nbg = 0.56;
-    const Rtx = 0.62;
-    const Rbg = 0.65;
-    const Bclip = 1.414;
-    const Bthrsh = 0.022;
-    const Wscale = 1.14;
-    const Woffset = 0.027;
-    const Wclamp = 0.1;
-
-    function softClamp(Yc) {
-      if (Yc < 0.0) return 0.0;
-      if (Yc < Bthrsh) {
-        return Yc + Math.pow(Bthrsh - Yc, Bclip);
-      }
-      return Yc;
+    if (typeof APCAcontrast === "function") {
+      try {
+        const res = APCAcontrast(textY, bgY);
+        if (Number.isFinite(res)) return parseFloat(res.toFixed(1));
+      } catch {}
     }
 
-    const Ytxt = softClamp(textY);
-    const Ybg = softClamp(bgY);
-
-    let Sapc = 0;
-
-    if (Ybg > Ytxt) {
-      // Normal polarity (dark text on light background)
-      Sapc = (Math.pow(Ybg, Nbg) - Math.pow(Ytxt, Ntx)) * Wscale;
-    } else {
-      // Reverse polarity (light text on dark background)
-      Sapc = (Math.pow(Ybg, Rbg) - Math.pow(Ytxt, Rtx)) * Wscale;
-    }
-
-    let Lc = 0;
-    if (Math.abs(Sapc) < Wclamp) {
-      Lc = 0.0;
-    } else if (Sapc > 0) {
-      Lc = (Sapc - Woffset) * 100.0;
-    } else {
-      Lc = (Sapc + Woffset) * 100.0;
-    }
-
-    return parseFloat(Lc.toFixed(1));
-  } catch (e) {
+    // Fallback: delta Y signé
+    const sign = textY > bgY ? -1 : 1;
+    const lc = sign * Math.abs((textY - bgY) * 100);
+    return parseFloat(lc.toFixed(1));
+  } catch {
     return 0;
   }
 }
 
-/**
- * Met à jour les indicateurs visuels dans le guide des seuils
- */
+// Indicators
 function updateThresholdIndicators() {
-  const contrastRatioElement = wcagDisplay.querySelector(".contrast-ratio");
-  const apcaRatioElement = apcaDisplay.querySelector(".contrast-ratio");
+  const wcagRatioEl = wcagDisplay
+    ? wcagDisplay.querySelector(".contrast-ratio")
+    : null;
+  const apcaRatioEl = apcaDisplay
+    ? apcaDisplay.querySelector(".contrast-ratio")
+    : null;
 
-  if (contrastRatioElement) {
-    const wcagRatio = parseFloat(contrastRatioElement.textContent);
-
-    const wcagIndicators = document.querySelectorAll(
+  if (wcagRatioEl) {
+    const wcagRatio = parseFloat(wcagRatioEl.textContent);
+    const nodes = document.querySelectorAll(
       ".guide-content--wcag .threshold-indicator"
     );
-    wcagIndicators.forEach((indicator) => {
+    nodes.forEach((indicator) => {
       const threshold = parseFloat(indicator.dataset.threshold);
       const isPassed = wcagRatio >= threshold;
-
       indicator.innerHTML = isPassed
         ? '✅<span class="visually-hidden"> accessible</span>'
         : '❌<span class="visually-hidden"> non accessible</span>';
-      indicator.dataset.passed = isPassed.toString();
-
-      // Applique l'état au threshold-item parent
-      const thresholdItem = indicator.closest(".threshold-item");
-      if (thresholdItem) {
-        thresholdItem.dataset.passed = isPassed.toString();
-      }
+      indicator.dataset.passed = String(isPassed);
+      const parent = indicator.closest(".threshold-item");
+      if (parent) parent.setAttribute("data-passed", String(isPassed));
     });
   }
 
-  if (apcaRatioElement) {
-    const apcaValue = parseFloat(apcaRatioElement.textContent);
-
-    const apcaIndicators = document.querySelectorAll(
+  if (apcaRatioEl) {
+    const apcaVal = parseFloat(apcaRatioEl.textContent);
+    const nodes = document.querySelectorAll(
       ".guide-content--apca .threshold-indicator"
     );
-    apcaIndicators.forEach((indicator) => {
+    nodes.forEach((indicator) => {
       const threshold = parseFloat(indicator.dataset.threshold);
-      // Pour APCA, seule la valeur absolue compte
-      const isPassed = Math.abs(apcaValue) >= threshold;
-
+      const isPassed = Math.abs(apcaVal) >= threshold;
       indicator.innerHTML = isPassed
         ? '✅<span class="visually-hidden"> accessible</span>'
         : '❌<span class="visually-hidden"> non accessible</span>';
-      indicator.dataset.passed = isPassed.toString();
-
-      // Applique l'état au threshold-item parent
-      const thresholdItem = indicator.closest(".threshold-item");
-      if (thresholdItem) {
-        thresholdItem.dataset.passed = isPassed.toString();
-      }
+      indicator.dataset.passed = String(isPassed);
+      const parent = indicator.closest(".threshold-item");
+      if (parent) parent.setAttribute("data-passed", String(isPassed));
     });
   }
 }
 
-/**
- * Met à jour les indicateurs de seuil dans la section d'exemple
- */
 function updateExampleIndicators() {
-  const contrastSwitcherChecked = contrastSwitcher.checked;
+  const apcaMode = !!(contrastSwitcher && contrastSwitcher.checked);
   const exampleItems = document.querySelectorAll(".example-text-item");
-
   exampleItems.forEach((item) => {
     const size = parseInt(item.dataset.size);
     const weight = item.dataset.weight;
-    const type = item.dataset.type; // Nouveau : type graphique
-    const statusElement = item.querySelector(".threshold-status");
+    const type = item.dataset.type;
+    const status = item.querySelector(".threshold-status");
+    if (!status) return;
 
-    if (!statusElement) return;
-
-    let isPassed = false;
-
-    if (contrastSwitcherChecked) {
-      const apcaRatioElement = apcaDisplay.querySelector(".contrast-ratio");
-      if (apcaRatioElement) {
-        const apcaValue = Math.abs(parseFloat(apcaRatioElement.textContent));
-
-        // Seuils APCA selon la taille et le type
-        let threshold = 75;
-        if (type === "graphic") {
-          // Éléments graphiques = Texte large en APCA
-          threshold = 45;
-        } else if ((size >= 24 && weight === "bold") || size >= 36) {
-          threshold = 45;
-        } else if (size >= 24 || (size >= 16 && weight === "bold")) {
-          threshold = 60;
-        }
-
-        isPassed = apcaValue >= threshold;
+    let passed = false;
+    if (apcaMode) {
+      const span = apcaDisplay
+        ? apcaDisplay.querySelector(".contrast-ratio")
+        : null;
+      if (span) {
+        const val = Math.abs(parseFloat(span.textContent));
+        let th = 75;
+        if (type === "graphic") th = 45;
+        else if ((size >= 24 && weight === "bold") || size >= 36) th = 45;
+        else if (size >= 24 || (size >= 16 && weight === "bold")) th = 60;
+        passed = val >= th;
       }
     } else {
-      const wcagRatioElement = wcagDisplay.querySelector(".contrast-ratio");
-      if (wcagRatioElement) {
-        const wcagRatio = parseFloat(wcagRatioElement.textContent);
-
-        // Seuils WCAG2 selon la taille et le type (niveau AA)
-        let threshold = 4.5;
-        if (type === "graphic") {
-          // Éléments graphiques = seuil 3:1
-          threshold = 3;
-        } else if ((size >= 18 && weight === "bold") || size >= 24) {
-          threshold = 3;
-        }
-
-        isPassed = wcagRatio >= threshold;
+      const span = wcagDisplay
+        ? wcagDisplay.querySelector(".contrast-ratio")
+        : null;
+      if (span) {
+        const val = parseFloat(span.textContent);
+        let th = 4.5;
+        if (type === "graphic") th = 3;
+        else if ((size >= 18 && weight === "bold") || size >= 24) th = 3;
+        passed = val >= th;
       }
     }
 
-    statusElement.innerHTML = isPassed
+    status.innerHTML = passed
       ? '✅<span class="visually-hidden"> accessible</span>'
       : '❌<span class="visually-hidden"> non accessible</span>';
-
-    // Applique l'état au size-indicator parent
-    const sizeIndicator = item.querySelector(".size-indicator");
-    if (sizeIndicator) {
-      sizeIndicator.dataset.passed = isPassed.toString();
-    }
+    const sizeInd = item.querySelector(".size-indicator");
+    if (sizeInd) sizeInd.setAttribute("data-passed", String(passed));
   });
 }
 
-/**
- * Met à jour l'affichage des valeurs OKLCH et les calculs de contraste
- */
+// Update display
 function updateOKLCHValues() {
-  const primaryColorOutOfGamut = root.dataset.primaryColorOutOfGamut === "true";
   const box = document.querySelector(".box-user");
-
   if (box) {
-    let actualBgColor, actualTextColor;
-    let colorToDisplayInBox;
+    const lVar = parseFloat(
+      getComputedStyle(root).getPropertyValue("--slider-l").trim()
+    );
+    const cVar = parseFloat(
+      getComputedStyle(root).getPropertyValue("--slider-c").trim()
+    );
+    const hVar = parseFloat(
+      getComputedStyle(root).getPropertyValue("--slider-h").trim()
+    );
+    const safeL = Number.isFinite(lVar) ? lVar : 0;
+    const rawC = Number.isFinite(cVar) ? cVar : 0;
+    const safeC = Math.abs(rawC) < 1e-6 ? 0 : rawC;
+    const safeH = Number.isFinite(hVar) ? hVar : 0;
+    const safeOklch = safeOklchString(safeL, safeC, safeH);
 
-    if (isTextColorPrimary) {
-      // Mode swap : sliders contrôlent le texte
-      actualBgColor = getComputedStyle(root)
-        .getPropertyValue("--color-user-1")
-        .trim();
-      actualTextColor = getComputedStyle(root)
-        .getPropertyValue("--color-user-2")
-        .trim();
-      colorToDisplayInBox = actualTextColor;
-    } else {
-      // Mode normal : sliders contrôlent l'arrière-plan
-      actualBgColor = getComputedStyle(root)
-        .getPropertyValue("--color-user-2")
-        .trim();
-      actualTextColor = getComputedStyle(root)
-        .getPropertyValue("--color-user-1")
-        .trim();
-      colorToDisplayInBox = actualBgColor;
-    }
+    const oklchValue = `oklch(${formatSmart(safeL * 100, 2)}% ${formatSmart(
+      safeC,
+      3
+    )} ${formatSmart(safeH, 2)})`;
+    const oklchSpan = box.querySelector(".box-half.box-oklch .box-color-value");
+    if (oklchSpan) oklchSpan.textContent = oklchValue;
 
-    // Fallback si les variables CSS ne sont pas encore définies
-    if (!actualBgColor || actualBgColor === "") {
-      actualBgColor = isTextColorPrimary ? "#eeeeee" : "#e5508a";
-    }
-    if (!actualTextColor || actualTextColor === "") {
-      actualTextColor = isTextColorPrimary ? "#e5508a" : "#eeeeee";
-    }
-    if (!colorToDisplayInBox || colorToDisplayInBox === "") {
-      colorToDisplayInBox = isTextColorPrimary ? "#e5508a" : "#e5508a";
-    }
-
-    // La boîte affiche toujours la couleur contrôlée par les sliders
-    const oklchBgColorString = colorToDisplayInBox;
-    const textColorForContrast = actualTextColor;
-
-    const boxBodyOklchHalf = box.querySelector(".box-half.box-oklch");
-    const boxBodyHexHalf = box.querySelector(".box-half.box-hex");
-    const oklchValueInBox = boxBodyOklchHalf
-      ? boxBodyOklchHalf.querySelector(".box-color-value")
-      : null;
-    const hexDisplayContainerInBox = boxBodyHexHalf
-      ? boxBodyHexHalf.querySelector(".box-color-value")
-      : null;
-
-    const contrastRatioElement = wcagDisplay.querySelector(".contrast-value");
-    const apcaContrastDisplay = apcaDisplay.querySelector(".contrast-value");
-
-    if (textColorForContrast && oklchBgColorString) {
-      const oklchRegex =
-        /oklch\(\s*([\d.%]+)\s+([\d.%]+)\s+([\d.]+)\s*(?:\/\s*([\d.%]+))?\s*\)/i;
-      const oklchDisplayValue = oklchBgColorString.replace(
-        oklchRegex,
-        (match, l, c, h, alpha) => {
-          const lightness = l.includes("%")
-            ? l
-            : `${formatSmart(parseFloat(l) * 100, 2)}%`;
-          const chroma = c.includes("%")
-            ? `${formatSmart(parseFloat(c.replace("%", "")), 0)}%`
-            : formatSmart(parseFloat(c), 3);
-          const hue = formatSmart(parseFloat(h), 2);
-
-          return `oklch(${lightness} ${chroma} ${hue})`;
-        }
-      );
-
-      const hexEquivalentColor = toHex(oklchBgColorString);
-
-      if (boxBodyOklchHalf) {
-        if (oklchValueInBox) oklchValueInBox.textContent = oklchDisplayValue;
-      }
-
-      let hexDisplayValue = hexEquivalentColor;
-      let gamutWarningText = "";
-      let currentBoxColorOutOfGamut = false;
-      try {
-        let colorStringToParse = oklchBgColorString;
-        if (
-          typeof oklchBgColorString === "string" &&
-          oklchBgColorString.toLowerCase().startsWith("oklch(")
-        ) {
-          const match = oklchBgColorString.match(oklchRegex);
-          if (match) {
-            let lComponent = match[1];
-            const cComponent = match[2];
-            const hComponent = match[3];
-            const alphaComponent = match[4];
-
-            const originalLComponent = lComponent;
-
-            if (!lComponent.includes("%")) {
-              const lNum = parseFloat(lComponent);
-              if (!isNaN(lNum) && lNum >= 0 && lNum <= 1) {
-                lComponent = (lNum * 100).toString() + "%";
-              }
-            }
-
-            colorStringToParse = `oklch(${lComponent} ${cComponent} ${hComponent}${
-              alphaComponent ? ` / ${alphaComponent}` : ""
-            })`;
-          }
-        }
-
-        const oklchColorObj = new Color(colorStringToParse);
-        const isInGamut = oklchColorObj.inGamut("srgb");
-        currentBoxColorOutOfGamut = !isInGamut;
-
-        if (!isInGamut) {
-          const clampedColor = oklchColorObj
-            .clone()
-            .toGamut({ method: "clip" });
-          const clampedColorString = clampedColor.toString();
-          hexDisplayValue = toHex(clampedColorString);
-          gamutWarningText = " (sRGB la plus proche)";
-        }
-      } catch (e) {
-        currentBoxColorOutOfGamut = true;
+    let hexDisplayValue = toHex(safeOklch);
+    let gamutWarningText = "";
+    try {
+      const oklchObj = new Color(safeOklch);
+      const inGamut = oklchObj.inGamut("srgb");
+      if (!inGamut) {
+        const clamped = oklchObj.clone().toGamut({ method: "clip" });
+        hexDisplayValue = toHex(clamped.toString());
         gamutWarningText = " (sRGB la plus proche)";
       }
+    } catch {
+      gamutWarningText = " (sRGB la plus proche)";
+    }
 
-      if (boxBodyHexHalf) {
-        const realBgColorForHex = actualBgColor.startsWith("#")
-          ? actualBgColor
-          : toHex(actualBgColor);
-
-        root.style.setProperty("--ui-background-hex", realBgColorForHex);
-        if (hexDisplayContainerInBox) {
-          const upperCaseHex = hexDisplayValue.toUpperCase();
-          hexDisplayContainerInBox.innerHTML = upperCaseHex;
-
-          if (gamutWarningText) {
-            let gamutWarningElement =
-              hexDisplayContainerInBox.querySelector(".gamut-warning");
-            if (!gamutWarningElement) {
-              gamutWarningElement = document.createElement("span");
-              gamutWarningElement.classList.add("gamut-warning");
-              hexDisplayContainerInBox.appendChild(gamutWarningElement);
-            }
-            gamutWarningElement.textContent = gamutWarningText;
-          } else {
-            const existingWarning =
-              hexDisplayContainerInBox.querySelector(".gamut-warning");
-            if (existingWarning) {
-              existingWarning.remove();
-            }
-          }
+    const hexContainer = box.querySelector(
+      ".box-half.box-hex .box-color-value"
+    );
+    if (hexContainer) {
+      hexContainer.textContent = hexDisplayValue.toUpperCase();
+      let warn = hexContainer.querySelector(".gamut-warning");
+      if (gamutWarningText) {
+        if (!warn) {
+          warn = document.createElement("span");
+          warn.className = "gamut-warning";
+          hexContainer.appendChild(warn);
         }
-      }
-
-      try {
-        // Utiliser les vraies couleurs pour les calculs de contraste
-        // actualBgColor = vraie couleur d'arrière-plan, actualTextColor = vraie couleur de texte
-        const realTextColor = actualTextColor.startsWith("#")
-          ? actualTextColor
-          : toHex(actualTextColor);
-        const realBgColor = actualBgColor.startsWith("#")
-          ? actualBgColor
-          : toHex(actualBgColor);
-
-        const wcagContrast = getContrastRatio(realTextColor, realBgColor);
-        const apcaContrast = getAPCAContrast(realTextColor, realBgColor);
-
-        if (contrastRatioElement) {
-          const wcagRatioSpan =
-            contrastRatioElement.querySelector(".contrast-ratio");
-          if (wcagRatioSpan) {
-            wcagRatioSpan.innerHTML = `<span class="contrast-value">${wcagContrast.toFixed(
-              2
-            )}</span><span class="contrast-unit">:1</span>`;
-          } else {
-            contrastRatioElement.innerHTML = `<span class="visually-hidden">Contraste WCAG2 : </span><span class="contrast-ratio"><span class="contrast-value">${wcagContrast.toFixed(
-              2
-            )}</span><span class="contrast-unit">:1</span></span>`;
-          }
-
-          const level =
-            wcagContrast >= 7
-              ? "AAA"
-              : wcagContrast >= 4.5
-              ? "AA"
-              : wcagContrast >= 3
-              ? "AA Large"
-              : "Échec";
-          contrastRatioElement.dataset.level = level;
-
-          // Suppression de l'application de couleur - le texte garde sa couleur naturelle
-
-          // Utiliser le conteneur d'avertissement existant
-          const wcagWarningContainer =
-            document.getElementById("wcag-gamut-warning");
-          const shouldShowWcagWarning = currentBoxColorOutOfGamut;
-
-          if (shouldShowWcagWarning) {
-            if (wcagWarningContainer) {
-              wcagWarningContainer.textContent =
-                " (calculé sur la couleur sRGB la plus proche)";
-            }
-          } else {
-            if (wcagWarningContainer) {
-              wcagWarningContainer.textContent = "";
-            }
-          }
-        }
-
-        if (apcaContrastDisplay) {
-          const apcaValueSpan =
-            apcaContrastDisplay.querySelector(".contrast-ratio");
-          if (apcaValueSpan) {
-            apcaValueSpan.textContent =
-              apcaContrast >= 0
-                ? `+${apcaContrast.toFixed(1)}`
-                : apcaContrast.toFixed(1);
-          } else {
-            apcaContrastDisplay.innerHTML = `<span class="visually-hidden">APCA Lc : </span><span class="contrast-ratio">${
-              apcaContrast >= 0
-                ? `+${apcaContrast.toFixed(1)}`
-                : apcaContrast.toFixed(1)
-            }</span>`;
-          }
-
-          // Suppression de l'application de couleur - le texte garde sa couleur naturelle
-        }
-      } catch (error) {
-        if (contrastRatioElement) {
-          const wcagRatioSpan =
-            contrastRatioElement.querySelector(".contrast-ratio");
-          if (wcagRatioSpan) {
-            wcagRatioSpan.innerHTML =
-              '<span class="contrast-value">0.00</span><span class="contrast-unit">:1</span>';
-          } else {
-            contrastRatioElement.innerHTML =
-              '<span class="visually-hidden">Contraste WCAG2 : </span><span class="contrast-ratio"><span class="contrast-value">0.00</span><span class="contrast-unit">:1</span></span>';
-          }
-          // Suppression de l'application de couleur - le texte garde sa couleur naturelle
-          // contrastRatioElement.style.color = "var(--error)";
-        }
-        if (apcaContrastDisplay) {
-          const apcaValueSpan =
-            apcaContrastDisplay.querySelector(".contrast-ratio");
-          if (apcaValueSpan) apcaValueSpan.textContent = "0.00";
-          else
-            apcaContrastDisplay.innerHTML =
-              '<span class="visually-hidden">APCA Lc : </span><span class="contrast-ratio">0.00</span>';
-        }
-      }
-    } else {
-      if (contrastRatioElement) {
-        const wcagRatioSpan =
-          contrastRatioElement.querySelector(".contrast-ratio");
-        if (wcagRatioSpan) {
-          wcagRatioSpan.innerHTML =
-            '<span class="contrast-value">0.00</span><span class="contrast-unit">:1</span>';
-        } else {
-          contrastRatioElement.innerHTML =
-            '<span class="visually-hidden">Contraste WCAG2 : </span><span class="contrast-ratio"><span class="contrast-value">0.00</span><span class="contrast-unit">:1</span></span>';
-        }
-        // Suppression de l'application de couleur - le texte garde sa couleur naturelle
-        // contrastRatioElement.style.color = "var(--error)";
-      }
-      if (apcaContrastDisplay) {
-        const apcaValueSpan =
-          apcaContrastDisplay.querySelector(".contrast-ratio");
-        if (apcaValueSpan) apcaValueSpan.textContent = "0.00";
-        else
-          apcaContrastDisplay.innerHTML =
-            '<span class="visually-hidden">APCA Lc : </span><span class="contrast-ratio">0.00</span>';
+        warn.textContent = gamutWarningText;
+      } else if (warn) {
+        warn.remove();
       }
     }
+
+    const sliderHex = toNormalizedHex(safeOklch);
+    const bgHex = isTextColorPrimary
+      ? getCssVarHex("--color-user-1")
+      : sliderHex;
+    const textHex = isTextColorPrimary
+      ? sliderHex
+      : getCssVarHex("--color-user-1");
+    // eslint-disable-next-line no-console
+    if (document.documentElement.dataset.debug === "true") {
+      try {
+        console.debug("[updateOKLCHValues]", {
+          isTextColorPrimary,
+          sliderHex,
+          textHex,
+          bgHex,
+        });
+      } catch {}
+    }
+    root.style.setProperty("--ui-background-hex", bgHex);
+
+    const wcagContrast = getContrastRatio(textHex, bgHex);
+    const apcaContrast = getAPCAContrast(textHex, bgHex);
+
+    const wcagRatioSpan = wcagDisplay
+      ? wcagDisplay.querySelector(".contrast-ratio")
+      : null;
+    if (wcagRatioSpan)
+      wcagRatioSpan.textContent = `${wcagContrast.toFixed(2)}:1`;
+    const wcagValueP = wcagDisplay
+      ? wcagDisplay.querySelector(".contrast-value")
+      : null;
+    if (wcagValueP) {
+      const level =
+        wcagContrast >= 7
+          ? "AAA"
+          : wcagContrast >= 4.5
+          ? "AA"
+          : wcagContrast >= 3
+          ? "AA Large"
+          : "Échec";
+      wcagValueP.dataset.level = level;
+    }
+    const wcagWarn = document.getElementById("wcag-gamut-warning");
+    if (wcagWarn)
+      wcagWarn.textContent = gamutWarningText
+        ? " (calculé sur la couleur sRGB la plus proche)"
+        : "";
+
+    const apcaSpan = apcaDisplay
+      ? apcaDisplay.querySelector(".contrast-ratio")
+      : null;
+    if (apcaSpan)
+      apcaSpan.textContent =
+        apcaContrast > 0
+          ? `+${apcaContrast.toFixed(1)}`
+          : apcaContrast.toFixed(1);
   }
 
   updateThresholdIndicators();
   updateExampleIndicators();
 }
 
-/**
- * Met à jour une couleur (primaire contrôlée par sliders ou secondaire fixe)
- */
+// Color updates
 function updateColor(value, isPrimaryColor = true) {
-  if (!isValidColor(value)) {
-    return;
-  }
+  if (!isValidColor(value)) return;
 
   if (isPrimaryColor) {
-    if (!isTextColorPrimary) {
-      // Mode normal : sliders contrôlent l'arrière-plan
-      if (backgroundColorText) backgroundColorText.value = value;
-      if (backgroundColorPicker) backgroundColorPicker.value = value;
-      root.style.setProperty("--ui-background", "var(--color-user-2)");
-      root.style.setProperty("--ui-foreground", "var(--color-user-1)");
-    } else {
-      // Mode swap : sliders contrôlent le texte
-      if (foregroundColorText) foregroundColorText.value = value;
-      if (foregroundColorPicker) foregroundColorPicker.value = value;
+    if (isTextColorPrimary) {
+      if (foregroundColorText)
+        foregroundColorText.value = toNormalizedHex(value);
+      if (foregroundColorPicker)
+        foregroundColorPicker.value = toInputHex(value);
       root.style.setProperty("--ui-background", "var(--color-user-1)");
       root.style.setProperty("--ui-foreground", "var(--color-user-2)");
+    } else {
+      if (backgroundColorText)
+        backgroundColorText.value = toNormalizedHex(value);
+      if (backgroundColorPicker)
+        backgroundColorPicker.value = toInputHex(value);
+      root.style.setProperty("--ui-background", "var(--color-user-2)");
+      root.style.setProperty("--ui-foreground", "var(--color-user-1)");
     }
 
     try {
       const colorObj = new Color(value);
-      const inGamut = colorObj.inGamut("srgb");
-      root.dataset.primaryColorOutOfGamut = String(!inGamut);
-
-      // Convertir en OKLCH et mettre à jour les variables slider
+      root.dataset.primaryColorOutOfGamut = String(!colorObj.inGamut("srgb"));
       const oklch = colorObj.to("oklch");
-      root.style.setProperty(
-        "--slider-l",
-        Math.max(0, Math.min(1, oklch.coords[0])).toString()
-      );
-      root.style.setProperty(
-        "--slider-c",
-        Math.max(0, oklch.coords[1] || 0).toString()
-      );
+      root.style.setProperty("--slider-l", clamp01(oklch.coords[0]).toString());
+      {
+        const Cn = Math.max(0, oklch.coords[1] || 0);
+        const C = Math.abs(Cn) < 1e-6 ? 0 : Cn;
+        root.style.setProperty("--slider-c", C.toString());
+      }
       root.style.setProperty("--slider-h", (oklch.coords[2] || 0).toString());
-
       initializeSliderDisplays();
-    } catch (e) {
+    } catch {
       root.dataset.primaryColorOutOfGamut = "true";
     }
 
-    const secondaryColor = getComputedStyle(root)
+    const secondary = getComputedStyle(root)
       .getPropertyValue("--color-user-1")
       .trim();
-    if (secondaryColor) {
+    if (secondary) {
       if (!isTextColorPrimary) {
-        if (foregroundColorText) foregroundColorText.value = secondaryColor;
-        if (foregroundColorPicker) foregroundColorPicker.value = secondaryColor;
+        if (foregroundColorText)
+          foregroundColorText.value = toNormalizedHex(secondary);
+        if (foregroundColorPicker)
+          foregroundColorPicker.value = toInputHex(secondary);
       } else {
-        if (backgroundColorText) backgroundColorText.value = secondaryColor;
-        if (backgroundColorPicker) backgroundColorPicker.value = secondaryColor;
+        if (backgroundColorText)
+          backgroundColorText.value = toNormalizedHex(secondary);
+        if (backgroundColorPicker)
+          backgroundColorPicker.value = toInputHex(secondary);
       }
     }
   } else {
-    if (!isTextColorPrimary) {
-      // Mode normal : mettre à jour la couleur de texte
-      root.style.setProperty("--color-user-1", value);
-      if (foregroundColorText) foregroundColorText.value = value;
-      if (foregroundColorPicker) foregroundColorPicker.value = value;
-      root.style.setProperty("--ui-background", "var(--color-user-2)");
-      root.style.setProperty("--ui-foreground", "var(--color-user-1)");
-    } else {
-      // Mode swap : mettre à jour la couleur d'arrière-plan
-      root.style.setProperty("--color-user-1", value);
-      if (backgroundColorText) backgroundColorText.value = value;
-      if (backgroundColorPicker) backgroundColorPicker.value = value;
+    root.style.setProperty("--color-user-1", value);
+    if (isTextColorPrimary) {
+      if (backgroundColorText)
+        backgroundColorText.value = toNormalizedHex(value);
+      if (backgroundColorPicker)
+        backgroundColorPicker.value = toInputHex(value);
       root.style.setProperty("--ui-background", "var(--color-user-1)");
       root.style.setProperty("--ui-foreground", "var(--color-user-2)");
+    } else {
+      if (foregroundColorText)
+        foregroundColorText.value = toNormalizedHex(value);
+      if (foregroundColorPicker)
+        foregroundColorPicker.value = toInputHex(value);
+      root.style.setProperty("--ui-background", "var(--color-user-2)");
+      root.style.setProperty("--ui-foreground", "var(--color-user-1)");
     }
   }
   updateOKLCHValues();
 }
 
+// Inputs
 if (backgroundColorPicker) {
   backgroundColorPicker.addEventListener("input", (e) => {
-    // En mode normal: backgroundColorPicker contrôle la couleur primaire (arrière-plan)
-    // En mode swap: backgroundColorPicker contrôle la couleur secondaire (texte)
+    updateColor(e.target.value, !isTextColorPrimary);
+  });
+  backgroundColorPicker.addEventListener("change", (e) => {
     updateColor(e.target.value, !isTextColorPrimary);
   });
 }
-
 if (foregroundColorPicker) {
   foregroundColorPicker.addEventListener("input", (e) => {
-    // En mode normal: foregroundColorPicker contrôle la couleur secondaire (texte)
-    // En mode swap: foregroundColorPicker contrôle la couleur primaire (arrière-plan)
+    updateColor(e.target.value, isTextColorPrimary);
+  });
+  foregroundColorPicker.addEventListener("change", (e) => {
     updateColor(e.target.value, isTextColorPrimary);
   });
 }
-
-/**
- * Initialise l'affichage des sliders avec les valeurs CSS actuelles
- */
-function initializeSliderDisplays() {
-  updateSliderFromCSS("--slider-l", lSlider, lValueDisplay);
-  updateSliderFromCSS("--slider-c", cSlider, cValueDisplay);
-  updateSliderFromCSS("--slider-h", hSlider, hValueDisplay);
-}
-
 if (backgroundColorText) {
   backgroundColorText.addEventListener("input", (e) => {
-    // En mode normal: backgroundColorText contrôle la couleur primaire (arrière-plan)
-    // En mode swap: backgroundColorText contrôle la couleur secondaire (texte)
     updateColor(e.target.value, !isTextColorPrimary);
   });
 }
-
 if (foregroundColorText) {
   foregroundColorText.addEventListener("input", (e) => {
-    // En mode normal: foregroundColorText contrôle la couleur secondaire (texte)
-    // En mode swap: foregroundColorText contrôle la couleur primaire (arrière-plan)
     updateColor(e.target.value, isTextColorPrimary);
   });
 }
 
-/**
- * Met à jour un slider depuis une variable CSS
- */
 function updateSliderFromCSS(cssVarName, slider, valueDisplay) {
   if (!slider) return;
-
   const computedValue = getComputedStyle(root)
     .getPropertyValue(cssVarName)
     .trim();
-
   if (cssVarName === "--slider-l") {
-    let lightness = parseFloat(computedValue) * 100; // Convert from 0-1 to 0-100
+    let lightness = parseFloat(computedValue) * 100;
     if (isNaN(lightness)) lightness = 75;
     slider.value = lightness;
-    if (valueDisplay) {
+    if (valueDisplay)
       valueDisplay.textContent = `${formatSmart(lightness, 2)}%`;
-    }
   } else if (cssVarName === "--slider-c") {
     let chroma = parseFloat(computedValue);
     if (isNaN(chroma)) chroma = 0.1;
@@ -898,64 +606,78 @@ function updateSliderFromCSS(cssVarName, slider, valueDisplay) {
   }
 }
 
-/**
- * Met à jour les champs couleur selon les valeurs des sliders
- */
+function initializeSliderDisplays() {
+  updateSliderFromCSS("--slider-l", lSlider, lValueDisplay);
+  updateSliderFromCSS("--slider-c", cSlider, cValueDisplay);
+  updateSliderFromCSS("--slider-h", hSlider, hValueDisplay);
+}
+
 function updateSliderColor() {
-  const l = parseFloat(root.style.getPropertyValue("--slider-l")) || 0;
-  const c = parseFloat(root.style.getPropertyValue("--slider-c")) || 0;
-  const h = parseFloat(root.style.getPropertyValue("--slider-h")) || 0;
+  let l = lSlider ? parseFloat(lSlider.value) / 100 : NaN;
+  let c = cSlider ? parseFloat(cSlider.value) : NaN;
+  let h = hSlider ? parseFloat(hSlider.value) : NaN;
+  if (!Number.isFinite(l))
+    l = parseFloat(
+      getComputedStyle(root).getPropertyValue("--slider-l").trim()
+    );
+  if (!Number.isFinite(c))
+    c = parseFloat(
+      getComputedStyle(root).getPropertyValue("--slider-c").trim()
+    );
+  if (!Number.isFinite(h))
+    h = parseFloat(
+      getComputedStyle(root).getPropertyValue("--slider-h").trim()
+    );
+  l = Number.isFinite(l) ? l : 0;
+  c = Number.isFinite(c) ? c : 0;
+  h = Number.isFinite(h) ? h : 0;
 
-  const oklchColor = `oklch(${l} ${c} ${h})`;
+  const oklchColor = safeOklchString(l, c, h);
   const hexColor = toHex(oklchColor);
-
-  if (!isTextColorPrimary) {
-    // Mode normal : sliders contrôlent l'arrière-plan
-    if (backgroundColorPicker) backgroundColorPicker.value = hexColor;
-    if (backgroundColorText) backgroundColorText.value = hexColor;
-    root.style.setProperty("--ui-background", "var(--color-user-2)");
-    root.style.setProperty("--ui-foreground", "var(--color-user-1)");
-  } else {
-    // Mode swap : sliders contrôlent le texte
-    if (foregroundColorPicker) foregroundColorPicker.value = hexColor;
+  if (isTextColorPrimary) {
+    if (foregroundColorPicker)
+      foregroundColorPicker.value = toInputHex(hexColor);
     if (foregroundColorText) foregroundColorText.value = hexColor;
     root.style.setProperty("--ui-background", "var(--color-user-1)");
     root.style.setProperty("--ui-foreground", "var(--color-user-2)");
+  } else {
+    if (backgroundColorPicker)
+      backgroundColorPicker.value = toInputHex(hexColor);
+    if (backgroundColorText) backgroundColorText.value = hexColor;
+    root.style.setProperty("--ui-background", "var(--color-user-2)");
+    root.style.setProperty("--ui-foreground", "var(--color-user-1)");
   }
-
   updateOKLCHValues();
 }
 
 if (lSlider) {
   lSlider.addEventListener("input", () => {
     const value = parseFloat(lSlider.value);
-    root.style.setProperty("--slider-l", (value / 100).toString()); // Convert from 0-100 to 0-1
+    root.style.setProperty("--slider-l", (value / 100).toString());
     if (lValueDisplay) lValueDisplay.textContent = `${formatSmart(value, 2)}%`;
+    lSlider.value = String(value);
     updateSliderColor();
   });
 }
-
 if (cSlider) {
   cSlider.addEventListener("input", () => {
     const value = parseFloat(cSlider.value);
     root.style.setProperty("--slider-c", value.toString());
     if (cValueDisplay) cValueDisplay.textContent = formatSmart(value, 3);
+    cSlider.value = String(value);
     updateSliderColor();
   });
 }
-
 if (hSlider) {
   hSlider.addEventListener("input", () => {
     const value = parseFloat(hSlider.value);
     root.style.setProperty("--slider-h", value.toString());
     if (hValueDisplay) hValueDisplay.textContent = formatSmart(value, 2);
+    hSlider.value = String(value);
     updateSliderColor();
   });
 }
 
-/**
- * Initialise la page avec les couleurs par défaut
- */
 function initializePage() {
   const initialBgColor = backgroundColorPicker
     ? backgroundColorPicker.value
@@ -963,139 +685,247 @@ function initializePage() {
   const initialTextColor = foregroundColorPicker
     ? foregroundColorPicker.value
     : "#eeeeee";
-
-  root.style.setProperty("--color-user-1", initialTextColor);
-  root.style.setProperty("--ui-background", initialBgColor);
-  root.style.setProperty("--ui-foreground", initialTextColor);
-
+  root.style.setProperty("--color-user-1", initialBgColor);
+  root.style.setProperty("--ui-background", "var(--color-user-1)");
+  root.style.setProperty("--ui-foreground", "var(--color-user-2)");
   try {
-    const colorObj = new Color(initialBgColor);
-    const oklch = colorObj.to("oklch");
-
-    root.style.setProperty(
-      "--slider-l",
-      Math.max(0, Math.min(1, oklch.coords[0])).toString()
+    const c = new Color(initialTextColor).to("oklch");
+    root.style.setProperty("--slider-l", clamp01(c.coords[0]).toString());
+    {
+      const Cn = Math.max(0, c.coords[1] || 0);
+      const C = Math.abs(Cn) < 1e-6 ? 0 : Cn;
+      root.style.setProperty("--slider-c", C.toString());
+    }
+    root.style.setProperty("--slider-h", (c.coords[2] || 0).toString());
+    root.dataset.primaryColorOutOfGamut = String(
+      !new Color(initialTextColor).inGamut("srgb")
     );
-    root.style.setProperty(
-      "--slider-c",
-      Math.max(0, oklch.coords[1] || 0).toString()
-    );
-    root.style.setProperty("--slider-h", (oklch.coords[2] || 0).toString());
-
-    const inGamut = colorObj.inGamut("srgb");
-    root.dataset.primaryColorOutOfGamut = String(!inGamut);
-  } catch (e) {
+  } catch {
     root.style.setProperty("--slider-l", "0.75");
     root.style.setProperty("--slider-c", "0.1");
     root.style.setProperty("--slider-h", "180");
     root.dataset.primaryColorOutOfGamut = "false";
   }
-
   initializeSliderDisplays();
   updateOKLCHValues();
+  // Aligne l'affichage des champs sur l'UI (HEX uppercase dans les champs texte)
+  syncPickersFromUI();
 }
 
 initializePage();
 
-/**
- * Synchronise les valeurs initiales au chargement
- */
 function syncInitialValues() {
   const defaultBgColor = "#e5508a";
   const defaultTextColor = "#eeeeee";
-
-  updateColor(defaultBgColor, true);
-  root.style.setProperty("--color-user-1", defaultTextColor);
-
-  const backgroundColorPicker = document.getElementById(
-    "backgroundColorPicker"
-  );
-  const backgroundColorText = document.getElementById("backgroundColorText");
-  const foregroundColorPicker = document.getElementById(
-    "foregroundColorPicker"
-  );
-  const foregroundColorText = document.getElementById("foregroundColorText");
-
-  if (backgroundColorPicker) backgroundColorPicker.value = defaultBgColor;
-  if (backgroundColorText) backgroundColorText.value = defaultBgColor;
-  if (foregroundColorPicker) foregroundColorPicker.value = defaultTextColor;
-  if (foregroundColorText) foregroundColorText.value = defaultTextColor;
-
+  root.style.setProperty("--color-user-1", defaultBgColor);
+  updateColor(defaultTextColor, true);
+  root.style.setProperty("--ui-background", "var(--color-user-1)");
+  root.style.setProperty("--ui-foreground", "var(--color-user-2)");
+  if (foregroundColorPicker)
+    foregroundColorPicker.value = toInputHex(defaultTextColor);
+  if (foregroundColorText)
+    foregroundColorText.value = toNormalizedHex(defaultTextColor);
+  if (backgroundColorPicker)
+    backgroundColorPicker.value = toInputHex(defaultBgColor);
+  if (backgroundColorText)
+    backgroundColorText.value = toNormalizedHex(defaultBgColor);
   updateOKLCHValues();
 }
 
 syncInitialValues();
+// Assure que l’affichage correspond exactement à l’UI rendue (uppercase dans champs texte)
+syncPickersFromUI();
 
-updateColorControlsOrder();
-updateActiveColorIndicator();
+function updateActiveColorIndicator() {
+  if (!activeColorIndicator) return;
+  activeColorIndicator.textContent = isTextColorPrimary
+    ? "Texte"
+    : "Arrière-plan";
+}
 
-/**
- * Réinitialise toutes les couleurs aux valeurs par défaut
- */
-function resetToDefaultColors() {
-  // Valeurs par défaut depuis le HTML
-  const defaultTextColor = "#eeeeee";
-  const defaultBgColor = "#e5508a";
+function updateColorControlsOrder() {
+  // Inverse physiquement les champs selon la cible des sliders
+  if (!pickersGroup || !textControl || !bgControl || !swapColorsButton) return;
 
-  // IMPORTANT : Réinitialiser l'état du swap AVANT d'appliquer les couleurs
-  isTextColorPrimary = false;
-  updateActiveColorIndicator();
-  updateColorControlsOrder();
-
-  // Maintenant appliquer les couleurs avec la logique normale
-  updateColor(defaultBgColor, true); // Met à jour automatiquement les sliders OKLCH
-  root.style.setProperty("--color-user-1", defaultTextColor);
-
-  // Réinitialiser les champs de saisie de couleur
-  if (foregroundColorPicker) foregroundColorPicker.value = defaultTextColor;
-  if (foregroundColorText) foregroundColorText.value = defaultTextColor;
-  if (backgroundColorPicker) backgroundColorPicker.value = defaultBgColor;
-  if (backgroundColorText) backgroundColorText.value = defaultBgColor;
-
-  // Remettre les attributs data aux valeurs par défaut
-  root.removeAttribute("data-primary-color-out-of-gamut");
-  root.removeAttribute("data-background-color-out-of-gamut");
-
-  // Réinitialiser le contraste switcher en mode WCAG
-  if (contrastSwitcher) {
-    contrastSwitcher.checked = false;
-    // Déclencher manuellement l'événement change pour mettre à jour l'affichage
-    contrastSwitcher.dispatchEvent(new Event("change"));
+  if (isTextColorPrimary) {
+    // Ordre: Texte | ↔ | Arrière-plan
+    if (pickersGroup.firstElementChild !== textControl) {
+      pickersGroup.insertBefore(textControl, pickersGroup.firstElementChild);
+    }
+    if (swapColorsButton.previousElementSibling !== textControl) {
+      pickersGroup.insertBefore(swapColorsButton, textControl.nextSibling);
+    }
+    if (bgControl.nextElementSibling !== null) {
+      pickersGroup.appendChild(bgControl);
+    }
+  } else {
+    // Ordre: Arrière-plan | ↔ | Texte
+    if (pickersGroup.firstElementChild !== bgControl) {
+      pickersGroup.insertBefore(bgControl, pickersGroup.firstElementChild);
+    }
+    if (swapColorsButton.previousElementSibling !== bgControl) {
+      pickersGroup.insertBefore(swapColorsButton, bgControl.nextSibling);
+    }
+    if (textControl.nextElementSibling !== null) {
+      pickersGroup.appendChild(textControl);
+    }
   }
 }
 
-// Event listener pour le bouton de réinitialisation
+if (swapColorsButton) {
+  swapColorsButton.addEventListener("click", () => {
+    // Recalcule à partir des sources de vérité (sliders + --color-user-1)
+    const l = parseFloat(
+      getComputedStyle(root).getPropertyValue("--slider-l").trim()
+    );
+    const c = parseFloat(
+      getComputedStyle(root).getPropertyValue("--slider-c").trim()
+    );
+    const h = parseFloat(
+      getComputedStyle(root).getPropertyValue("--slider-h").trim()
+    );
+    const sliderHex = toNormalizedHex(safeOklchString(l, c, h));
+    const currentBg = getCssVarHex("--color-user-1");
+    const currentText = sliderHex;
+
+    // Inverse le rôle: les sliders pilotent désormais la couleur de fond
+    isTextColorPrimary = !isTextColorPrimary;
+
+    // Mettre à jour le mapping UI en fonction de la nouvelle cible
+    if (isTextColorPrimary) {
+      root.style.setProperty("--ui-background", "var(--color-user-1)");
+      root.style.setProperty("--ui-foreground", "var(--color-user-2)");
+    } else {
+      root.style.setProperty("--ui-background", "var(--color-user-2)");
+      root.style.setProperty("--ui-foreground", "var(--color-user-1)");
+    }
+
+    // Aligne la variable de texte (color-user-1) sur l'ancien fond pour cohérence interne
+    // et laisse la couleur pilotée (sliders) pour l'arrière-plan via --color-user-2
+    root.style.setProperty("--color-user-1", currentBg);
+
+    // Synchronise les champs pour refléter l'inversion visuelle
+    // Après inversion: arrière-plan = couleur pilotée (sliders), texte = couleur fixe
+    if (backgroundColorPicker)
+      backgroundColorPicker.value = toInputHex(currentText);
+    if (backgroundColorText)
+      backgroundColorText.value = toNormalizedHex(currentText);
+    if (foregroundColorPicker)
+      foregroundColorPicker.value = toInputHex(currentBg);
+    if (foregroundColorText)
+      foregroundColorText.value = toNormalizedHex(currentBg);
+
+    // Assure que la box HEX a le bon fond immédiatement
+    const newBgHex = isTextColorPrimary ? currentBg : currentText;
+    root.style.setProperty("--ui-background-hex", toNormalizedHex(newBgHex));
+
+    updateActiveColorIndicator();
+    updateColorControlsOrder();
+    updateOKLCHValues();
+    // Corrige l'affichage des pickers selon l'UI réellement rendue
+    syncPickersFromUI({ defer: true, label: "after-swap" });
+  });
+}
+
+if (contrastSwitcher) {
+  contrastSwitcher.addEventListener("change", (e) => {
+    const apcaMode = !!e.target.checked;
+    if (apcaMode) {
+      if (wcagDisplay) wcagDisplay.style.display = "none";
+      if (apcaDisplay) apcaDisplay.style.display = "block";
+      if (wcagGuide) wcagGuide.style.display = "none";
+      if (apcaGuide) apcaGuide.style.display = "block";
+    } else {
+      if (wcagDisplay) wcagDisplay.style.display = "block";
+      if (apcaDisplay) apcaDisplay.style.display = "none";
+      if (wcagGuide) wcagGuide.style.display = "block";
+      if (apcaGuide) apcaGuide.style.display = "none";
+    }
+    updateOKLCHValues();
+  });
+}
+
+function resetToDefaultColors() {
+  const defaultTextColor = "#eeeeee";
+  const defaultBgColor = "#e5508a";
+  isTextColorPrimary = true;
+  // Applique le fond par défaut
+  root.style.setProperty("--color-user-1", defaultBgColor);
+  // Mapping UI: sliders -> texte (couleur utilisateur 2), fond = couleur utilisateur 1
+  root.style.setProperty("--ui-background", "var(--color-user-1)");
+  root.style.setProperty("--ui-foreground", "var(--color-user-2)");
+
+  // Calcule OKLCH pour la couleur texte par défaut et positionne sliders (CSS vars + inputs)
+  try {
+    const c = new Color(defaultTextColor).to("oklch");
+    const L = clamp01(c.coords[0]);
+    const Ctemp = Math.max(0, c.coords[1] || 0);
+    const C = Math.abs(Ctemp) < 1e-6 ? 0 : Ctemp;
+    const H = c.coords[2] || 0;
+    root.style.setProperty("--slider-l", String(L));
+    root.style.setProperty("--slider-c", String(C));
+    root.style.setProperty("--slider-h", String(H));
+    if (lSlider) {
+      lSlider.value = String(L * 100);
+      if (lValueDisplay)
+        lValueDisplay.textContent = `${formatSmart(L * 100, 2)}%`;
+    }
+    if (cSlider) {
+      cSlider.value = String(C);
+      if (cValueDisplay) cValueDisplay.textContent = formatSmart(C, 3);
+    }
+    if (hSlider) {
+      hSlider.value = String(H);
+      if (hValueDisplay) hValueDisplay.textContent = formatSmart(H, 2);
+    }
+  } catch {}
+
+  // Synchronise les champs de saisie
+  if (foregroundColorPicker)
+    foregroundColorPicker.value = toInputHex(defaultTextColor);
+  if (foregroundColorText)
+    foregroundColorText.value = toNormalizedHex(defaultTextColor);
+  if (backgroundColorPicker)
+    backgroundColorPicker.value = toInputHex(defaultBgColor);
+  if (backgroundColorText)
+    backgroundColorText.value = toNormalizedHex(defaultBgColor);
+
+  root.removeAttribute("data-primary-color-out-of-gamut");
+  root.removeAttribute("data-background-color-out-of-gamut");
+  if (contrastSwitcher) {
+    contrastSwitcher.checked = false;
+    contrastSwitcher.dispatchEvent(new Event("change"));
+  }
+
+  // Met à jour l’indicateur et l’ordre des contrôles
+  updateActiveColorIndicator();
+  updateColorControlsOrder();
+
+  // Propage la couleur des sliders vers l’UI (met à jour boxes et ratios)
+  updateSliderColor();
+  // Corrige l'affichage des pickers selon l'UI réellement rendue
+  syncPickersFromUI();
+}
+
 const resetButton = document.getElementById("reset-colors");
 if (resetButton) {
   resetButton.addEventListener("click", resetToDefaultColors);
 }
 
-/**
- * Teste une valeur de luminosité pour vérifier si elle atteint les seuils requis
- */
 function testLuminosity(lightness, chroma, hue, targetColor) {
   try {
-    // Créer la couleur de test avec la nouvelle luminosité
-    const testColorOklch = `oklch(${lightness / 100} ${chroma} ${hue}deg)`;
-    const testColorHex = toHex(testColorOklch);
-
-    // Calculer les contrastes selon l'ordre correct (texte, arrière-plan)
+    const testOklch = safeOklchString(lightness / 100, chroma, hue);
+    const testHex = toHex(testOklch);
     let wcagRatio, apcaValue;
-
     if (isTextColorPrimary) {
-      // Mode swap : sliders contrôlent le texte, donc testColor = texte, targetColor = arrière-plan
-      wcagRatio = getContrastRatio(testColorHex, targetColor);
-      apcaValue = Math.abs(getAPCAContrast(testColorHex, targetColor));
+      wcagRatio = getContrastRatio(testHex, targetColor);
+      apcaValue = Math.abs(getAPCAContrast(testHex, targetColor));
     } else {
-      // Mode normal : sliders contrôlent l'arrière-plan, donc testColor = arrière-plan, targetColor = texte
-      wcagRatio = getContrastRatio(targetColor, testColorHex);
-      apcaValue = Math.abs(getAPCAContrast(targetColor, testColorHex));
+      wcagRatio = getContrastRatio(targetColor, testHex);
+      apcaValue = Math.abs(getAPCAContrast(targetColor, testHex));
     }
-
-    // Vérifier si les seuils sont atteints
     const wcagPassed = wcagRatio >= 4.5;
     const apcaPassed = apcaValue >= 60;
-
     return {
       wcagRatio,
       apcaValue,
@@ -1103,7 +933,7 @@ function testLuminosity(lightness, chroma, hue, targetColor) {
       apcaPassed,
       success: wcagPassed && apcaPassed,
     };
-  } catch (e) {
+  } catch {
     return {
       wcagRatio: 0,
       apcaValue: 0,
@@ -1114,141 +944,57 @@ function testLuminosity(lightness, chroma, hue, targetColor) {
   }
 }
 
-/**
- * Ajuste automatiquement la luminosité pour atteindre les seuils d'accessibilité
- */
 function makeColorAccessible() {
   try {
-    // Obtenir les valeurs actuelles des sliders
     const currentL = parseFloat(lSlider.value);
     const currentC = parseFloat(cSlider.value);
     const currentH = parseFloat(hSlider.value);
+    const { textHex, bgHex } = getResolvedUiColors();
+    const targetColor = isTextColorPrimary ? bgHex : textHex;
+    const apcaMode = !!(contrastSwitcher && contrastSwitcher.checked);
+    const wcagGoal = 4.5;
+    const apcaGoal = 60;
+    const passes = (wcag, apca) =>
+      apcaMode ? Math.abs(apca) >= apcaGoal : wcag >= wcagGoal;
+    const scoreToGoal = (wcag, apca) =>
+      apcaMode
+        ? Math.abs(Math.abs(apca) - apcaGoal)
+        : Math.abs(wcag - wcagGoal);
 
-    // Déterminer la couleur cible (celle qui ne sera pas modifiée)
-    let targetColorRaw;
-    if (isTextColorPrimary) {
-      // Mode swap : sliders contrôlent le texte, la couleur cible est l'arrière-plan
-      targetColorRaw =
-        getComputedStyle(root).getPropertyValue("--color-user-1").trim() ||
-        "#eeeeee";
-    } else {
-      // Mode normal : sliders contrôlent l'arrière-plan, la couleur cible est le texte
-      targetColorRaw =
-        getComputedStyle(root).getPropertyValue("--color-user-1").trim() ||
-        "#eeeeee";
-    }
+    const current = testLuminosity(currentL, currentC, currentH, targetColor);
+    if (passes(current.wcagRatio, current.apcaValue)) return;
 
-    // Convertir la couleur cible en hex si nécessaire
-    const targetColor = targetColorRaw.startsWith("#")
-      ? targetColorRaw
-      : toHex(targetColorRaw);
-
-    console.log(
-      `Mode: ${isTextColorPrimary ? "Texte primaire" : "Arrière-plan primaire"}`
-    );
-    console.log(`Couleur cible: ${targetColor}`);
-    console.log(`Luminosité actuelle: ${currentL.toFixed(1)}%`);
-
-    // Tester d'abord la valeur actuelle
-    const currentTest = testLuminosity(
-      currentL,
-      currentC,
-      currentH,
-      targetColor
-    );
-    if (currentTest.success) {
-      console.log(
-        "La couleur actuelle respecte déjà les seuils d'accessibilité"
-      );
-      return;
-    }
-
-    console.log(
-      `État actuel: WCAG ${currentTest.wcagRatio.toFixed(2)} (${
-        currentTest.wcagPassed ? "✅" : "❌"
-      }), APCA ${currentTest.apcaValue.toFixed(1)} (${
-        currentTest.apcaPassed ? "✅" : "❌"
-      })`
-    );
-
-    // Recherche optimisée : trouver la valeur la plus proche des seuils idéaux
-    let bestLightness = null;
-    let bestResult = null;
-    let minDistance = Infinity;
-    let bestScore = Infinity; // Score combiné : distance aux seuils idéaux
-
-    // Recherche fine avec incréments de 0.1% pour plus de précision
+    let bestPass = { L: null, score: Infinity, dist: Infinity };
+    let bestApprox = { L: null, score: Infinity, dist: Infinity };
     for (let l = 0; l <= 100; l += 0.1) {
-      const result = testLuminosity(l, currentC, currentH, targetColor);
-
-      if (result.success) {
-        // Calculer la distance à la luminosité originale
-        const distanceFromOriginal = Math.abs(l - currentL);
-
-        // Calculer la distance aux seuils idéaux (4.5 pour WCAG, 60 pour APCA)
-        const wcagDistance = Math.abs(result.wcagRatio - 4.5);
-        const apcaDistance = Math.abs(result.apcaValue - 60);
-
-        // Score combiné : priorité à la proximité des seuils idéaux, puis distance originale
-        const idealScore =
-          wcagDistance * 2 + apcaDistance * 0.1 + distanceFromOriginal * 0.01;
-
-        // Garder la meilleure solution
+      const r = testLuminosity(l, currentC, currentH, targetColor);
+      const s = scoreToGoal(r.wcagRatio, r.apcaValue);
+      const d = Math.abs(l - currentL);
+      if (passes(r.wcagRatio, r.apcaValue)) {
+        if (s < bestPass.score || (s === bestPass.score && d < bestPass.dist))
+          bestPass = { L: l, score: s, dist: d };
+      } else {
         if (
-          idealScore < bestScore ||
-          (idealScore === bestScore && distanceFromOriginal < minDistance)
-        ) {
-          bestLightness = l;
-          bestResult = result;
-          minDistance = distanceFromOriginal;
-          bestScore = idealScore;
-        }
+          s < bestApprox.score ||
+          (s === bestApprox.score && d < bestApprox.dist)
+        )
+          bestApprox = { L: l, score: s, dist: d };
       }
     }
-
-    if (bestLightness !== null && bestResult && bestResult.success) {
-      console.log(
-        `Meilleure luminosité trouvée: ${bestLightness.toFixed(
-          1
-        )}% (distance: ${minDistance.toFixed(1)}%)`
-      );
-      console.log(
-        `Nouveaux contrastes: WCAG ${bestResult.wcagRatio.toFixed(2)} (${
-          bestResult.wcagPassed ? "✅" : "❌"
-        }), APCA ${bestResult.apcaValue.toFixed(1)} (${
-          bestResult.apcaPassed ? "✅" : "❌"
-        })`
-      );
-      console.log(
-        `Distances aux seuils idéaux: WCAG ${Math.abs(
-          bestResult.wcagRatio - 4.5
-        ).toFixed(2)}, APCA ${Math.abs(bestResult.apcaValue - 60).toFixed(1)}`
-      );
-
-      // Appliquer la nouvelle luminosité
-      lSlider.value = bestLightness;
-      root.style.setProperty("--slider-l", (bestLightness / 100).toString());
-      if (lValueDisplay) {
-        lValueDisplay.textContent = `${formatSmart(bestLightness, 1)}%`;
-      }
-      updateSliderColor();
-      updateOKLCHValues();
-    } else {
-      console.log(
-        "Impossible de trouver une luminosité qui respecte les deux seuils d'accessibilité"
-      );
-      alert(
-        "Impossible de trouver une luminosité accessible avec cette combinaison de couleurs. Essayez de changer la couleur de texte ou la saturation."
-      );
-    }
+    const newL = bestPass.L ?? bestApprox.L;
+    if (newL == null) return;
+    lSlider.value = String(newL);
+    root.style.setProperty("--slider-l", (newL / 100).toString());
+    if (lValueDisplay) lValueDisplay.textContent = `${formatSmart(newL, 1)}%`;
+    updateSliderColor();
+    updateOKLCHValues();
   } catch (error) {
     console.error("Erreur lors de l'ajustement automatique:", error);
     alert("Une erreur s'est produite lors de l'ajustement automatique.");
   }
 }
 
-// Event listener pour le bouton "Couleur proche accessible"
-const accessibleButton = document.getElementById("make-accessible");
-if (accessibleButton) {
-  accessibleButton.addEventListener("click", makeColorAccessible);
+const accessibleBtn = document.getElementById("make-accessible");
+if (accessibleBtn) {
+  accessibleBtn.addEventListener("click", makeColorAccessible);
 }

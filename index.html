@@ -154,41 +154,6 @@
             <!-- Contrôles de couleurs avec double saisie (sélecteur de couleur + texte) -->
             <div class="color-pickers-group">
               <div
-                class="control control--color control--color-bg"
-                id="bg-color-control"
-              >
-                <label for="backgroundColorPicker"
-                  >Arrière-plan <small>(tous formats acceptés)</small></label
-                >
-                <div class="color-inputs">
-                  <input
-                    type="color"
-                    id="backgroundColorPicker"
-                    name="backgroundColorPicker"
-                    value="#e5508a"
-                  />
-                  <input
-                    type="text"
-                    id="backgroundColorText"
-                    name="backgroundColorText"
-                    value="#e5508a"
-                    aria-labelledby="backgroundColorPicker"
-                  />
-                </div>
-              </div>
-
-              <!-- Bouton de swap des couleurs -->
-              <button
-                type="button"
-                class="color-swap-button"
-                id="swapColorsButton"
-                title="Inverser les couleurs"
-                aria-label="Inverser couleur d'arrière-plan et couleur de texte"
-              >
-                ⇄
-              </button>
-
-              <div
                 class="control control--color control--color-text"
                 id="text-color-control"
               >
@@ -208,6 +173,41 @@
                     name="foregroundColorText"
                     value="#eeeeee"
                     aria-labelledby="foregroundColorPicker"
+                  />
+                </div>
+              </div>
+
+              <!-- Bouton de swap des couleurs -->
+              <button
+                type="button"
+                class="color-swap-button"
+                id="swapColorsButton"
+                title="Inverser les couleurs"
+                aria-label="Inverser couleur d'arrière-plan et couleur de texte"
+              >
+                ⇄
+              </button>
+
+              <div
+                class="control control--color control--color-bg"
+                id="bg-color-control"
+              >
+                <label for="backgroundColorPicker"
+                  >Arrière-plan <small>(tous formats acceptés)</small></label
+                >
+                <div class="color-inputs">
+                  <input
+                    type="color"
+                    id="backgroundColorPicker"
+                    name="backgroundColorPicker"
+                    value="#e5508a"
+                  />
+                  <input
+                    type="text"
+                    id="backgroundColorText"
+                    name="backgroundColorText"
+                    value="#e5508a"
+                    aria-labelledby="backgroundColorPicker"
                   />
                 </div>
               </div>

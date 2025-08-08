@@ -20,14 +20,18 @@
  */
 :root {
   /* Variables dynamiques, gérées par JavaScript */
-  --slider-l: 0.649;
-  --slider-c: 0.19;
-  --slider-h: 360;
+  --slider-l: 0.94;
+  --slider-c: 0;
+  --slider-h: 0;
 
-  --color-user-1: #eeeeee;
-  --color-user-2: oklch(var(--slider-l) var(--slider-c) var(--slider-h));
-  --ui-foreground: var(--color-user-1);
-  --ui-background: var(--color-user-2);
+  /* color-user-2 = texte (piloté par sliders), color-user-1 = fond */
+  --color-user-1: #e5508a;
+  /* L en %, H en nombre (degrés unitless pour compat UA actuels) */
+  --color-user-2: oklch(
+    calc(var(--slider-l) * 100%) var(--slider-c) var(--slider-h)
+  );
+  --ui-foreground: var(--color-user-2);
+  --ui-background: var(--color-user-1);
 
   /* Variables spécifiques aux composants */
   --width-color-picker: 2rem;

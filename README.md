@@ -51,6 +51,20 @@ Pour en savoir plus sur le support navigateur et les avantages d'OKLCH, consulte
 
 L'algorithme d'optimisation automatique trouve la couleur la plus proche qui respecte ces seuils selon la norme sélectionnée.
 
+## Détails d’implémentation
+
+### Calcul APCA
+
+- Source: `apca-w3` chargée en ESM via jsDelivr: `https://cdn.jsdelivr.net/npm/apca-w3/+esm`.
+- Entrées: l’API utilisée attend les luminances relatives Y (0..1). Nous convertissons d’abord les couleurs en sRGB 8‑bit, puis en luminances via `sRGBtoY([r, g, b])`, et appelons `APCAcontrast(textY, bgY)`.
+- Signe: l’APCA est signée (négatif si le texte est plus clair que le fond). L’UI affiche `+x.x` pour les positifs, et la valeur brute pour les négatifs.
+- Fallback: si la lib est indisponible, un delta Y signé est affiché pour éviter les blocages, mais il peut différer légèrement de l’APCA officielle.
+
+### Mode debug (optionnel)
+
+- Pour activer des logs compacts de synchronisation, ajoutez `data-debug="true"` sur l’élément `<html>` dans `index.html`.
+- Par défaut, les logs sont désactivés.
+
 ## Contribution
 
 Ce projet est développé avec ❤️ par [Alsacréations](https://www.alsacreations.fr/).
