@@ -29,6 +29,9 @@ const wcagDisplay = document.querySelector(".contrast-display--wcag");
 const apcaDisplay = document.querySelector(".contrast-display--apca");
 const wcagGuide = document.querySelector(".guide-content--wcag");
 const apcaGuide = document.querySelector(".guide-content--apca");
+const contrastTypeIndicator = document.querySelector(
+  ".contrast-type-indicator"
+);
 
 // State: sliders contrôlent le texte
 let isTextColorPrimary = true;
@@ -1092,6 +1095,9 @@ if (contrastSwitcher) {
       if (wcagGuide) wcagGuide.style.display = "block";
       if (apcaGuide) apcaGuide.style.display = "none";
     }
+    // Met à jour le libellé de l’exemple d’application
+    if (contrastTypeIndicator)
+      contrastTypeIndicator.textContent = apcaMode ? "(APCA)" : "(WCAG)";
     updateOKLCHValues();
   });
 }
