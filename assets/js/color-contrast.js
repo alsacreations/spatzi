@@ -90,12 +90,10 @@ function syncPickersFromUI(options = { defer: true, label: "sync" }) {
 
     const textHex = resolved.textHex || calc.textHex;
     const bgHex = resolved.bgHex || calc.bgHex;
+    // Ne synchronise que les color pickers pour ne pas écraser la notation saisie par l'utilisateur
     if (backgroundColorPicker) backgroundColorPicker.value = toInputHex(bgHex);
-    if (backgroundColorText) backgroundColorText.value = toNormalizedHex(bgHex);
     if (foregroundColorPicker)
       foregroundColorPicker.value = toInputHex(textHex);
-    if (foregroundColorText)
-      foregroundColorText.value = toNormalizedHex(textHex);
   };
   if (options && options.defer) {
     requestAnimationFrame(run);
@@ -142,6 +140,83 @@ function toHex(inputColor) {
 
 function toNormalizedHex(inputColor) {
   return toHex(inputColor).toUpperCase();
+}
+
+// Détecte une couleur nommée CSS (heuristique simple)
+function isNamedColorKeyword(value) {
+  if (typeof value !== "string") return false;
+  const v = value.trim().toLowerCase();
+  // Simples mots (sans #, parenthèses, espaces, chiffres)
+  if (!/^[a-z]+$/.test(v)) return false;
+  // Exclure mots-clés non-couleur éventuels si besoin (peu probable ici)
+  return isValidColor(v);
+}
+
+// Préserve la notation utilisateur sauf pour les noms (convertis en HEX uppercase)
+function normalizeDisplayValue(value, source) {
+  if (source === "text" && isNamedColorKeyword(value)) {
+    return toNormalizedHex(value);
+  }
+  if (source === "text") {
+    return String(value).trim();
+  }
+  return toNormalizedHex(value);
+}
+
+// Détection basique de la notation saisie
+function detectNotation(value) {
+  if (typeof value !== "string") return "hex";
+  const v = value.trim();
+  if (/^#[0-9a-fA-F]{6}$/.test(v)) return "hex";
+  if (/^oklch\(/i.test(v)) return "oklch";
+  if (/^oklab\(/i.test(v)) return "oklab";
+  if (/^hsl[a]?\(/i.test(v)) return "hsl";
+  if (/^rgb[a]?\(/i.test(v)) return "rgb";
+  if (/^[a-z]+$/i.test(v) && isNamedColorKeyword(v)) return "named";
+  return "hex";
+}
+
+// Sérialise une couleur dans une notation donnée
+function serializeColorString(colorInput, notation) {
+  try {
+    const c = new Color(colorInput);
+    switch (notation) {
+      case "oklch": {
+        const o = c.to("oklch");
+        const L = formatSmart(o.coords[0] * 100, 2);
+        const C = formatSmart(Math.max(0, o.coords[1] || 0), 3);
+        const H = formatSmart(o.coords[2] || 0, 2);
+        return `oklch(${L}% ${C} ${H})`;
+      }
+      case "oklab": {
+        const o = c.to("oklab");
+        const L = formatSmart(o.coords[0] * 100, 2);
+        const a = formatSmart(o.coords[1] || 0, 3);
+        const b = formatSmart(o.coords[2] || 0, 3);
+        return `oklab(${L}% ${a} ${b})`;
+      }
+      case "hsl": {
+        const o = c.to("hsl");
+        const H = formatSmart(o.coords[0] || 0, 1);
+        const S = formatSmart((o.coords[1] || 0) * 100, 1);
+        const L = formatSmart((o.coords[2] || 0) * 100, 1);
+        return `hsl(${H} ${S}% ${L}%)`;
+      }
+      case "rgb": {
+        const o = c.to("srgb");
+        const r = Math.round(clamp01(o.coords[0]) * 255);
+        const g = Math.round(clamp01(o.coords[1]) * 255);
+        const b = Math.round(clamp01(o.coords[2]) * 255);
+        return `rgb(${r} ${g} ${b})`;
+      }
+      case "named":
+      case "hex":
+      default:
+        return toNormalizedHex(c);
+    }
+  } catch {
+    return toNormalizedHex(colorInput);
+  }
 }
 
 // Certains navigateurs sont pointilleux sur input[type=color]
@@ -481,20 +556,20 @@ function updateOKLCHValues() {
 }
 
 // Color updates
-function updateColor(value, isPrimaryColor = true) {
+function updateColor(value, isPrimaryColor = true, source = "other") {
   if (!isValidColor(value)) return;
 
   if (isPrimaryColor) {
     if (isTextColorPrimary) {
       if (foregroundColorText)
-        foregroundColorText.value = toNormalizedHex(value);
+        foregroundColorText.value = normalizeDisplayValue(value, source);
       if (foregroundColorPicker)
         foregroundColorPicker.value = toInputHex(value);
       root.style.setProperty("--ui-background", "var(--color-user-1)");
       root.style.setProperty("--ui-foreground", "var(--color-user-2)");
     } else {
       if (backgroundColorText)
-        backgroundColorText.value = toNormalizedHex(value);
+        backgroundColorText.value = normalizeDisplayValue(value, source);
       if (backgroundColorPicker)
         backgroundColorPicker.value = toInputHex(value);
       root.style.setProperty("--ui-background", "var(--color-user-2)");
@@ -534,17 +609,18 @@ function updateColor(value, isPrimaryColor = true) {
       }
     }
   } else {
-    root.style.setProperty("--color-user-1", value);
+    // Conserve la notation saisie pour la couleur fixe
+    root.style.setProperty("--color-user-1", String(value).trim());
     if (isTextColorPrimary) {
       if (backgroundColorText)
-        backgroundColorText.value = toNormalizedHex(value);
+        backgroundColorText.value = normalizeDisplayValue(value, source);
       if (backgroundColorPicker)
         backgroundColorPicker.value = toInputHex(value);
       root.style.setProperty("--ui-background", "var(--color-user-1)");
       root.style.setProperty("--ui-foreground", "var(--color-user-2)");
     } else {
       if (foregroundColorText)
-        foregroundColorText.value = toNormalizedHex(value);
+        foregroundColorText.value = normalizeDisplayValue(value, source);
       if (foregroundColorPicker)
         foregroundColorPicker.value = toInputHex(value);
       root.style.setProperty("--ui-background", "var(--color-user-2)");
@@ -557,28 +633,32 @@ function updateColor(value, isPrimaryColor = true) {
 // Inputs
 if (backgroundColorPicker) {
   backgroundColorPicker.addEventListener("input", (e) => {
-    updateColor(e.target.value, !isTextColorPrimary);
+    updateColor(e.target.value, !isTextColorPrimary, "picker");
   });
   backgroundColorPicker.addEventListener("change", (e) => {
-    updateColor(e.target.value, !isTextColorPrimary);
+    updateColor(e.target.value, !isTextColorPrimary, "picker");
   });
 }
 if (foregroundColorPicker) {
   foregroundColorPicker.addEventListener("input", (e) => {
-    updateColor(e.target.value, isTextColorPrimary);
+    updateColor(e.target.value, isTextColorPrimary, "picker");
   });
   foregroundColorPicker.addEventListener("change", (e) => {
-    updateColor(e.target.value, isTextColorPrimary);
+    updateColor(e.target.value, isTextColorPrimary, "picker");
   });
 }
 if (backgroundColorText) {
   backgroundColorText.addEventListener("input", (e) => {
-    updateColor(e.target.value, !isTextColorPrimary);
+    const val = e.target.value;
+    backgroundColorText.dataset.format = detectNotation(val);
+    updateColor(val, !isTextColorPrimary, "text");
   });
 }
 if (foregroundColorText) {
   foregroundColorText.addEventListener("input", (e) => {
-    updateColor(e.target.value, isTextColorPrimary);
+    const val = e.target.value;
+    foregroundColorText.dataset.format = detectNotation(val);
+    updateColor(val, isTextColorPrimary, "text");
   });
 }
 
@@ -634,16 +714,28 @@ function updateSliderColor() {
 
   const oklchColor = safeOklchString(l, c, h);
   const hexColor = toHex(oklchColor);
+  const serializedByPref = (pref, fallbackHex) => {
+    if (!pref) return fallbackHex;
+    return serializeColorString(oklchColor, pref);
+  };
   if (isTextColorPrimary) {
     if (foregroundColorPicker)
       foregroundColorPicker.value = toInputHex(hexColor);
-    if (foregroundColorText) foregroundColorText.value = hexColor;
+    if (foregroundColorText)
+      foregroundColorText.value = serializedByPref(
+        foregroundColorText.dataset.format,
+        hexColor
+      );
     root.style.setProperty("--ui-background", "var(--color-user-1)");
     root.style.setProperty("--ui-foreground", "var(--color-user-2)");
   } else {
     if (backgroundColorPicker)
       backgroundColorPicker.value = toInputHex(hexColor);
-    if (backgroundColorText) backgroundColorText.value = hexColor;
+    if (backgroundColorText)
+      backgroundColorText.value = serializedByPref(
+        backgroundColorText.dataset.format,
+        hexColor
+      );
     root.style.setProperty("--ui-background", "var(--color-user-2)");
     root.style.setProperty("--ui-foreground", "var(--color-user-1)");
   }
@@ -785,7 +877,10 @@ if (swapColorsButton) {
       getComputedStyle(root).getPropertyValue("--slider-h").trim()
     );
     const sliderHex = toNormalizedHex(safeOklchString(l, c, h));
-    const currentBg = getCssVarHex("--color-user-1");
+    const currentBgHex = getCssVarHex("--color-user-1");
+    const currentBgRaw = getComputedStyle(root)
+      .getPropertyValue("--color-user-1")
+      .trim();
     const currentText = sliderHex;
 
     // Inverse le rôle: les sliders pilotent désormais la couleur de fond
@@ -800,23 +895,35 @@ if (swapColorsButton) {
       root.style.setProperty("--ui-foreground", "var(--color-user-1)");
     }
 
-    // Aligne la variable de texte (color-user-1) sur l'ancien fond pour cohérence interne
-    // et laisse la couleur pilotée (sliders) pour l'arrière-plan via --color-user-2
-    root.style.setProperty("--color-user-1", currentBg);
+    // Conserve la notation d'origine du fond dans --color-user-1
+    root.style.setProperty("--color-user-1", currentBgRaw || currentBgHex);
 
     // Synchronise les champs pour refléter l'inversion visuelle
     // Après inversion: arrière-plan = couleur pilotée (sliders), texte = couleur fixe
+    const prevFgTextVal = foregroundColorText
+      ? foregroundColorText.value
+      : null;
+    const prevBgTextVal = backgroundColorText
+      ? backgroundColorText.value
+      : null;
+    const prevFgFormat = foregroundColorText?.dataset.format;
+    const prevBgFormat = backgroundColorText?.dataset.format;
     if (backgroundColorPicker)
       backgroundColorPicker.value = toInputHex(currentText);
-    if (backgroundColorText)
-      backgroundColorText.value = toNormalizedHex(currentText);
     if (foregroundColorPicker)
-      foregroundColorPicker.value = toInputHex(currentBg);
-    if (foregroundColorText)
-      foregroundColorText.value = toNormalizedHex(currentBg);
+      foregroundColorPicker.value = toInputHex(currentBgHex);
+    // Échange les valeurs texte pour préserver les notations utilisateur
+    if (backgroundColorText && prevFgTextVal != null)
+      backgroundColorText.value = prevFgTextVal;
+    if (foregroundColorText && prevBgTextVal != null)
+      foregroundColorText.value = prevBgTextVal;
+    if (backgroundColorText && prevFgFormat != null)
+      backgroundColorText.dataset.format = prevFgFormat;
+    if (foregroundColorText && prevBgFormat != null)
+      foregroundColorText.dataset.format = prevBgFormat;
 
     // Assure que la box HEX a le bon fond immédiatement
-    const newBgHex = isTextColorPrimary ? currentBg : currentText;
+    const newBgHex = isTextColorPrimary ? currentBgHex : currentText;
     root.style.setProperty("--ui-background-hex", toNormalizedHex(newBgHex));
 
     updateActiveColorIndicator();
