@@ -33,6 +33,77 @@ const apcaGuide = document.querySelector(".guide-content--apca");
 // State: sliders contrôlent le texte
 let isTextColorPrimary = true;
 
+// URL sync (partage) — helpers et état
+let scheduledUrlUpdate = null;
+let lastAppliedHash = "";
+
+function buildHashFromColors(fg, bg) {
+  const params = new URLSearchParams();
+  params.set("fg", String(fg));
+  params.set("bg", String(bg));
+  return `#${params.toString()}`;
+}
+
+function parseColorsFromHash() {
+  try {
+    const raw = window.location.hash.startsWith("#")
+      ? window.location.hash.slice(1)
+      : window.location.hash;
+    if (!raw) return null;
+    const params = new URLSearchParams(raw);
+    const fg = params.get("fg");
+    const bg = params.get("bg");
+    if (!fg || !bg) return null;
+    if (!isValidColor(fg) || !isValidColor(bg)) return null;
+    return { fg, bg };
+  } catch {
+    return null;
+  }
+}
+
+function scheduleUrlUpdateWithColors(fgStr, bgStr) {
+  try {
+    const targetHash = buildHashFromColors(fgStr, bgStr);
+    if (targetHash === lastAppliedHash) return;
+    if (scheduledUrlUpdate) cancelAnimationFrame(scheduledUrlUpdate);
+    scheduledUrlUpdate = requestAnimationFrame(() => {
+      const url = new URL(window.location.href);
+      url.hash = targetHash;
+      // Remplace silencieusement pour éviter hashchange
+      history.replaceState(null, "", url);
+      lastAppliedHash = targetHash;
+      scheduledUrlUpdate = null;
+    });
+  } catch {}
+}
+
+function applyColorsFromUrl() {
+  const parsed = parseColorsFromHash();
+  if (!parsed) return false;
+  const { fg, bg } = parsed;
+  // Définit le fond (color-user-1) et la couleur texte pilotée par sliders
+  root.style.setProperty("--color-user-1", String(bg).trim());
+  updateColor(fg, true, "url");
+  // Met à jour les pickers pour cohérence visuelle
+  if (backgroundColorPicker) backgroundColorPicker.value = toInputHex(bg);
+  if (foregroundColorPicker) foregroundColorPicker.value = toInputHex(fg);
+  // Alimente les champs texte avec la notation telle que dans l’URL et mémorise le format
+  if (backgroundColorText) {
+    backgroundColorText.value = String(bg).trim();
+    backgroundColorText.dataset.format = detectNotation(
+      backgroundColorText.value
+    );
+  }
+  if (foregroundColorText) {
+    foregroundColorText.value = String(fg).trim();
+    foregroundColorText.dataset.format = detectNotation(
+      foregroundColorText.value
+    );
+  }
+  updateOKLCHValues();
+  return true;
+}
+
 // Calcule les hex UI à partir des variables (sliders et --color-user-1)
 function getUiHexColors() {
   const lVar = parseFloat(
@@ -516,6 +587,17 @@ function updateOKLCHValues() {
     const wcagContrast = getContrastRatio(textHex, bgHex);
     const apcaContrast = getAPCAContrast(textHex, bgHex);
 
+    // Met à jour l’URL en préservant la notation utilisateur si connue
+    const fgPref = foregroundColorText?.dataset.format;
+    const bgPref = backgroundColorText?.dataset.format;
+    const fgStr = fgPref
+      ? serializeColorString(textHex, fgPref)
+      : toNormalizedHex(textHex);
+    const bgStr = bgPref
+      ? serializeColorString(bgHex, bgPref)
+      : toNormalizedHex(bgHex);
+    scheduleUrlUpdateWithColors(fgStr, bgStr);
+
     const wcagRatioSpan = wcagDisplay
       ? wcagDisplay.querySelector(".contrast-ratio")
       : null;
@@ -827,6 +909,15 @@ function syncInitialValues() {
 syncInitialValues();
 // Assure que l’affichage correspond exactement à l’UI rendue (uppercase dans champs texte)
 syncPickersFromUI();
+
+// Applique les couleurs depuis l’URL si présentes (prioritaire sur les valeurs par défaut)
+applyColorsFromUrl();
+
+// Écoute les modifications du hash pour partager/coller des palettes
+window.addEventListener("hashchange", () => {
+  const ok = applyColorsFromUrl();
+  if (ok) syncPickersFromUI({ defer: true, label: "from-url" });
+});
 
 function updateActiveColorIndicator() {
   if (!activeColorIndicator) return;
