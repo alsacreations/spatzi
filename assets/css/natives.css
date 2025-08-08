@@ -443,7 +443,7 @@ dialog {
 }
 
 /* Responsive */
-@media (--until-sm) {
+@media (width < 48rem) {
   dialog {
     --dialog-max-width: calc(100vw - var(--spacing-16, 1rem));
     --dialog-max-height: calc(100vh - var(--spacing-16, 1rem));
@@ -1061,7 +1061,7 @@ textarea {
 }
 
 /* Responsive : compteur sur nouvelle ligne sur petits écrans */
-@media (--until-sm) {
+@media (width < 48rem) {
   .form-group-footer {
     flex-direction: column;
     align-items: stretch;

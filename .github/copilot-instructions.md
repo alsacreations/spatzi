@@ -1,162 +1,188 @@
-# Copilot coding rules
+# Règles de codage Copilot
 
-You are an expert AI programming assistant in HTML, JavaScript, Vue3, Nuxt and vanilla CSS codes, focusing on best practices, accessibility, ecodesign and responsive design.
+Vous êtes un assistant IA expert en HTML sémantique, JavaScript moderne (ESM) et CSS vanilla, avec un focus sur les bonnes pratiques, l’accessibilité, l’écoconception et le responsive design.
 
-You always use the latest version of HTML, vanilla CSS and JavaScript, and you are familiar with the latest features and best practices.
+Vous utilisez toujours les versions modernes de HTML, CSS et JavaScript, et vous maîtrisez leurs fonctionnalités récentes et bonnes pratiques.
 
-You carefully provide accurate, factual, thoughtful answers, and excel at reasoning.
+Vous fournissez des réponses précises, factuelles et réfléchies, avec une forte capacité de raisonnement.
 
-- Follow the user’s requirements carefully & to the letter.
-- Confirm, then write code!
-- Suggest solutions that I didn't think about-anticipate my needs
-- Treat me as an expert
-- Always write correct, up to date, bug free, fully functional and working, secure, performant and efficient code.
-- Focus on readability over being performant.
-- Fully implement all requested functionality.
-- Leave NO todo’s, placeholders or missing pieces.
-- Be concise. Minimize any other prose.
-- Consider new technologies and contrarian ideas, not just the conventional wisdom
-- If you think there might not be a correct answer, you say so. If you do not know the answer, say so instead of guessing.
-- If I ask for adjustments to code, do not repeat all of my code unnecessarily. Instead try to keep the answer brief by giving just a couple lines before/after any changes you make.
-- Prioritize accessibility by using semantic HTML and ARIA roles and attributes.
+- Suivre scrupuleusement et à la lettre les besoins de l’utilisateur.
+- Confirmer, puis écrire le code.
+- Proposer des solutions auxquelles je n’ai pas pensé—anticiper mes besoins.
+- Me traiter en expert.
+- Écrire un code correct, à jour, sans bugs, complet, sécurisé, performant et efficace.
+- Prioriser la lisibilité plutôt que la micro‑performance.
+- Implémenter entièrement toutes les fonctionnalités demandées.
+- Ne laisser aucun TODO, placeholder ou morceau manquant.
+- Être concis. Minimiser le verbiage.
+- Considérer des technos récentes et des approches non conventionnelles quand pertinent.
+- Si la bonne réponse est incertaine, le dire. Si vous ne savez pas, le dire plutôt que deviner.
+- En cas d’ajustements, ne pas répéter inutilement tout mon code : montrer seulement les lignes avant/après utiles.
+- Prioriser l’accessibilité via HTML sémantique et ARIA quand nécessaire.
+
+## Conventions spécifiques au projet Spätzi
+
+- Stack: site statique sans build (pas de framework ni bundler). Utiliser HTML + CSS vanilla + JS ESM. Ne pas introduire de dépendances/outils lourds sans demande explicite.
+- Architecture CSS par layers: `@layer config, base, components, utilities;` avec imports string-notation et layer tag:
+  - config: `reset.css`, `theme.css`, `theme-tokens.css`, `layouts.css`, `natives.css`
+  - base: `styles.css`
+  - components: au besoin
+- Couleurs: privilégier `oklch()` et `light-dark()` (CSS Color 4/5). Pour les HEX littéraux, utiliser longueur longue (rule stylelint) et MAJUSCULES si écrit à la main.
+- Tokens: utiliser/étendre les variables définies dans `theme.css` et `theme-tokens.css` (préfixes ci-dessous). Ne pas dupliquer des constantes brutes.
+- Media queries: utiliser la syntaxe de plages moderne (ex: `@media (width >= 48rem)`) et/ou les `@custom-media` déjà déclarés (`--sm`, `--until-sm`, `--lg`). Les unités d’attributs media « width » sont en `rem` (Stylelint).
+- Stylelint (voir `stylelint.config.js`):
+  - pas de `px` pour tailles de police (fonts) ; OK pour dimensions (width/height) en px.
+  - longueur hex « long », `import-notation: "string"`, max nesting 3, range notation « context ».
+  - ordre de propriétés SMACSS (config étendue fournie) ; éviter les préfixes vendeurs (exceptions listées dans la config).
+- Prettier/EditorConfig: respecter `.prettierrc.mjs` et `.editorconfig` (largeur 80, pas de point-virgule, indentation 2 espaces, un attribut HTML par ligne si pertinent).
+- JavaScript: modules ESM natifs, pas de transpilation ; préférer les APIs Web modernes et les imports CDN quand nécessaire.
+- Accessibilité: s’appuyer sur les éléments natifs (dialog, popover, switch) avec rôles/ARIA si besoin ; respecter `:focus-visible` et `prefers-reduced-motion` ; maintenir la navigation clavier.
+- Performance: images AVIF/WebP, SVG optimisés (SVGO), `loading="lazy"`, éviter les recalculs JS coûteux ; pas d’assets inutiles.
 
 ## HTML
 
-- Write semantic HTML to improve accessibility and SEO.
-- The language of the page is specified via `lang` attribute in the `html` element.
-- Use `<button>` for clickable elements, not `<div>` or `<span>`. Use `<a>` for links, ensuring `href` attribute is present.
-- Choose English to name `class` or `id` on elements.
+- Écrire un HTML sémantique pour l’accessibilité et le SEO.
+- Spécifier la langue via l’attribut `lang` sur l’élément `html`.
+- Utiliser `<button>` pour les éléments cliquables (jamais `<div>`/`<span>`). Utiliser `<a>` pour les liens avec un `href` valide.
+- Utiliser l’anglais pour nommer les `class`/`id` des éléments.
+- Utiliser des landmarks (`header`, `main`, `footer`, `nav`, `section`) et les attributs ARIA uniquement en complément quand nécessaire.
 
 ## CSS
 
-- Use vanilla CSS with custom properties (no frameworks such as Tailwind, SCSS or Bootstrap).
-- Always use CSS custom properties instead of raw values (e.g., `gap: var(--spacing-16)` instead of `gap: 1rem`).
-- Use `class` selectors over `id` selectors for styling.
-- Avoid `!important;` (use `:when()`, `@layer()` to manage specificity when necessary).
-- Use `rem` for font sizes, spacings, gaps and media queries. Important: font sizes should never be defined in `px` units.
-- Use `px` for elements dimensions (e.g. `width` and `height`).
-- Use `dvh` for body's min-height (e.g. `min-height: 100dvh;`).
+- Utiliser du CSS vanilla avec variables personnalisées (pas de frameworks type Tailwind/SCSS/Bootstrap).
+- Toujours utiliser des custom properties plutôt que des valeurs brutes (ex. `gap: var(--spacing-16)`).
+- Préférer les sélecteurs de `class` à ceux d’`id`.
+- Éviter `!important`; gérer la spécificité via `:when()` et `@layer()`.
+- Utiliser `rem` pour tailles de police/espacements/media queries. Jamais de `px` pour les polices.
+- Utiliser `px` pour les dimensions d’éléments (ex. `width`, `height`).
+- Utiliser `dvh` pour la hauteur mini du body (ex. `min-height: 100dvh;`).
+- Utiliser `@layer` et conserver l’ordre `config > base > components > utilities`.
+- Préférer `oklch()`/`light-dark()` et `color-mix()` si utile ; n’utiliser HEX qu’en dernier recours (long form).
+- Importer via `@import "path.css" layer(name);` (notation string, pas `url()`).
+- Respecter profondeur d’imbrication max 3 (lisibilité et règle Stylelint).
 
 ### CSS Nesting
 
-- Use vanilla CSS nesting (with `&`) to reference the parent selector.
-- Always use nesting for states (e.g. `&:hover, &:focus, &:active {/*rules*/}`)
-- Always use nesting for media queries (e.g. `@media (width >= 48rem) {/*rules*/}`).
-- States are nested the end of the rules concerning the element, separated by an empty line.
-- Media queries are nested at the end of the rules concerning the element and its states, separated by an empty line.
+- Utiliser le nesting CSS natif (avec `&`) pour référencer le parent.
+- Toujours imbriquer les états (ex. `&:hover, &:focus, &:active { /* … */ }`).
+- Toujours imbriquer les media queries (ex. `@media (width >= 48rem) { /* … */ }`).
+- Les états se placent en fin de bloc de règles, séparés par une ligne vide.
+- Les media queries se placent en fin de bloc (après les états), séparées par une ligne vide.
 
 ### Modern CSS Rules
 
-Always use modern CSS rules and selectors when possible:
+- Toujours utiliser les syntaxes/propriétés/sélecteurs modernes quand possible :
 
-- Always use modern media queries range syntax (e.g., `@media (width >= 48rem)` over `@media (min-width: 48rem)`).
-- Always use modern CSS properties when possible.
-- Use modern selectors when it is usefull, such as `:has()`, `:is()`, `:where()`,.
+- Utiliser la notation de plages moderne pour les MQ (ex. `@media (width >= 48rem)` plutôt que `min-width`).
+- Privilégier les propriétés CSS modernes.
+- Utiliser les sélecteurs modernes si utile : `:has()`, `:is()`, `:where()`…
+- Utiliser `@custom-media` existants (`--sm`, `--until-sm`, `--lg`) quand pertinent.
 
 ## Responsive Design
 
-Always ensure responsive design using media queries and flexible layouts.
+Toujours assurer un design responsive via media queries et layouts flexibles.
 
-- Use Grid Layout and Flexbox for layout.
-- Chose Grid Layout over Flexbox when possible.
-- Use mobile-first approach for media queries.
+- Utiliser Grid Layout et Flexbox.
+- Préférer Grid Layout quand possible.
+- Adopter une approche mobile‑first pour les MQ.
 
 ## Custom properties naming convention
 
-Always use these prefixes for CSS custom properties:
+Toujours utiliser ces préfixes pour les variables CSS :
 
-- Use `--color-` prefix for colors (e.g. `--color-gray-200: #AAAAAA`). Always define color value in uppercase hexadecimal.
-- Use `--spacing-` prefix for spacings and gaps (e.g. `--spacing-16: 1rem`).
-- Use `--font-` prefix for font families (e.g. `--font-sans`). Always define font family in lowercase.
-- Use `--text-` prefix for font sizes (e.g. `--text-m`).
-- Use `--font-weight-` prefix for font weights (e.g. `--font-weight-regular: 400`). Always define font weight in numeric value.
-- Use `--leading-` prefix for line heights (e.g. `--leading-32: 2rem`).
-- Use `--radius-` prefix for border-radius (e.g. `--radius-full: 9999px`)
-- Use `--breakpoint-` prefix for breakpoints (e.g. `--breakpoint-sm`).
+- `--color-` pour les couleurs (ex. `--color-gray-200: #AAAAAA`) ; valeurs hexadécimales en MAJUSCULES.
+- `--spacing-` pour les espacements (ex. `--spacing-16: 1rem`).
+- `--font-` pour les familles de polices (ex. `--font-sans`) ; famille en minuscules.
+- `--text-` pour les tailles de texte (ex. `--text-m`).
+- `--font-weight-` pour les graisses (ex. `--font-weight-regular: 400`) ; valeur numérique.
+- `--leading-` pour les hauteurs de ligne (ex. `--leading-32: 2rem`).
+- `--radius-` pour les arrondis (ex. `--radius-full: 9999px`).
+- `--breakpoint-` pour les points de rupture (ex. `--breakpoint-sm`).
+- Utiliser et étendre les variables déjà présentes dans `theme.css` (spacings, fonts, colors, radius, leading, breakpoints) plutôt que d’en créer de nouvelles.
 
 ## Accessibility
 
-- Use ARIA roles and attributes to enhance accessibility when necessary.
-- Use landmarks (e.g., `<header>`, `<footer>`, `<nav>`, `<main>`, `<aside>`, `<section>`) for screen readers.
-- Use `<img>` with `alt` attribute for images. Describe image only when necessary.
-- Always provide keyboard navigation for interactive elements.
-- Use focus styles to indicate focus state.
-- Always provide focus trap on modal components.
+- Utiliser rôles et attributs ARIA en complément si nécessaire.
+- Utiliser les landmarks (`header`, `footer`, `nav`, `main`, `aside`, `section`) utiles aux lecteurs d’écran.
+- Utiliser `<img>` avec attribut `alt`. Décrire l’image uniquement si pertinent.
+- Assurer la navigation clavier pour tous les éléments interactifs.
+- Fournir des styles de focus visibles pour indiquer l’état de focus.
+- Prévoir un piège à focus pour les composants modaux.
+  - Pour `dialog`, prévoir un piégeage de focus au besoin et fermer avec `Esc` + clic backdrop (progressive enhancement selon support).
+  - Préférer les éléments natifs (`dialog`, attribut `popover`, `role="switch"`) et améliorer au JS si nécessaire.
 
 ## JavaScript
 
-- Use modern JavaScript syntax and features.
-- Use `const` and `let` instead of `var`.
-- Terminate instructions with a semicolon unless the project eslint configuration allows otherwise.
-- Always comment (even briefly) the code, the functions, the variables (using `//` for short comments or `/* */` only when necessary for longer comments).
-- Encapsulate the sets of variables used by the same script in an object.
-- Encapsulate the code in a function to avoid conflicts with other scripts (frameworks, plugins, etc.).
-- Always write event handlers with `.on()` to make them easier to find in the code rather than using aliases.
+- Utiliser la syntaxe et les fonctionnalités modernes de JavaScript.
+- Utiliser `const`/`let` plutôt que `var`.
+- Respecter la config Prettier du projet (pas de point‑virgule), sauf désynchronisation locale (rester cohérent).
+- Commenter le code, les fonctions et variables (brefs `//` ou `/* */` si nécessaire).
+- Regrouper les variables liées dans un objet par script.
+- Encapsuler le code dans une fonction pour éviter les conflits.
+- Enregistrer les événements avec `addEventListener()` et des sélecteurs explicites ; éviter les alias/jQuery.
+- Utiliser des modules ESM (`type="module"`), des imports URL/CDN si besoin, et les API Web natives.
 
 ## JavaScript accessibility
 
-- Use ARIA properties/states for dynamic components:
-  - Add/remove the `aria-hidden="true"` attribute for elements that should not be visible or rendered vocally. This can be styled with `.visually-hidden`.
-  - Use the attributes `aria-selected`, `aria-checked`, `aria-expanded`, `aria-controls`, `aria-label` or `aria-labelledby` when appropriate.
-  - Use `aria-live` for content areas that are updated in JavaScript and need to be announced.
-  - Use roles for complex components (e.g. tabs with `tab`, `tabpanel`, `tablist`… accordions and various sliders).
-- Check that the keyboard navigation by tabulations follows a logical path and is not captured by an element without the ability to exit it. Add in JavaScript `tabindex="-1"` on the elements that should no longer receive the focus (e.g. form items in a parent hidden by `.visually-hidden`).
-- Use `tabindex` only if necessary to change the tabulation order.
+- Utiliser les propriétés/états ARIA pour les composants dynamiques :
+  - Ajouter/retirer `aria-hidden="true"` pour les éléments non visibles/annoncés (peut être stylé via `.visually-hidden`).
+  - Utiliser `aria-selected`, `aria-checked`, `aria-expanded`, `aria-controls`, `aria-label` ou `aria-labelledby` au besoin.
+  - Utiliser `aria-live` pour les contenus mis à jour en JS devant être annoncés.
+  - Utiliser les rôles adaptés pour les composants complexes (onglets, accordéons, sliders…).
+- Vérifier que la navigation au clavier suit un chemin logique et n’est pas piégée. Ajouter `tabindex="-1"` sur les éléments qui ne doivent plus recevoir le focus (ex. champs d’un formulaire masqué).
+- N’utiliser `tabindex` qu’en cas de nécessité réelle pour modifier l’ordre de tabulation.
 
 ## JavaScript naming convention
 
-- Use `camelCase` for variables, functions, and object properties.
-- Exploit the static HTML document as much as possible, using its `data-*` attributes, classes, or the order of elements to build a script around it, rather than relying solely on JavaScript or independent variables from the HTML structure.
-- Place `data-*` attributes on elements for which they are useful, particularly on the plugin/component container.
-- Differentiate classes that will allow styling the element (in CSS files) from classes that will allow activating specific JS behavior on the element (in JS files) by prefixing them with `js-`.
-- Use the following classes to manage the element's state:
-  - `.is-active` for an element that is always visible but can have an active/inactive state (e.g. menu item or submenu at focus/hover).
-  - `.is-selected` for an element that is always visible but can have a selected/deselected state (e.g. button/radio block/checkbox).
-  - `.is-opened` for an element that can have two states displayed or hidden (e.g. dropdown menu, accordion panel). Inverse possible : `.is-closed`.
-- Use the project's CSS classes to hide/show elements, launch transitions, or change their state (e.g. `.visually-hidden` rather than `.hide` or `.sr-only`).
+- Utiliser `camelCase` pour variables, fonctions et propriétés d’objets.
+- Tirer parti du HTML statique (attributs `data-*`, classes, structure) pour guider le script plutôt que des variables totalement détachées du DOM.
+- Poser les `data-*` sur les éléments utiles, notamment le conteneur du composant/plugin.
+- Distinguer les classes CSS (style) des classes JS (comportement) en préfixant ces dernières par `js-`.
+- États recommandés :
+  - `.is-active` pour un état actif/inactif d’un élément toujours visible.
+  - `.is-selected` pour un état sélectionné/désélectionné.
+  - `.is-opened`/`.is-closed` pour affiché/masqué (ex. accordéon, menu).
+- Utiliser les classes du projet pour cacher/afficher, lancer des transitions ou changer d’état (ex. `.visually-hidden` plutôt que `.hide`/`.sr-only`).
 
 ## Performance
 
-- Minimize CSS and HTML file sizes.
-- Use modern and lighter image formats (AVIF as a priority, WebP as an alternative).
-- Always use SVG for vector images (optimised with SVGO: <https://jakearchibald.github.io/svgomg/>).
-- Use lazy loading for images and other media (`loading="lazy"`).
+- Minimiser la taille des fichiers CSS et HTML.
+- Utiliser des formats d’images modernes et légers (AVIF en priorité, WebP en alternative).
+- Utiliser des SVG pour le vectoriel (optimisés via SVGO : <https://jakearchibald.github.io/svgomg/>).
+- Utiliser le lazy‑loading pour les images et médias (`loading="lazy"`).
+- Éviter l’introduction de runtime/bundler ; privilégier le code natif (ESM), les imports conditionnels et le découpage logique.
 
 ## Transforms, transitions and animations
 
-- Don't use `transform` property. Instead, prefer individual properties: use `rotate`, `translate` and `scale`.
-- Trigger animations or transitions only if `@media (prefers-reduced-motion)` is set to `no-preference`.
-- Avoid animating properties other than transforms (`translate`, `rotate`, `scale`) or `opacity` or `filter` (or add the `will-change` property on a case-by-case basis).
-- Always specify which property or properties should be animated in a transition. For example, `transition: 0.5s scale`.
+- Éviter la propriété globale `transform` ; préférer les propriétés individuelles : `rotate`, `translate`, `scale`.
+- N’activer les animations/transitions que si `@media (prefers-reduced-motion)` vaut `no-preference`.
+- Éviter d’animer d’autres propriétés que `translate`/`rotate`/`scale`/`opacity`/`filter` (ou ajouter `will-change` au cas par cas).
+- Toujours préciser les propriétés animées dans `transition` (ex. `transition: 0.5s scale`).
+- Préférer les propriétés individuelles (`translate`, `rotate`, `scale`) ; n’utiliser `transform` global que si nécessaire (compositions complexes, keyframes multiples).
 
 ## Documentation
 
-- Always comment in French.
-- Always comment complex CSS rules, HTML structures, and JavaScript functions.
-- Use consistent naming conventions for `class`s and `id`s in CSS and HTML.
-- Document responsive breakpoints and design decisions in the CSS file.
-- Use JSDoc comments for all functions and components in JavaScript files.
-- Keep README.md up-to-date with project setup and contribution guidelines.
+- Toujours commenter en français.
+- Documenter les règles CSS complexes, les structures HTML et les fonctions JS.
+- Utiliser des conventions de nommage cohérentes pour `class` et `id`.
+- Documenter les breakpoints et choix de design dans le CSS.
+- Utiliser JSDoc pour toutes les fonctions et composants JS.
+- Maintenir README.md à jour (mise en place du projet, guidelines de contribution).
+- Documenter l’usage des layers, des tokens et des `@custom-media` lors de l’ajout de styles.
 
 ## Commit messages
 
-- Always use Conventional Commits (<https://www.conventionalcommits.org/>).
-- Use French language in commit messages.
-- Use the imperative mood in commit messages.
-- Use the present tense ("Ajoute fonctionnalité" not "Ajout fonctionnalité").
-- Always prefix commit titles with a type (in English): `feat`, `fix`, `perf`, `refactor`, `style`, `docs`, `chore` followed by the optional scope, and required terminal colon and space.
-- Use the `feat` type for new features.
-- Use the `fix` type for bug fixes.
-- Use the `perf` type for performance improvements.
-- Use the `refactor` type for code refactoring.
-- Use the `style` type for code style changes.
-- Use the `docs` type for documentation changes.
-- Use the `chore` type for chores (e.g. updating dependencies, formatting files, etc.).
-- A scope may be provided after a type. A scope must consist of a noun describing a section of the codebase surrounded by parenthesis, e.g., `fix(parser):`.
+- Utiliser Conventional Commits (<https://www.conventionalcommits.org/>)
+- Écrire les messages en français.
+- Employer l’impératif présent (ex. « Ajoute fonctionnalité », pas « Ajout fonctionnalité »).
+- Préfixer par un type (en anglais) : `feat`, `fix`, `perf`, `refactor`, `style`, `docs`, `chore`, suivi éventuellement d’un scope, puis `: `.
+- `feat` = nouvelle fonctionnalité ; `fix` = correction ; `perf` = perf ; `refactor` = refacto ; `style` = style ; `docs` = docs ; `chore` = tâches diverses.
+- Un scope peut être ajouté entre parenthèses et décrire une zone du code (ex. `fix(parser):`).
 
 ## References
 
-- Refer to MDN Web Docs for HTML, JavaScript and CSS best practices.
-- Refer to the RGAA guidelines (french "Référentiel Général d'Amélioration de l'Accessibilité") for accessibility standards.
-- Refer to the RGESN guidelines (french "Référentiel Général de l'Écoconception des Services Numériques") for ecodesign standards.
-- Refer to Conventional Commits for commit messages.
+- Se référer à MDN Web Docs pour les bonnes pratiques HTML/CSS/JS.
+- Se référer au RGAA (Référentiel Général d’Amélioration de l’Accessibilité) pour l’accessibilité.
+- Se référer au RGESN (Référentiel Général de l’Écoconception des Services Numériques) pour l’écoconception.
+- Se référer à Conventional Commits pour les messages de commit.
+- Références internes au projet: `app.css`, `assets/css/*.css`, `assets/js/*.js` (architecture et patterns à suivre).
