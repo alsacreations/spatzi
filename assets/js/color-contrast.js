@@ -36,6 +36,9 @@ let isTextColorPrimary = true;
 // URL sync (partage) — helpers et état
 let scheduledUrlUpdate = null;
 let lastAppliedHash = "";
+// Référence pour le bouton "Réinitialiser" (devient les couleurs définies par l’utilisateur ou l’URL)
+let resetReference = { fg: "#EEEEEE", bg: "#E5508A" };
+let resetRefLocked = false;
 
 function buildHashFromColors(fg, bg) {
   const params = new URLSearchParams();
@@ -101,6 +104,9 @@ function applyColorsFromUrl() {
     );
   }
   updateOKLCHValues();
+  // La première application via URL devient la référence de reset
+  captureResetReference("from-url");
+  resetRefLocked = true;
   return true;
 }
 
@@ -347,6 +353,34 @@ function getResolvedUiColors() {
   const bgHex = toNormalizedHex(cs.backgroundColor);
   probe.remove();
   return { textHex, bgHex };
+}
+
+// Capture la paire actuelle comme référence de réinitialisation
+function captureResetReference(reason = "") {
+  if (resetRefLocked) return;
+  try {
+    // Préfère la valeur des champs texte (préserve la notation), fallback sur UI résolue
+    const resolved = getResolvedUiColors();
+    let fgStr =
+      foregroundColorText && isValidColor(foregroundColorText.value)
+        ? String(foregroundColorText.value).trim()
+        : serializeColorString(
+            resolved.textHex,
+            foregroundColorText?.dataset.format || "hex"
+          );
+    let bgStr =
+      backgroundColorText && isValidColor(backgroundColorText.value)
+        ? String(backgroundColorText.value).trim()
+        : serializeColorString(
+            resolved.bgHex,
+            backgroundColorText?.dataset.format || "hex"
+          );
+    resetReference = { fg: fgStr, bg: bgStr };
+    if (document.documentElement.dataset.debug === "true") {
+      // eslint-disable-next-line no-console
+      console.debug("[captureResetReference]", reason, resetReference);
+    }
+  } catch {}
 }
 
 // Contrast
@@ -710,6 +744,14 @@ function updateColor(value, isPrimaryColor = true, source = "other") {
     }
   }
   updateOKLCHValues();
+  // Met à jour la référence de reset après toute modification utilisateur explicite
+  if (source === "text" || source === "picker" || source === "url") {
+    captureResetReference(`updateColor:${source}`);
+    // Verrouille sur la première action utilisateur (texte/picker) pour figer la référence
+    if ((source === "text" || source === "picker") && !resetRefLocked) {
+      resetRefLocked = true;
+    }
+  }
 }
 
 // Inputs
@@ -859,6 +901,11 @@ function initializePage() {
   const initialTextColor = foregroundColorPicker
     ? foregroundColorPicker.value
     : "#eeeeee";
+  // Initialise la référence par défaut (sera écrasée si URL présente)
+  resetReference = {
+    fg: toNormalizedHex(initialTextColor),
+    bg: toNormalizedHex(initialBgColor),
+  };
   root.style.setProperty("--color-user-1", initialBgColor);
   root.style.setProperty("--ui-background", "var(--color-user-1)");
   root.style.setProperty("--ui-foreground", "var(--color-user-2)");
@@ -911,7 +958,11 @@ syncInitialValues();
 syncPickersFromUI();
 
 // Applique les couleurs depuis l’URL si présentes (prioritaire sur les valeurs par défaut)
-applyColorsFromUrl();
+const urlApplied = applyColorsFromUrl();
+if (!urlApplied) {
+  // Pas de valeurs dans l’URL, on fixe la référence sur les valeurs par défaut affichées
+  captureResetReference("initial-default");
+}
 
 // Écoute les modifications du hash pour partager/coller des palettes
 window.addEventListener("hashchange", () => {
@@ -1022,6 +1073,8 @@ if (swapColorsButton) {
     updateOKLCHValues();
     // Corrige l'affichage des pickers selon l'UI réellement rendue
     syncPickersFromUI({ defer: true, label: "after-swap" });
+    // Le swap fixe aussi la référence de reset
+    captureResetReference("after-swap");
   });
 }
 
@@ -1044,18 +1097,19 @@ if (contrastSwitcher) {
 }
 
 function resetToDefaultColors() {
-  const defaultTextColor = "#eeeeee";
-  const defaultBgColor = "#e5508a";
+  // Utilise la référence dynamique (définie par l'utilisateur ou l'URL)
+  const fgRef = resetReference?.fg || "#EEEEEE";
+  const bgRef = resetReference?.bg || "#E5508A";
+
+  // Sliders pilotent le texte
   isTextColorPrimary = true;
-  // Applique le fond par défaut
-  root.style.setProperty("--color-user-1", defaultBgColor);
-  // Mapping UI: sliders -> texte (couleur utilisateur 2), fond = couleur utilisateur 1
+  root.style.setProperty("--color-user-1", String(bgRef));
   root.style.setProperty("--ui-background", "var(--color-user-1)");
   root.style.setProperty("--ui-foreground", "var(--color-user-2)");
 
-  // Calcule OKLCH pour la couleur texte par défaut et positionne sliders (CSS vars + inputs)
+  // Positionne les sliders sur la couleur texte de référence
   try {
-    const c = new Color(defaultTextColor).to("oklch");
+    const c = new Color(fgRef).to("oklch");
     const L = clamp01(c.coords[0]);
     const Ctemp = Math.max(0, c.coords[1] || 0);
     const C = Math.abs(Ctemp) < 1e-6 ? 0 : Ctemp;
@@ -1078,15 +1132,19 @@ function resetToDefaultColors() {
     }
   } catch {}
 
-  // Synchronise les champs de saisie
-  if (foregroundColorPicker)
-    foregroundColorPicker.value = toInputHex(defaultTextColor);
-  if (foregroundColorText)
-    foregroundColorText.value = toNormalizedHex(defaultTextColor);
-  if (backgroundColorPicker)
-    backgroundColorPicker.value = toInputHex(defaultBgColor);
-  if (backgroundColorText)
-    backgroundColorText.value = toNormalizedHex(defaultBgColor);
+  // Synchronise les champs de saisie (préserve notations si connues)
+  if (foregroundColorPicker) foregroundColorPicker.value = toInputHex(fgRef);
+  if (foregroundColorText) {
+    const fmt = foregroundColorText.dataset.format || detectNotation(fgRef);
+    foregroundColorText.dataset.format = fmt;
+    foregroundColorText.value = serializeColorString(fgRef, fmt);
+  }
+  if (backgroundColorPicker) backgroundColorPicker.value = toInputHex(bgRef);
+  if (backgroundColorText) {
+    const fmt = backgroundColorText.dataset.format || detectNotation(bgRef);
+    backgroundColorText.dataset.format = fmt;
+    backgroundColorText.value = serializeColorString(bgRef, fmt);
+  }
 
   root.removeAttribute("data-primary-color-out-of-gamut");
   root.removeAttribute("data-background-color-out-of-gamut");
@@ -1095,13 +1153,11 @@ function resetToDefaultColors() {
     contrastSwitcher.dispatchEvent(new Event("change"));
   }
 
-  // Met à jour l’indicateur et l’ordre des contrôles
   updateActiveColorIndicator();
   updateColorControlsOrder();
 
-  // Propage la couleur des sliders vers l’UI (met à jour boxes et ratios)
+  // Met à jour les displays et ratios
   updateSliderColor();
-  // Corrige l'affichage des pickers selon l'UI réellement rendue
   syncPickersFromUI();
 }
 
