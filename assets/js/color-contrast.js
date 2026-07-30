@@ -1,8 +1,8 @@
 import {
   APCAcontrast,
   sRGBtoY,
-} from "https://cdn.jsdelivr.net/npm/apca-w3/+esm";
-import Color from "https://esm.sh/colorjs.io";
+} from "https://cdn.jsdelivr.net/npm/apca-w3@0.1.9/+esm";
+import Color from "https://esm.sh/colorjs.io@0.6.1";
 
 // DOM helpers
 const $ = (sel) => document.querySelector(sel);
