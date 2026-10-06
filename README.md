@@ -1,27 +1,30 @@
 # Spätzi - Outil d'aide au contraste des couleurs
 
-Spätzi est un outil interactif conçu pour aider les designers et développeurs à créer des palettes de couleurs accessibles. Il permet de vérifier les ratios de contraste selon les normes <span lang="en">WCAG (Web Content Accessibility Guidelines)</span> et <APCA lang="en">APCA (Accessible Perceptual Contrast Algorithm)</span>, et d'explorer des variations de couleurs en utilisant l'espace colorimétrique OKLCH.
+Spätzi est un outil interactif conçu pour aider les designers et développeurs à créer des combinaisons de couleurs accessibles. Il mesure le contraste entre un texte et son fond selon les WCAG 2.2 (_Web Content Accessibility Guidelines_) ou APCA (_Accessible Perceptual Contrast Algorithm_), permet d'ajuster les couleurs dans l'espace colorimétrique OKLCH, propose des corrections automatiques et simule les principaux daltonismes.
 
 ## Fonctionnalités principales
 
-- ℹ️ **Informations d'accessibilité :** obtenez les taux de contraste entre la couleur de fond et la couleur de texte selon les normes WCAG 2.1 et APCA.
-- 🎨 **Aperçu en direct :** visualisation directe du rendu texte/fond selon les combinaisons choisies.
-- 👁️ **Exemples d'application en temps réel :** une démonstration (recette de cuisine) montre comment vos couleurs s'appliquent sur du texte de différentes tailles et des éléments graphiques, avec des indicateurs visuels de conformité (✅/❌).
-- 🎯 **Couleur proche accessible :** trouve automatiquement la couleur la plus proche qui respecte les seuils d'accessibilité WCAG (4.5:1) ou APCA (60) selon le mode sélectionné
-- ⚖️ **Guides d’accessibilité intégrés** : indications sur les seuils requis pour AA, AAA ou APCA lisibilité renforcée.
-- ↔️ **Échange de couleurs :** bouton de permutation pour échanger instantanément la couleur de fond et la couleur de texte.
-- 🧽 **Réinitialiser :** remet les couleurs à leurs valeurs par défaut
-- ⚠️ Un avertissement "(sRGB la plus proche)" apparaît si une couleur OKLCH choisie ou générée est en dehors du champ sRGB. La valeur HEX affichée correspond alors à la couleur sRGB la plus proche.
+- 🎯 **Rapport de contraste :** ratio WCAG ou valeur APCA Lc, verdict de conformité et lecture secondaire selon l'autre méthode.
+- ⚖️ **Bascule WCAG 2.2 / APCA :** tous les affichages (verdict, critères, corrections, daltonismes, palette) suivent la méthode choisie.
+- 🎨 **Ajustement OKLCH :** curseurs Luminosité, Chroma et Teinte pour la couleur du texte ou celle du fond, avec avertissement « sRGB la plus proche » lorsque la couleur sort du gamut sRGB.
+- 👁️ **Aperçu en direct :** exemple de recette en plusieurs cas (30 px, 24 px gras, 24 px, 19 px gras, 16 px, icônes, 14 px), avec boutons et lien dans vos couleurs.
+- ✅ **Conformité par cas :** chaque taille de texte et les icônes affichent leur seuil et un indicateur conforme / non conforme, en plus des critères détaillés.
+- 🪄 **Corrections proposées :** la couleur la plus proche qui atteint le seuil, en modifiant le texte ou le fond. Seule la luminosité OKLCH varie, la teinte et la saturation sont conservées.
+- 🕶️ **Simulation des daltonismes :** protanopie, deutéranopie, tritanopie et achromatopsie, avec le contraste qui en résulte.
+- 🧩 **Test de palette :** matrice de toutes les combinaisons texte/fond d'une palette (jusqu'à 10 couleurs). Un clic sur une case la charge dans l'outil.
+- ↔️ **Inverser / Réinitialiser :** échange le texte et le fond, ou revient aux couleurs de départ.
+- 🔗 **Partage et historique :** lien de partage, copie du CSS, et historique des 8 dernières combinaisons testées.
+- 💧 **Pipette :** prélèvement d'une couleur à l'écran (navigateurs compatibles avec l'API EyeDropper).
+- 🌓 **Thème clair / sombre :** selon la préférence système ou au choix.
 
 ## Comment utiliser cet outil ?
 
-- **Sélectionnez vos couleurs de base :** Sélectionnez une couleur de fond et une couleur de texte à l'aide des sélecteurs de couleur ou en saisissant directement les valeurs (formats acceptés : mots-clés CSS, OKLCH, HEX, RGB, HSL)
-- **Observez la boîte de couleur :** Vérifiez les informations de couleur et les ratios de contraste.
-- **Explorez les variations :** Utilisez les curseurs L, C, H pour modifier la couleur de fond.
-- **Utilisez les boutons d'action :**
-  - **Réinitialiser** pour revenir aux couleurs par défaut
-  - **Couleur proche accessible** pour optimiser automatiquement l'accessibilité
-- **Basculez entre WCAG et APCA :** Utilisez le commutateur pour évaluer vos couleurs selon différentes normes d'accessibilité.
+1. **Saisissez vos couleurs :** couleur du texte et couleur de fond, via le sélecteur, la pipette ou en saisissant directement une valeur (formats acceptés : mots-clés CSS, HEX, RGB, HSL, OKLCH…).
+2. **Ajustez en OKLCH :** choisissez « Texte » ou « Fond », puis déplacez les curseurs L, C et H.
+3. **Choisissez la méthode :** WCAG 2.2 (norme en vigueur, exigée par le RGAA) ou APCA (à titre indicatif).
+4. **Lisez la conformité par cas :** les seuils applicables dépendent de la taille et de la graisse du texte.
+5. **Corrigez si besoin :** appliquez une des corrections proposées en un clic.
+6. **Partagez :** copiez le lien ou le CSS du couple de couleurs.
 
 ## Pourquoi OKLCH ?
 
@@ -37,33 +40,61 @@ Pour en savoir plus sur le support navigateur et les avantages d'OKLCH, consulte
 
 ## Normes d'accessibilité supportées
 
-### WCAG 2.1 (Web Content Accessibility Guidelines)
+### WCAG 2.2 (Web Content Accessibility Guidelines)
 
-- **Seuil AA normal :** 4.5:1 pour le texte standard
-- **Seuil AA large :** 3:1 pour le texte de 18pt gras ou 24pt+ normal
-- **Éléments graphiques :** 3:1 pour les icônes et éléments d'interface
+- **Critère 1.4.3 (AA) :** 4,5:1 pour le texte courant, 3:1 pour le grand texte (au moins 24 px, ou 18,66 px en gras).
+- **Critère 1.4.6 (AAA) :** 7:1 pour le texte courant, 4,5:1 pour le grand texte.
+- **Critère 1.4.11 (AA) :** 3:1 pour les composants d'interface et éléments graphiques (bordures de champs, icônes porteuses de sens, états de focus).
 
 ### APCA (Accessible Perceptual Contrast Algorithm)
 
-- **Texte standard :** 75+ Lc pour les petites tailles
-- **Texte moyen :** 60+ Lc pour les tailles moyennes
-- **Texte large :** 45+ Lc pour les grandes tailles et éléments graphiques
+Méthode à l'étude pour les futures WCAG 3, donnée à titre indicatif.
 
-L'algorithme d'optimisation automatique trouve la couleur la plus proche qui respecte ces seuils selon la norme sélectionnée.
+- **Texte courant :** Lc 75 minimum, Lc 90 idéal.
+- **Texte moyen :** Lc 60 (à partir de 24 px, ou 16 px en gras).
+- **Grand texte :** Lc 45 (à partir de 36 px, ou 24 px en gras).
 
-## Détails d’implémentation
+La valeur Lc est signée : elle est négative lorsque le texte est plus clair que le fond. Les seuils s'appliquent à sa valeur absolue.
 
-### Calcul APCA
+## Détails d'implémentation
 
-- Source: `apca-w3` chargée en ESM via jsDelivr: `https://cdn.jsdelivr.net/npm/apca-w3/+esm`.
-- Entrées: l’API utilisée attend les luminances relatives Y (0..1). Nous convertissons d’abord les couleurs en sRGB 8‑bit, puis en luminances via `sRGBtoY([r, g, b])`, et appelons `APCAcontrast(textY, bgY)`.
-- Signe: l’APCA est signée (négatif si le texte est plus clair que le fond). L’UI affiche `+x.x` pour les positifs, et la valeur brute pour les négatifs.
-- Fallback: si la lib est indisponible, un delta Y signé est affiché pour éviter les blocages, mais il peut différer légèrement de l’APCA officielle.
+Spätzi est un site statique en HTML, CSS et JavaScript, sans dépendance ni étape de build.
 
-### Mode debug (optionnel)
+```text
+index.html
+app.css                    # point d'entrée CSS (layers)
+assets/css/
+  reset.css
+  theme-tokens.css         # polices et design tokens (light-dark())
+  styles.css               # styles de base et mise en page
+  components.css           # composants
+assets/js/
+  spatzi.js                # logique de l'outil
+  theme-switcher.js        # thème clair / sombre
+assets/fonts/
+  lexend.woff2
+```
 
-- Pour activer des logs compacts de synchronisation, ajoutez `data-debug="true"` sur l’élément `<html>` dans `index.html`.
-- Par défaut, les logs sont désactivés.
+### Calculs
+
+- **Lecture des couleurs :** toute couleur CSS valide est convertie en sRGB 8 bits via un `<canvas>`. Les couleurs semi-transparentes sont composées sur le fond avant calcul.
+- **WCAG :** ratio de luminance relative. Les ratios affichés sont tronqués et non arrondis : 4,499:1 n'atteint pas 4,5:1.
+- **APCA :** implémentation de l'algorithme APCA 0.0.98G (`APCAcontrast`) intégrée au script. La valeur affichée est également tronquée.
+- **Corrections :** recherche par pas de 0,005 sur la luminosité OKLCH, dans les deux sens, en conservant la chroma et la teinte. La chroma est réduite si nécessaire pour rester dans le gamut sRGB.
+- **Daltonismes :** matrices de Machado et al. (2009) à sévérité maximale ; luminance seule pour l'achromatopsie.
+
+### Partage et stockage
+
+- **Lien de partage :** les couleurs sont stockées dans le fragment d'URL, par exemple `#fg=146af5&bg=ffffff`, avec `&m=apca` lorsque la méthode APCA est active.
+- **Stockage local (`localStorage`) :** thème (`theme`), méthode de calcul (`spatzi-method`) et historique (`spatzi-history`).
+
+### Lancer le projet en local
+
+Les scripts sont chargés en modules ES : la page doit être servie par un serveur HTTP, par exemple :
+
+```bash
+python3 -m http.server
+```
 
 ## Contribution
 

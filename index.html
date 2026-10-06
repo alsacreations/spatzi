@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width" />
+      content="width=device-width, initial-scale=1" />
     <link
       rel="icon"
       type="image/png"
@@ -19,704 +19,460 @@
       content="Alsacreations" />
     <meta
       name="description"
-      content="Spätzi - Vérificateur de contrastes de couleurs" />
+      content="Spätzi - Vérificateur de contrastes de couleurs selon les WCAG 2.2, avec lecture APCA, corrections automatiques et simulations de daltonisme." />
     <link
       rel="preload"
       as="font"
-      href="assets/fonts/Poppins-Variable-opti.woff2"
+      href="assets/fonts/lexend.woff2"
       type="font/woff2"
       crossorigin />
-    <title>Spätzi - Outil de contraste des couleurs</title>
+    <title>Spätzi — Vérificateur de contrastes</title>
     <link
       rel="stylesheet"
       href="app.css" />
   </head>
-  <body class="liquid">
-    <header
-      class="header"
-      role="banner">
-      <div class="header-top">
-        <div class="logo">
-          <svg
-            role="img"
-            aria-labelledby="title-alsacreations"
-            class="logo-alsacreations is-default"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 241 45"
-            width="241"
-            height="45">
-            <title id="title-alsacreations">Alsacreations</title>
-            <g class="logo-alsacreations-pepins-group">
-              <path
-                class="logo-alsacreations-pepins-outer"
-                d="M232 18.5c2.2-1.1 3.5-2.4 4-4 .6-1.9-.2-4-2.2-6.2-1.7-2-3.5-2.7-5.3-2.2-1.5.4-2.9 1.7-4.2 3.7-1.1 1.7-2 3.8-2.6 5.9-.6 2.1-.7 3.6-.4 4.5.9.3 2.3.3 4.5 0a14 14 0 0 0 6.2-1.7zm-12-9.1c1.1-2.2 1.4-4 .8-5.5-.7-1.9-2.5-3.1-5.4-3.7-2.5-.6-4.4-.1-5.5 1.4-.9 1.2-1.4 3-1.2 5.5.1 2.1.6 4.2 1.5 6.4.8 2 1.5 3.3 2.3 3.9a20 20 0 0 0 7.5-8zm13.6 24.3c2.4.4 4.2.1 5.5-.9 1.5-1.2 2.1-3.3 1.8-6.3-.2-2.6-1.3-4.1-3-4.8-1.5-.5-3.3-.3-5.6.6-1.9.8-3.8 1.9-5.5 3.3-1.7 1.4-2.7 2.5-2.9 3.5.6.7 1.7 1.6 3.6 2.6 2.1 1.1 4.1 1.8 6.1 2z"></path>
-              <path
-                class="logo-alsacreations-pepins-inner"
-                d="M214.4 7.8c-.9-.2-1.5 0-1.9.5-.3.4-.5 1.1-.4 1.9.1.7.2 1.5.5 2.2.2.7.6 1.2.8 1.4l1.2-.9c.6-.6 1.1-1.2 1.4-1.8.4-.7.5-1.4.3-1.9-.3-.7-1-1.2-1.9-1.4zm14 6.1c-.6-.7-1.2-.9-1.9-.7-.5.1-1 .6-1.5 1.3-.4.6-.7 1.3-.9 2.1-.2.7-.2 1.2-.1 1.5h1.5c.8-.1 1.5-.3 2.2-.7.7-.4 1.2-.8 1.4-1.4.2-.6 0-1.4-.7-2.1zm4.9 14c-.1-.9-.4-1.5-1.1-1.7-.5-.2-1.2-.1-2 .2-.7.3-1.4.7-1.9 1.2-.6.5-.9.9-1.1 1.2.2.2.6.6 1.3.9.7.4 1.5.6 2.2.7.8.1 1.5 0 1.9-.3.6-.5.9-1.2.7-2.2z"></path>
-            </g>
-            <path
-              class="logo-alsacreations-alsa"
-              d="m1.5 25.1-.1-.6.1-.6a12.7 12.7 0 0 1 9-2.2c3.8.2 5 2.6 5 6.7v2l-.1 5.3-.1 4s-.1 2.1 1.3 1.9l-.1 2c-.4.6-1.5 1.3-2.9 1.3a4 4 0 0 1-2.8-1.4l-1.1.7c-1.1.6-2.3.7-3.6.7-3.1 0-6.1-2-6.1-6.3 0-5.7 5.3-7.4 8.2-7.7l1.4-.1 1.1.1v-2.3c0-2-.2-3-1.7-3s-3.3.7-4.7 1.2c-.5.2-1.1.4-1.7.4-.8-.9-1-1.7-1.1-2.1zm9.1 12V34h-.5l-1.5.1h.1c-2 .4-3.8 1.3-3.8 4 0 2.2.9 3 2 3h.3c1.2 0 2.7-.6 3.2-1.4l-.1.1.1-.6c.2-.5.2-1.2.2-2.1zm16.2 4.4-.1 2c-.5.7-1.5 1.3-2.9 1.3-.7 0-1.4-.3-1.9-.7a3 3 0 0 1-1.4-2.5v-24l-.1-5.2c.6-1.3 2.3-1.5 4.6-1.5.3 1.1.3 2.2.3 4.6v24.1c.1.1 0 2.2 1.5 1.9zm11.6-19.9c3 .2 4.4 1.5 4.6 2.1 0 .6-.4 1.7-.9 2.4l-.9-.2-1.5-.4c-.7-.3-1.4-.4-2.1-.4-1.7 0-2.7.9-2.7 2.2 0 .7.3 1.4 1.3 2.2l2 1.4 2.7 2c2 1.7 2.9 3.3 2.9 5.3 0 4.5-3.6 6.7-8.2 6.7-3 0-5.7-.9-6.2-2.3 0-.7.4-1.8.9-2.5h.5c.4 0 .9.1 1.4.4v-.1c1 .4 2.2.7 3.3.7l.9-.1c1.4-.1 2.3-1.1 2.3-2.5 0-1.1-.5-1.9-1.8-2.8l-.6-.4c-1.1-.7-2.3-1.7-3.2-2.5l-1.3-.8c-1.5-1.5-2.2-2.9-2.2-4.6 0-3.7 3-5.9 7.5-5.9l1.3.1zm8.9 3.5-.1-.6.1-.6a12.7 12.7 0 0 1 9-2.2c3.8.2 5 2.6 5 6.7v2l-.1 5.3-.1 4s-.1 2.1 1.3 1.9l-.1 2c-.4.6-1.5 1.3-2.9 1.3a4 4 0 0 1-2.8-1.4l-1.1.7c-1.1.6-2.3.7-3.6.7-3.2 0-6.2-2-6.2-6.4 0-5.7 5.3-7.4 8.2-7.7l1.4-.1 1.1.1v-2.3c0-2-.2-3-1.7-3s-3.3.7-4.7 1.2c-.5.2-1.1.4-1.7.4-.8-.8-.9-1.6-1-2zm9.1 12V34h-.5l-1.5.1h.1c-2 .4-3.8 1.3-3.8 4 0 2.2.9 3 2 3h.3c1.2 0 2.7-.6 3.2-1.4l-.1.1.1-.6c.2-.5.2-1.2.2-2.1z"></path>
-            <path
-              class="logo-alsacreations-creations"
-              d="M80.8 23.6c0 .6-.3 1.7-.7 2.5h-.6a4 4 0 0 1-1.5-.3 7 7 0 0 0-2.5-.6 1 1 0 0 0-.5.1c-2.7.2-4.6 2.7-4.6 8.1 0 6.5 2.7 7.9 5.4 7.9 1.5 0 3.1-.5 4.3-1.1l.4 1.8c-.1.7-.6 1.5-1.2 2-.9.7-2.5 1.1-4.4 1.1-5.2 0-9.8-1.9-9.8-11.4 0-4.9 1.7-8 3.5-9.8a9.8 9.8 0 0 1 6.7-2.3c3-.1 5.3 1.3 5.5 2zm8.3 3.5V42c0 .7-.1 1.3-.5 1.9-.7.6-1.5.6-4.5.6l.1-9.3.1-7.9c0-1.5-.3-2.6-.6-3.5.4-.4 1-.7 2-1.2l.7-.1c1 0 1.4.3 1.7.9.9-.6 1.9-1.1 2.8-1.4.8-.3 1.9-.5 2.7-.4 1.4.1 2.2.6 2.3 1.3 0 .7-.2 2-.9 3l-.7.1-1.4-.1-.6-.1c-1.3.1-2.3.4-3.2 1.3zM113 39.7c.3.9.4 1.9.5 2.3-.1 1-1.6 2-3 2.5h.1c-.7.2-2.2.5-3.6.5-2.3 0-4.8-.4-6.6-2.3-1.7-1.8-2.6-4.8-2.6-8.6 0-9.2 4-12.5 9.3-12.5 4.5 0 6.8 2.7 7.2 6.7l.1 2.3-.2 2.8c-.6.5-2.3 1.1-3.6 1.3-1.5.2-3.8.3-6.1.3h-1.7c.1 4.7 2 6.2 5 6.2 1.6-.2 3.4-.5 5.2-1.5zM106.2 25c-1.7.2-3.3 2.2-3.6 6.4h1.3l4.5-.1.7-.2.2-1.4-.1-.5v-.5c-.2-2.5-1.1-3.7-2.8-3.7h-.2zm11.7.1-.1-.6.1-.6a12.7 12.7 0 0 1 9-2.2c3.8.2 5 2.6 5 6.7v2l-.1 5.3-.1 4s-.1 2.1 1.3 1.9l-.1 2c-.4.6-1.5 1.3-2.9 1.3a4 4 0 0 1-2.8-1.4l-1.1.7c-1.1.6-2.3.7-3.6.7-3.2 0-6.2-2-6.2-6.4 0-5.7 5.3-7.4 8.2-7.7l1.4-.1 1.1.1v-2.3c0-2-.2-3-1.7-3s-3.3.7-4.7 1.2c-.5.2-1.1.4-1.7.4-.7-.8-.9-1.6-1-2zm9.1 12V34h-.5l-1.5.1h.1c-2 .4-3.8 1.3-3.8 4 0 2.2.9 3 2 3h.3c1.2 0 2.7-.6 3.2-1.4l-.1.1.1-.6c.2-.5.2-1.2.2-2.1zm21.6 3.4.1 1.1-.1 1.3c-.1.3-.3.6-.7.9a8.7 8.7 0 0 1-4.4 1.1c-4.7 0-5.6-4.2-5.6-8V25.8a6.3 6.3 0 0 1-2.8-.7c0-1.4.1-1.4.4-1.7.7-.5 1.4-.7 2-.9l.7-.1.2-4.1c.4-1.1 1.6-2 4.5-2.2v.7l-.1 5.3h6c-.1 2.7-.5 3.2-1.5 3.5l-1.2.1-3.3.1-.1 6.1.1 3v2.2c.2 2.5.5 4.2 2 4.2.6.1 2.5-.6 2.8-.9l1 .1zm6.3-29c2.2 0 2.7.9 2.6 2.7-.1 1.8-.6 3-2.8 3-1.9 0-2.7-.9-2.7-2.9 0-1.8 1-2.8 2.9-2.8zm1.9 10.6c.4.7.4 1.4.4 3.4v15.8c0 1.1-.2 1.9-.7 2.6-.3.5-1.1.5-4.4.6v-3.8l.1-4.3v-8.2l-.1-4.8c.6-1.2 2.2-1.3 4.3-1.3h.4zm13.6 22.8c-6 0-9.4-3.5-9.4-11.7 0-8.1 4-11.8 9.5-11.8 6.2 0 9.3 4 9.3 11.5 0 8-4 12-9.4 12zm.1-3.4c2.2 0 4.1-2.1 4.1-8.3 0-5.9-1.7-8.1-4.2-8.1-2.2 0-4.2 2.2-4.2 8 0 6.3 1.8 8.4 4.3 8.4zm18-14.2.1-.1v14.5c0 1.1-.1 1.6-.6 2.3-.7.6-1.2.6-3.3.6h-1.2l.1-9.3v-7.9c0-1.5-.2-2.6-.5-3.5.3-.4.9-.7 2-1.2l.7-.1c.9 0 1.4.4 1.7 1a10 10 0 0 1 5.8-1.9c5.9 0 7 3 7 8.3v7l.1 6.7c-.6.6-1.5.7-4.6.7a4 4 0 0 1-.5-2.1V30c0-3.4-.8-4.6-3.2-4.6-1.4 0-2.7.8-3.6 1.9zm24.7-5.7c3 .2 4.4 1.5 4.6 2.1 0 .6-.4 1.7-.9 2.4l-.9-.2-1.5-.4c-.7-.3-1.4-.4-2.1-.4-1.7 0-2.7.9-2.7 2.2 0 .7.3 1.4 1.3 2.2l2 1.4 2.7 2c2 1.7 2.9 3.3 2.9 5.3 0 4.5-3.6 6.7-8.2 6.7-3 0-5.7-.9-6.2-2.3 0-.7.4-1.8.9-2.5h.5c.4 0 .9.1 1.4.4v-.1c1 .4 2.2.7 3.3.7l.9-.1c1.4-.1 2.3-1.1 2.3-2.5 0-1.1-.5-1.9-1.8-2.8l-.6-.4c-1.1-.7-2.3-1.7-3.2-2.5l-1.2-.9c-1.5-1.5-2.2-2.9-2.2-4.6 0-3.7 3-5.9 7.5-5.9l1.2.2zm-110.1-3.4s.5-3.2 1.9-5.1c1.5-2.1 3.9-3.3 5.5-1.3 1.2 1.4.9 2.9-1.6 4.5-3.1 1.9-5.8 1.9-5.8 1.9z"></path>
-          </svg>
-        </div>
+  <body>
+    <div class="container">
+      <header class="header">
+        <span
 
-        <button
-          class="theme-switcher js-theme-switcher"
-          type="button"
-          aria-pressed="false">
-          <span class="visually-hidden">Changer le mode de couleurs</span>
-          <span class="theme-icon">
-            <svg
-              class="theme-icon-light"
-              aria-hidden="true"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="transparent"
-              stroke="currentColor"
-              stroke-linecap="round">
-              <path
-                fill="currentColor"
-                d="M18 12a6 6 0 1 1-12 0 6 6 0 0 1 12 0Z" />
-              <path
-                fill="currentColor"
-                fill-rule="evenodd"
-                d="M12 1.25c.41 0 .75.34.75.75v1a.75.75 0 0 1-1.5 0V2c0-.41.34-.75.75-.75ZM4.4 4.4c.3-.3.77-.3 1.06 0l.4.4a.75.75 0 0 1-1.07 1.05l-.4-.4a.75.75 0 0 1 0-1.05Zm15.2 0c.3.3.3.77 0 1.06l-.4.4a.75.75 0 0 1-1.05-1.07l.4-.4a.76.76 0 0 1 1.05 0ZM1.25 12c0-.41.34-.75.75-.75h1a.75.75 0 0 1 0 1.5H2a.75.75 0 0 1-.75-.75Zm19 0c0-.41.34-.75.75-.75h1a.75.75 0 0 1 0 1.5h-1a.75.75 0 0 1-.75-.75Zm-2.1 6.15c.3-.3.77-.3 1.06 0l.4.4a.75.75 0 1 1-1.07 1.05l-.4-.4a.75.75 0 0 1 0-1.05Zm-12.3 0c.3.3.3.77 0 1.06l-.4.4a.75.75 0 1 1-1.05-1.07l.4-.4a.74.74 0 0 1 1.05 0Zm6.15 2.1c.41 0 .75.34.75.75v1a.75.75 0 0 1-1.5 0v-1c0-.41.34-.75.75-.75Z"
-                clip-rule="evenodd" />
-            </svg>
-            <svg
-              class="theme-icon-dark"
-              aria-hidden="true"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="transparent"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round">
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-            </svg>
+        class="brand">
+          <span
+            class="brand-mark"
+            aria-hidden="true">
+            <span class="brand-dot brand-dot-bg"></span>
+            <span class="brand-dot brand-dot-fg"></span>
           </span>
-        </button>
+          <span class="brand-text">
+            <span class="brand-name">Spätzi</span>
+            <span class="brand-by">par Alsacréations</span>
+          </span>
+        </span>
+        <nav
+          class="nav"
+          aria-label="Sections">
+          <a
+            href="#suggestions"
+            class="nav-link"
+            >Corrections</a
+          >
+          <a
+            href="#daltonismes"
+            class="nav-link"
+            >Daltonismes</a
+          >
+          <a
+            href="#palette"
+            class="nav-link"
+            >Palette</a
+          >
+          <a
+            href="#reperes"
+            class="nav-link"
+            >Repères</a
+          >
+          <button
+            type="button"
+            class="btn btn-outline theme-switcher js-theme-switcher"
+            aria-label="Passer au thème sombre"
+            title="Passer au thème sombre">
+            <span
+              class="theme-switcher-icon"
+              aria-hidden="true"></span>
+            <span class="js-theme-switcher-label">Sombre</span>
+          </button>
+        </nav>
+      </header>
 
-        <a
-          href="https://github.com/alsacreations/spatzi"
-          class="btn btn-primary btn-cta"
-          title="voir le repo sur Github">
-          Github&nbsp;
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 1024 1024"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg">
-            <path
-              fill-rule="evenodd"
-              clip-rule="evenodd"
-              d="M8 0C3.58 0 0 3.58 0 8C0 11.54 2.29 14.53 5.47 15.59C5.87 15.66 6.02 15.42 6.02 15.21C6.02 15.02 6.01 14.39 6.01 13.72C4 14.09 3.48 13.23 3.32 12.78C3.23 12.55 2.84 11.84 2.5 11.65C2.22 11.5 1.82 11.13 2.49 11.12C3.12 11.11 3.57 11.7 3.72 11.94C4.44 13.15 5.59 12.81 6.05 12.6C6.12 12.08 6.33 11.73 6.56 11.53C4.78 11.33 2.92 10.64 2.92 7.58C2.92 6.71 3.23 5.99 3.74 5.43C3.66 5.23 3.38 4.41 3.82 3.31C3.82 3.31 4.49 3.1 6.02 4.13C6.66 3.95 7.34 3.86 8.02 3.86C8.7 3.86 9.38 3.95 10.02 4.13C11.55 3.09 12.22 3.31 12.22 3.31C12.66 4.41 12.38 5.23 12.3 5.43C12.81 5.99 13.12 6.7 13.12 7.58C13.12 10.65 11.25 11.33 9.47 11.53C9.76 11.78 10.01 12.26 10.01 13.01C10.01 14.08 10 14.94 10 15.21C10 15.42 10.15 15.67 10.55 15.59C13.71 14.53 16 11.53 16 8C16 3.58 12.42 0 8 0Z"
-              transform="scale(64)"
-              fill="#ffff" />
-          </svg>
-        </a>
-      </div>
-      <div class="header-bottom">
-        <h1>Spätzi, l'assistant contrastes</h1>
-        <div class="subtitle">
-          <p>
-            Vérifiez et optimisez le contraste de vos couleurs selon les
-            standards d'accessibilité (<abbr
+      <main>
+        <section
+          id="outil"
+          class="hero"
+          aria-labelledby="title-outil">
+          <h1
+            id="title-outil"
+            class="hero-title">
+            Vos couleurs sont-elles <mark class="highlight">lisibles</mark>&nbsp;?
+          </h1>
+          <p class="hero-lead">
+            Mesurez le contraste entre un texte et son fond selon les
+            <abbr
               lang="en"
               title="Web Content Accessibility Guidelines"
               >WCAG</abbr
             >
-            et
+            2.2 ou
             <abbr
               lang="en"
               title="Accessible Perceptual Contrast Algorithm"
               >APCA</abbr
-            >). <br />Explorez les variations de couleurs en
+            >, ajustez vos couleurs en
             <abbr
               lang="en"
               title="OK LCh (Lightness, Chroma, Hue)"
               >OKLCH</abbr
-            >
-            pour créer des palettes accessibles.
+            >, avec des corrections automatiques et des simulations de
+            daltonisme.
           </p>
-        </div>
-      </div>
-    </header>
 
-    <main class="app">
-      <section class="controls-group">
-        <!-- Contrôles de sélection des couleurs -->
-        <div
-          class="color-controls"
-          aria-labelledby="color-controls-title">
-          <h2
-            id="color-controls-title"
-            class="visually-hidden">
-            Sélection des couleurs
-          </h2>
-          <form
-            class="controls"
-            id="controls">
-            <!-- Contrôles de couleurs avec double saisie (sélecteur de couleur + texte) -->
-            <div class="color-pickers-group">
-              <div
-                class="control control--color control--color-text"
-                id="text-color-control">
-                <label for="foregroundColorPicker"
-                  >Texte <small>(tous formats acceptés)</small></label
+          <div class="tool">
+            <!-- Panneau de réglages -->
+            <div class="panel">
+              <div class="field">
+                <label
+                  for="fg-input"
+                  class="field-label"
+                  >Couleur du texte</label
                 >
-                <div class="color-inputs">
-                  <input
-                    type="color"
-                    id="foregroundColorPicker"
-                    name="foregroundColorPicker"
-                    value="#eeeeee" />
-                  <input
-                    type="text"
-                    id="foregroundColorText"
-                    name="foregroundColorText"
-                    value="#eeeeee"
-                    aria-labelledby="foregroundColorPicker" />
-                </div>
-              </div>
-
-              <!-- Bouton de swap des couleurs -->
-              <button
-                type="button"
-                class="color-swap-button"
-                id="swapColorsButton"
-                title="Inverser les couleurs"
-                aria-label="Inverser couleur d'arrière-plan et couleur de texte">
-                ⇄
-              </button>
-
-              <div
-                class="control control--color control--color-bg"
-                id="bg-color-control">
-                <label for="backgroundColorPicker"
-                  >Arrière-plan <small>(tous formats acceptés)</small></label
-                >
-                <div class="color-inputs">
-                  <input
-                    type="color"
-                    id="backgroundColorPicker"
-                    name="backgroundColorPicker"
-                    value="#e5508a" />
-                  <input
-                    type="text"
-                    id="backgroundColorText"
-                    name="backgroundColorText"
-                    value="#e5508a"
-                    aria-labelledby="backgroundColorPicker" />
-                </div>
-              </div>
-            </div>
-          </form>
-        </div>
-
-        <!-- Affichage de la couleur sélectionnée -->
-        <div
-          class="color-display"
-          aria-labelledby="color-display-title">
-          <h2
-            id="color-display-title"
-            class="visually-hidden">
-            Couleur sélectionnée
-          </h2>
-          <div class="box-group">
-            <!-- Affichage des couleurs -->
-            <div class="box box-user">
-              <div class="box-body">
-                <div class="box-half box-oklch">
-                  <span class="box-color-value">oklch(0% 0 0)</span>
-                </div>
-                <div class="box-half box-hex">
-                  <span class="box-color-value">
-                    <span class="hex-code">#000000</span>
-                    <span class="gamut-warning-inline"></span>
+                <div class="color-field">
+                  <span class="swatch swatch-fg">
+                    <input
+                      type="color"
+                      class="swatch-input js-picker"
+                      data-target="fg"
+                      aria-label="Choisir la couleur du texte"
+                      value="#146af5" />
                   </span>
+                  <input
+                    id="fg-input"
+                    class="input input-mono js-color-input"
+                    data-target="fg"
+                    type="text"
+                    spellcheck="false"
+                    autocomplete="off"
+                    value="#146af5"
+                    aria-describedby="fg-error" />
+                  <button
+                    type="button"
+                    class="btn btn-outline btn-field js-eyedropper"
+                    data-target="fg"
+                    aria-label="Prélever la couleur du texte à l'écran"
+                    hidden>
+                    Pipette
+                  </button>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Contrôles OKLCH -->
-        <div class="oklch-controls">
-          <h2 class="visually-hidden">Contrôles OKLCH</h2>
-          <div class="lch-sliders-group">
-            <!-- Luminosity : modifie le composant L -->
-            <div class="control control--lumi">
-              <label for="lumi">Luminosity</label>
-              <div class="range">
-                <input
-                  type="range"
-                  id="lumi"
-                  name="lumi"
-                  min="0"
-                  max="100"
-                  step="0.01"
-                  value="64.9" />
-                <output
-                  class="range-value"
-                  for="lumi"
-                  >64.9%</output
-                >
-              </div>
-            </div>
-
-            <!-- Chroma : modifie le composant C -->
-            <div class="control control--chroma">
-              <label for="chroma">Chroma</label>
-              <div class="range">
-                <input
-                  type="range"
-                  id="chroma"
-                  name="chroma"
-                  min="0"
-                  max="0.4"
-                  step="0.0001"
-                  value="0.19" />
-                <output
-                  class="range-value"
-                  for="chroma"
-                  >0.19</output
-                >
-              </div>
-            </div>
-
-            <!-- Hue : modifie le composant H -->
-            <div class="control control--hue">
-              <label for="hue">Hue</label>
-              <div class="range">
-                <input
-                  type="range"
-                  id="hue"
-                  name="hue"
-                  min="0"
-                  max="360"
-                  step="0.01"
-                  value="360" />
-                <output
-                  class="range-value"
-                  for="hue"
-                  >360</output
-                >
-              </div>
-            </div>
-          </div>
-
-          <!-- Boutons d'action -->
-          <div class="action-buttons">
-            <button
-              type="button"
-              class="reset-button"
-              id="reset-colors"
-              aria-label="Réinitialiser les couleurs aux valeurs par défaut">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true">
-                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" />
-                <path d="M21 3v5h-5" />
-                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" />
-                <path d="M3 21v-5h5" />
-              </svg>
-              Réinitialiser
-            </button>
-
-            <button
-              type="button"
-              class="accessible-button"
-              id="make-accessible"
-              aria-label="Ajuster automatiquement pour rendre la couleur accessible">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true">
-                <path
-                  d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="3" />
-              </svg>
-              Couleur proche accessible (beta)
-            </button>
-          </div>
-        </div>
-
-        <!-- Informations de contraste -->
-        <div
-          class="contrast-section"
-          aria-labelledby="contrast-section-title">
-          <h2
-            id="contrast-section-title"
-            class="visually-hidden">
-            Informations de contraste
-          </h2>
-          <div class="contrast-info">
-            <!-- Affichage WCAG2 (par défaut) -->
-            <div class="contrast-display contrast-display--wcag">
-              <p
-                class="contrast-value"
-                id="wcag-contrast-value">
-                <span class="visually-hidden">Contraste WCAG2 : </span
-                ><span class="contrast-ratio">0.00</span>
-              </p>
-              <!-- L'avertissement de gamme pour WCAG sera inséré ici par JS -->
-              <div
-                class="contrast-warning"
-                id="wcag-gamut-warning"></div>
-            </div>
-
-            <!-- Affichage APCA (masqué par défaut) -->
-            <div
-              class="contrast-display contrast-display--apca"
-              style="display: none">
-              <p
-                class="contrast-value"
-                id="apca-contrast-value">
-                <span class="visually-hidden">Contraste APCA Lc : </span
-                ><span class="contrast-ratio">0.00</span>
-              </p>
-            </div>
-
-            <!-- Switcher pour choisir le type de contraste -->
-            <div
-              class="contrast-switcher-group"
-              role="group"
-              aria-labelledby="contrast-type-label">
-              <span
-                id="contrast-type-label"
-                class="visually-hidden"
-                >Type de contraste</span
-              >
-              <label
-                id="switch_contrast-wcag"
-                for="switch_contrast"
-                class="switcher-label switcher-label-left"
-                data-state="selected">
-                WCAG2
-                <span class="visually-hidden switcher-status"
-                  >(sélectionné)</span
-                >
-              </label>
-              <button
-                class="tooltip-button"
-                id="popover-1-trigger"
-                popovertarget="tooltip-1"
-                aria-label="informations sur WCAG">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24">
-                  <!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ -->
-                  <path
-                    fill="currentColor"
-                    d="M13 8a1 1 0 1 0-2 0a1 1 0 0 0 2 0m-1 9.75a.75.75 0 0 0 .75-.75v-6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75" />
-                  <path
-                    fill="currentColor"
-                    fill-rule="evenodd"
-                    d="M12.057 1.25h-.114c-2.309 0-4.118 0-5.53.19c-1.444.194-2.584.6-3.479 1.494c-.895.895-1.3 2.035-1.494 3.48c-.19 1.411-.19 3.22-.19 5.529v.114c0 2.309 0 4.118.19 5.53c.194 1.444.6 2.584 1.494 3.479c.895.895 2.035 1.3 3.48 1.494c1.411.19 3.22.19 5.529.19h.114c2.309 0 4.118 0 5.53-.19c1.444-.194 2.584-.6 3.479-1.494c.895-.895 1.3-2.035 1.494-3.48c.19-1.411.19-3.22.19-5.529v-.114c0-2.309 0-4.118-.19-5.53c-.194-1.444-.6-2.584-1.494-3.479c-.895-.895-2.035-1.3-3.48-1.494c-1.411-.19-3.22-.19-5.529-.19M3.995 3.995c.57-.57 1.34-.897 2.619-1.069c1.3-.174 3.008-.176 5.386-.176s4.086.002 5.386.176c1.279.172 2.05.5 2.62 1.069c.569.57.896 1.34 1.068 2.619c.174 1.3.176 3.008.176 5.386s-.002 4.086-.176 5.386c-.172 1.279-.5 2.05-1.069 2.62c-.57.569-1.34.896-2.619 1.068c-1.3.174-3.008.176-5.386.176s-4.086-.002-5.386-.176c-1.279-.172-2.05-.5-2.62-1.069c-.569-.57-.896-1.34-1.068-2.619c-.174-1.3-.176-3.008-.176-5.386s.002-4.086.176-5.386c.172-1.279.5-2.05 1.069-2.62"
-                    clip-rule="evenodd" />
-                </svg>
-              </button>
-              <div
-                id="tooltip-1"
-                popover
-                anchor="popover-1-trigger">
-                <strong>WCAG 2.1</strong> :
-                <span lang="en"> Web Content Accessibility Guidelines </span>.
-                Standard international qui définit les règles d'accessibilité
-                web. Niveau AA requis pour les sites publics français
-                (référenciel
-                <abbr
-                  title="Référentiel Général d'Accessibilité pour les Administrations"
-                  >RGAA</abbr
-                >).
-              </div>
-              <input
-                type="checkbox"
-                role="switch"
-                id="switch_contrast"
-                name="switch_contrast"
-                class="contrast-switcher"
-                aria-describedby="contrast-type-description"
-                aria-labelledby="switch_contrast-wcag switch_contrast-apca" />
-              <span
-                id="contrast-type-description"
-                class="visually-hidden"
-                >Bascule entre les méthodes de calcul WCAG2 et APCA</span
-              >
-              <label
-                for="switch_contrast"
-                id="switch_contrast-apca"
-                class="switcher-label switcher-label-right"
-                data-state="unselected">
-                APCA Lc
-                <span class="visually-hidden switcher-status"
-                  >(non sélectionné)</span
-                > </label
-              ><button
-                class="tooltip-button"
-                id="popover-2-trigger"
-                popovertarget="tooltip-2"
-                aria-label="informations sur APCA Lc">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24">
-                  <!-- Icon from Solar by 480 Design - https://creativecommons.org/licenses/by/4.0/ -->
-                  <path
-                    fill="currentColor"
-                    d="M13 8a1 1 0 1 0-2 0a1 1 0 0 0 2 0m-1 9.75a.75.75 0 0 0 .75-.75v-6a.75.75 0 0 0-1.5 0v6c0 .414.336.75.75.75" />
-                  <path
-                    fill="currentColor"
-                    fill-rule="evenodd"
-                    d="M12.057 1.25h-.114c-2.309 0-4.118 0-5.53.19c-1.444.194-2.584.6-3.479 1.494c-.895.895-1.3 2.035-1.494 3.48c-.19 1.411-.19 3.22-.19 5.529v.114c0 2.309 0 4.118.19 5.53c.194 1.444.6 2.584 1.494 3.479c.895.895 2.035 1.3 3.48 1.494c1.411.19 3.22.19 5.529.19h.114c2.309 0 4.118 0 5.53-.19c1.444-.194 2.584-.6 3.479-1.494c.895-.895 1.3-2.035 1.494-3.48c.19-1.411.19-3.22.19-5.529v-.114c0-2.309 0-4.118-.19-5.53c-.194-1.444-.6-2.584-1.494-3.479c-.895-.895-2.035-1.3-3.48-1.494c-1.411-.19-3.22-.19-5.529-.19M3.995 3.995c.57-.57 1.34-.897 2.619-1.069c1.3-.174 3.008-.176 5.386-.176s4.086.002 5.386.176c1.279.172 2.05.5 2.62 1.069c.569.57.896 1.34 1.068 2.619c.174 1.3.176 3.008.176 5.386s-.002 4.086-.176 5.386c-.172 1.279-.5 2.05-1.069 2.62c-.57.569-1.34.896-2.619 1.068c-1.3.174-3.008.176-5.386.176s-4.086-.002-5.386-.176c-1.279-.172-2.05-.5-2.62-1.069c-.569-.57-.896-1.34-1.068-2.619c-.174-1.3-.176-3.008-.176-5.386s.002-4.086.176-5.386c.172-1.279.5-2.05 1.069-2.62"
-                    clip-rule="evenodd" />
-                </svg>
-              </button>
-              <div
-                id="tooltip-2"
-                popover
-                anchor="popover-2-trigger">
-                <strong>APCA</strong> :
-                <span lang="en"> Accessible Perceptual Contrast Algorithm </span
-                >. Nouvelle méthode de calcul du contraste basée sur la
-                perception humaine. Sera intégrée dans les futures versions de
-                WCAG.
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Guide des seuils de contraste -->
-        <div class="contrast-guide">
-          <div class="guide-content guide-content--wcag">
-            <h2 class="visually-hidden">
-              <abbr
-                lang="en"
-                title="Web Content Accessibility Guidelines"
-                >WCAG</abbr
-              >
-              2.1 - Ratios de contraste
-            </h2>
-            <div class="threshold-grid">
-              <div class="threshold-group">
-                <p>Texte normal <br /><small>(< 24px ou < 19px gras)</small></p>
-                <ul>
-                  <li class="threshold-item">
-                    <span
-                      class="threshold-indicator"
-                      data-threshold="4.5"></span>
-                    <strong>AA :</strong> 4.5:1
-                  </li>
-                  <li class="threshold-item">
-                    <span
-                      class="threshold-indicator"
-                      data-threshold="7"></span>
-                    <strong>AAA :</strong> 7:1
-                  </li>
-                </ul>
-              </div>
-              <div class="threshold-group">
-                <p>Texte large <br /><small>(≥ 24px ou ≥ 19px gras)</small></p>
-                <ul>
-                  <li class="threshold-item">
-                    <span
-                      class="threshold-indicator"
-                      data-threshold="3"></span>
-                    <strong>AA :</strong> 3:1
-                  </li>
-                  <li class="threshold-item">
-                    <span
-                      class="threshold-indicator"
-                      data-threshold="4.5"></span>
-                    <strong>AAA :</strong> 4.5:1
-                  </li>
-                </ul>
-              </div>
-              <div class="threshold-group">
-                <p>
-                  Éléments graphiques <br /><small>(bordures, icônes)</small>
+                <p
+                  id="fg-error"
+                  class="field-error js-error"
+                  data-target="fg"
+                  role="alert"
+                  hidden>
+                  Format non reconnu. Essayez #1e3a8a, rgb(30 58 138), hsl() ou
+                  oklch().
                 </p>
-                <ul>
-                  <li class="threshold-item">
-                    <span
-                      class="threshold-indicator"
-                      data-threshold="3"></span>
-                    <strong>AA :</strong> 3:1
-                  </li>
-                </ul>
+              </div>
+
+              <div class="swap">
+                <button
+                  type="button"
+                  class="btn btn-outline btn-field-bg js-swap">
+                  <span
+                    class="swap-icon"
+                    aria-hidden="true"
+                    >⇅</span
+                  >Inverser
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-outline btn-field-bg js-reset"
+                  aria-label="Réinitialiser les couleurs">
+                  <span
+                    class="swap-icon"
+                    aria-hidden="true"
+                    >↺</span
+                  >Réinitialiser
+                </button>
+              </div>
+
+              <div class="field">
+                <label
+                  for="bg-input"
+                  class="field-label"
+                  >Couleur de fond</label
+                >
+                <div class="color-field">
+                  <span class="swatch swatch-bg">
+                    <input
+                      type="color"
+                      class="swatch-input js-picker"
+                      data-target="bg"
+                      aria-label="Choisir la couleur de fond"
+                      value="#ffffff" />
+                  </span>
+                  <input
+                    id="bg-input"
+                    class="input input-mono js-color-input"
+                    data-target="bg"
+                    type="text"
+                    spellcheck="false"
+                    autocomplete="off"
+                    value="#ffffff"
+                    aria-describedby="bg-error" />
+                  <button
+                    type="button"
+                    class="btn btn-outline btn-field js-eyedropper"
+                    data-target="bg"
+                    aria-label="Prélever la couleur de fond à l'écran"
+                    hidden>
+                    Pipette
+                  </button>
+                </div>
+                <p
+                  id="bg-error"
+                  class="field-error js-error"
+                  data-target="bg"
+                  role="alert"
+                  hidden>
+                  Format non reconnu. Essayez #ffffff, rgb(255 255 255), hsl()
+                  ou oklch().
+                </p>
+              </div>
+
+              <div
+                class="panel-section oklch js-oklch"
+                role="group"
+                aria-labelledby="oklch-title">
+                <div class="size-header">
+                  <h2
+                    id="oklch-title"
+                    class="field-label"
+                    >Ajuster en OKLCH</h2
+                  >
+                  <div
+                    class="segmented"
+                    role="radiogroup"
+                    aria-label="Couleur ajustée">
+                    <label class="segmented-option">
+                      <input
+                        type="radio"
+                        name="oklch-target"
+                        value="fg"
+                        class="segmented-input js-oklch-target"
+                        checked />
+                      <span>Texte</span>
+                    </label>
+                    <label class="segmented-option">
+                      <input
+                        type="radio"
+                        name="oklch-target"
+                        value="bg"
+                        class="segmented-input js-oklch-target" />
+                      <span>Fond</span>
+                    </label>
+                  </div>
+                </div>
+                <div class="slider">
+                  <label
+                    for="oklch-l"
+                    class="slider-label"
+                    >Luminosité</label
+                  >
+                  <input
+                    id="oklch-l"
+                    class="range-oklch range-oklch-l js-oklch-slider"
+                    data-channel="l"
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    value="55" />
+                  <output
+                    for="oklch-l"
+                    class="mono slider-value js-oklch-output"
+                    data-channel="l"></output>
+                </div>
+                <div class="slider">
+                  <label
+                    for="oklch-c"
+                    class="slider-label"
+                    >Chroma</label
+                  >
+                  <input
+                    id="oklch-c"
+                    class="range-oklch range-oklch-c js-oklch-slider"
+                    data-channel="c"
+                    type="range"
+                    min="0"
+                    max="0.4"
+                    step="0.001"
+                    value="0.2" />
+                  <output
+                    for="oklch-c"
+                    class="mono slider-value js-oklch-output"
+                    data-channel="c"></output>
+                </div>
+                <div class="slider">
+                  <label
+                    for="oklch-h"
+                    class="slider-label"
+                    >Teinte</label
+                  >
+                  <input
+                    id="oklch-h"
+                    class="range-oklch range-oklch-h js-oklch-slider"
+                    data-channel="h"
+                    type="range"
+                    min="0"
+                    max="360"
+                    step="0.1"
+                    value="260" />
+                  <output
+                    for="oklch-h"
+                    class="mono slider-value js-oklch-output"
+                    data-channel="h"></output>
+                </div>
+                <p class="oklch-value small">
+                  <span class="mono js-oklch-value"></span>
+                  <span class="mono js-oklch-hex"></span>
+                  <span
+                    class="gamut-warning js-gamut"
+                    hidden
+                    >sRGB la plus proche</span
+                  >
+                </p>
+              </div>
+
+              <div
+                class="panel-section"
+                role="group"
+                aria-labelledby="method-title">
+                <div class="size-header">
+                  <h2
+                    id="method-title"
+                    class="field-label">
+                    Méthode de calcul
+                  </h2>
+                  <div
+                    class="segmented"
+                    role="radiogroup"
+                    aria-labelledby="method-title">
+                    <label class="segmented-option">
+                      <input
+                        type="radio"
+                        name="method"
+                        value="wcag"
+                        class="segmented-input js-method"
+                        checked />
+                      <span>WCAG 2.2</span>
+                    </label>
+                    <label class="segmented-option">
+                      <input
+                        type="radio"
+                        name="method"
+                        value="apca"
+                        class="segmented-input js-method" />
+                      <span>APCA</span>
+                    </label>
+                  </div>
+                </div>
+                <p class="small js-method-note"></p>
+              </div>
+
+              <div class="actions">
+                <button
+                  type="button"
+                  class="btn btn-primary btn-lg js-copy-css">
+                  Copier le CSS
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-outline btn-lg js-share">
+                  Partager le lien
+                </button>
+              </div>
+
+              <div
+                class="history js-history"
+                hidden>
+                <h2 class="history-title">Récemment testés</h2>
+                <ul class="history-list js-history-list"></ul>
               </div>
             </div>
-          </div>
 
-          <div
-            class="guide-content guide-content--apca"
-            style="display: none">
-            <h2 class="visually-hidden">
-              <abbr
-                lang="en"
-                title="Accessible Perceptual Contrast Algorithm"
-                >APCA</abbr
-              >
-              - Contraste perceptuel
-            </h2>
-            <div class="threshold-grid">
-              <div class="threshold-group">
-                <p>Texte normal <br /><small>(< 24px ou < 16px gras)</small></p>
-                <ul>
-                  <li class="threshold-item">
-                    <span
-                      class="threshold-indicator"
-                      data-threshold="75"
-                      data-type="apca"></span>
-                    <strong>Lc</strong> 75 (ou -75)
-                  </li>
-                </ul>
+            <!-- Aperçu et rapport -->
+            <div class="preview">
+              <div class="preview-header">
+                <h2 class="preview-title">Rapport de contraste</h2>
+                <span class="badge badge-lg js-verdict"></span>
               </div>
-              <div class="threshold-group">
-                <p>Texte moyen <br /><small>(≥ 24px ou ≥ 16px gras)</small></p>
-                <ul>
-                  <li class="threshold-item">
-                    <span
-                      class="threshold-indicator"
-                      data-threshold="60"
-                      data-type="apca"></span>
-                    <strong>Lc</strong> 60 (ou -60)
-                  </li>
-                </ul>
-              </div>
-              <div class="threshold-group">
-                <p>Texte large <br /><small>(≥ 36px ou ≥ 24px gras)</small></p>
-                <ul>
-                  <li class="threshold-item">
-                    <span
-                      class="threshold-indicator"
-                      data-threshold="45"
-                      data-type="apca"></span>
-                    <strong>Lc</strong> 45 (ou -45)
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-      <!-- Exemple d'application des couleurs -->
-      <section
-        class="color-example"
-        aria-labelledby="color-example-title">
-        <h2 id="color-example-title">
-          Exemple d'application
-          <span class="contrast-type-indicator">(WCAG)</span>
-        </h2>
-        <div class="example-content">
-          <div
-            class="example-text-item"
-            data-size="30">
-            <span class="size-indicator">
-              <span class="threshold-status"></span>
-              30px
-            </span>
-            <p class="example-title">
-              Recette des Spätzles maison (façon Elsass)
-            </p>
-          </div>
-
-          <div
-            class="example-text-item"
-            data-size="24"
-            data-weight="bold">
-            <span class="size-indicator">
-              <span class="threshold-status"></span>
-              24px gras
-            </span>
-            <p class="example-bold">Les ingrédients</p>
-          </div>
-
-          <div
-            class="example-text-item"
-            data-size="24">
-            <span class="size-indicator">
-              <span class="threshold-status"></span>
-              24px
-            </span>
-            <p class="example-subtitle">Pour 4 personnes</p>
-          </div>
-
-          <div
-            class="example-text-item"
-            data-size="19"
-            data-weight="bold">
-            <span class="size-indicator">
-              <span class="threshold-status"></span>
-              19px gras
-            </span>
-            <p class="example-medium-bold">
-              En gratin avec du Munster bien fait, ça réchauffe les
-              cœurs&#8239;!
-            </p>
-          </div>
-
-          <div
-            class="example-text-item"
-            data-size="16">
-            <span class="size-indicator">
-              <span class="threshold-status"></span>
-              16px
-            </span>
-            <ul class="example-normal">
-              <li>400 g de farine</li>
-              <li>4 œufs</li>
-              <li>
-                10 cl d'eau (voire un peu plus si la pâte est trop épaisse)
-              </li>
-              <li>1 pincée de sel</li>
-              <li>Une noix de beurre (du vrai, pas de la margarine, hein)</li>
-            </ul>
-          </div>
-
-          <div
-            class="example-text-item"
-            data-size="24"
-            data-type="graphic">
-            <span class="size-indicator">
-              <span class="threshold-status"></span>
-              Icônes
-            </span>
-            <div class="example-icons">
+              <p
+                class="ratio"
+                aria-live="polite">
+                <span class="visually-hidden js-ratio-label"></span
+                ><span
+                  class="ratio-prefix js-ratio-prefix"
+                  aria-hidden="true"
+                  hidden
+                  >Lc</span
+                ><span class="js-ratio">0</span
+                ><span class="ratio-unit js-ratio-unit">:1</span>
+              </p>
+              <div class="preview-samples">
+              <ul
+                class="specimens"
+                aria-label="Conformité par taille de texte">
+                <li
+                  class="specimen js-specimen"
+                  data-size="30">
+                  <p class="specimen-sample specimen-30">Recette des Spätzles maison</p>
+                  <div class="specimen-meta">
+                    <span class="specimen-label">30&nbsp;px</span>
+                    <span class="specimen-threshold js-specimen-threshold"></span>
+                    <span class="badge badge-xs js-specimen-status"></span>
+                  </div>
+                </li>
+                <li
+                  class="specimen js-specimen"
+                  data-size="24" data-bold>
+                  <p class="specimen-sample specimen-24-bold">Les ingrédients</p>
+                  <div class="specimen-meta">
+                    <span class="specimen-label">24&nbsp;px gras</span>
+                    <span class="specimen-threshold js-specimen-threshold"></span>
+                    <span class="badge badge-xs js-specimen-status"></span>
+                  </div>
+                </li>
+                <li
+                  class="specimen js-specimen"
+                  data-size="24">
+                  <p class="specimen-sample specimen-24">Pour 4 personnes</p>
+                  <div class="specimen-meta">
+                    <span class="specimen-label">24&nbsp;px</span>
+                    <span class="specimen-threshold js-specimen-threshold"></span>
+                    <span class="badge badge-xs js-specimen-status"></span>
+                  </div>
+                </li>
+                <li
+                  class="specimen js-specimen"
+                  data-size="19" data-bold>
+                  <p class="specimen-sample specimen-19-bold">Du Munster bien fait, ça réchauffe les cœurs&#8239;!</p>
+                  <div class="specimen-meta">
+                    <span class="specimen-label">19&nbsp;px gras</span>
+                    <span class="specimen-threshold js-specimen-threshold"></span>
+                    <span class="badge badge-xs js-specimen-status"></span>
+                  </div>
+                </li>
+                <li
+                  class="specimen js-specimen"
+                  data-size="16">
+                  <p class="specimen-sample specimen-16">400&nbsp;g de farine, 4 œufs, 10&nbsp;cl d'eau et une pincée de sel.</p>
+                  <div class="specimen-meta">
+                    <span class="specimen-label">16&nbsp;px</span>
+                    <span class="specimen-threshold js-specimen-threshold"></span>
+                    <span class="badge badge-xs js-specimen-status"></span>
+                  </div>
+                </li>
+                <li
+                  class="specimen js-specimen"
+                  data-kind="ui">
+                  <div class="specimen-sample specimen-icons">
               <svg
+ aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 width="37"
                 height="30"
                 fill="none"
                 viewBox="0 0 37 30"
-                class="example-icon">
+                class="specimen-icon">
                 <path
                   fill="currentColor"
                   d="M20.594 3.477c2.8-2.34 6.585-3.251
@@ -742,12 +498,13 @@
                 1.103-1.045 2.01-1.86 4.159-2.534 6.32h6.56Z" />
               </svg>
               <svg
+ aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 width="29"
                 height="30"
                 fill="none"
                 viewBox="0 0 29 30"
-                class="example-icon">
+                class="specimen-icon">
                 <path
                   fill="currentColor"
                   d="M20.978 19.79c1.991-.78 3.55-.953
@@ -778,63 +535,225 @@
                 1.212.26-.086.606-.346 1.039-.78.52-.519.953-1.038
                 1.213-1.558.346-.606.432-1.212.259-1.645-.26-.606-.866-1.04-1.645-1.212Z" />
               </svg>
+                  </div>
+                  <div class="specimen-meta">
+                    <span class="specimen-label">Icônes</span>
+                    <span class="specimen-threshold js-specimen-threshold"></span>
+                    <span class="badge badge-xs js-specimen-status"></span>
+                  </div>
+                </li>
+                <li
+                  class="specimen js-specimen"
+                  data-size="14">
+                  <p class="specimen-sample specimen-14">Et comme on dit chez nous&nbsp;: «&nbsp;E Gueter&nbsp;!&nbsp;» Bon appétit&nbsp;!</p>
+                  <div class="specimen-meta">
+                    <span class="specimen-label">14&nbsp;px</span>
+                    <span class="specimen-threshold js-specimen-threshold"></span>
+                    <span class="badge badge-xs js-specimen-status"></span>
+                  </div>
+                </li>
+              </ul>
+                <div class="preview-ui">
+                  <span class="sample-btn sample-btn-solid">Bouton plein</span>
+                  <span class="sample-btn sample-btn-outline"
+                    >Bouton contour</span
+                  >
+                  <span class="sample-link">Un lien</span>
+                </div>
+              </div>
+              <p class="alt-reading">
+                <strong class="js-alt-value"></strong>
+                <span class="js-alt-note"></span>
+              </p>
             </div>
           </div>
 
-          <div
-            class="example-text-item"
-            data-size="14">
-            <span class="size-indicator">
-              <span class="threshold-status"></span>
-              14px
-            </span>
-            <p class="example-small">
-              Et comme on dit chez nous : "E Gueter !" – Bon appétit !
-            </p>
+          <ul
+            class="criteria js-criteria"
+            aria-label="Critères de contraste"></ul>
+        </section>
+
+        <section
+          id="suggestions"
+          class="section"
+          aria-labelledby="title-suggestions">
+          <h2
+            id="title-suggestions"
+            class="section-title">
+            Corrections proposées
+          </h2>
+          <p class="section-lead">
+            La couleur la plus proche qui atteint le seuil. Teinte et saturation
+            sont conservées&nbsp;: seule la luminosité OKLCH varie.
+          </p>
+          <div class="suggestions">
+            <div class="suggestion-group">
+              <h3 class="suggestion-group-title">En modifiant le texte</h3>
+              <ul class="suggestion-list">
+                <li
+                  class="suggestion js-suggestion"
+                  data-adjust="fg"
+                  data-rank="1"></li>
+                <li
+                  class="suggestion js-suggestion"
+                  data-adjust="fg"
+                  data-rank="2"></li>
+              </ul>
+            </div>
+            <div class="suggestion-group">
+              <h3 class="suggestion-group-title">En modifiant le fond</h3>
+              <ul class="suggestion-list">
+                <li
+                  class="suggestion js-suggestion"
+                  data-adjust="bg"
+                  data-rank="1"></li>
+                <li
+                  class="suggestion js-suggestion"
+                  data-adjust="bg"
+                  data-rank="2"></li>
+              </ul>
+            </div>
           </div>
-        </div>
-      </section>
-    </main>
+        </section>
 
-    <footer
-      class="footer"
-      role="contentinfo">
-      <p>Spätzi est un projet <i>fifoo</i> conçu avec ❤️ par</p>
-      <a
-        class="logo-link"
-        href="https://www.alsacreations.fr/"
-        ><svg
-          role="img"
-          aria-labelledby="title-alsacreations-footer"
-          class="logo-alsacreations"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 241 45"
-          width="241"
-          height="45">
-          <title id="title-alsacreations-footer">Alsacreations</title>
-          <g class="logo-alsacreations-pepins-group">
-            <path
-              class="logo-alsacreations-pepins-outer"
-              d="M232 18.5c2.2-1.1 3.5-2.4 4-4 .6-1.9-.2-4-2.2-6.2-1.7-2-3.5-2.7-5.3-2.2-1.5.4-2.9 1.7-4.2 3.7-1.1 1.7-2 3.8-2.6 5.9-.6 2.1-.7 3.6-.4 4.5.9.3 2.3.3 4.5 0a14 14 0 0 0 6.2-1.7zm-12-9.1c1.1-2.2 1.4-4 .8-5.5-.7-1.9-2.5-3.1-5.4-3.7-2.5-.6-4.4-.1-5.5 1.4-.9 1.2-1.4 3-1.2 5.5.1 2.1.6 4.2 1.5 6.4.8 2 1.5 3.3 2.3 3.9a20 20 0 0 0 7.5-8zm13.6 24.3c2.4.4 4.2.1 5.5-.9 1.5-1.2 2.1-3.3 1.8-6.3-.2-2.6-1.3-4.1-3-4.8-1.5-.5-3.3-.3-5.6.6-1.9.8-3.8 1.9-5.5 3.3-1.7 1.4-2.7 2.5-2.9 3.5.6.7 1.7 1.6 3.6 2.6 2.1 1.1 4.1 1.8 6.1 2z"></path>
-            <path
-              class="logo-alsacreations-pepins-inner"
-              d="M214.4 7.8c-.9-.2-1.5 0-1.9.5-.3.4-.5 1.1-.4 1.9.1.7.2 1.5.5 2.2.2.7.6 1.2.8 1.4l1.2-.9c.6-.6 1.1-1.2 1.4-1.8.4-.7.5-1.4.3-1.9-.3-.7-1-1.2-1.9-1.4zm14 6.1c-.6-.7-1.2-.9-1.9-.7-.5.1-1 .6-1.5 1.3-.4.6-.7 1.3-.9 2.1-.2.7-.2 1.2-.1 1.5h1.5c.8-.1 1.5-.3 2.2-.7.7-.4 1.2-.8 1.4-1.4.2-.6 0-1.4-.7-2.1zm4.9 14c-.1-.9-.4-1.5-1.1-1.7-.5-.2-1.2-.1-2 .2-.7.3-1.4.7-1.9 1.2-.6.5-.9.9-1.1 1.2.2.2.6.6 1.3.9.7.4 1.5.6 2.2.7.8.1 1.5 0 1.9-.3.6-.5.9-1.2.7-2.2z"></path>
-          </g>
-          <path
-            class="logo-alsacreations-alsa"
-            d="m1.5 25.1-.1-.6.1-.6a12.7 12.7 0 0 1 9-2.2c3.8.2 5 2.6 5 6.7v2l-.1 5.3-.1 4s-.1 2.1 1.3 1.9l-.1 2c-.4.6-1.5 1.3-2.9 1.3a4 4 0 0 1-2.8-1.4l-1.1.7c-1.1.6-2.3.7-3.6.7-3.1 0-6.1-2-6.1-6.3 0-5.7 5.3-7.4 8.2-7.7l1.4-.1 1.1.1v-2.3c0-2-.2-3-1.7-3s-3.3.7-4.7 1.2c-.5.2-1.1.4-1.7.4-.8-.9-1-1.7-1.1-2.1zm9.1 12V34h-.5l-1.5.1h.1c-2 .4-3.8 1.3-3.8 4 0 2.2.9 3 2 3h.3c1.2 0 2.7-.6 3.2-1.4l-.1.1.1-.6c.2-.5.2-1.2.2-2.1zm16.2 4.4-.1 2c-.5.7-1.5 1.3-2.9 1.3-.7 0-1.4-.3-1.9-.7a3 3 0 0 1-1.4-2.5v-24l-.1-5.2c.6-1.3 2.3-1.5 4.6-1.5.3 1.1.3 2.2.3 4.6v24.1c.1.1 0 2.2 1.5 1.9zm11.6-19.9c3 .2 4.4 1.5 4.6 2.1 0 .6-.4 1.7-.9 2.4l-.9-.2-1.5-.4c-.7-.3-1.4-.4-2.1-.4-1.7 0-2.7.9-2.7 2.2 0 .7.3 1.4 1.3 2.2l2 1.4 2.7 2c2 1.7 2.9 3.3 2.9 5.3 0 4.5-3.6 6.7-8.2 6.7-3 0-5.7-.9-6.2-2.3 0-.7.4-1.8.9-2.5h.5c.4 0 .9.1 1.4.4v-.1c1 .4 2.2.7 3.3.7l.9-.1c1.4-.1 2.3-1.1 2.3-2.5 0-1.1-.5-1.9-1.8-2.8l-.6-.4c-1.1-.7-2.3-1.7-3.2-2.5l-1.3-.8c-1.5-1.5-2.2-2.9-2.2-4.6 0-3.7 3-5.9 7.5-5.9l1.3.1zm8.9 3.5-.1-.6.1-.6a12.7 12.7 0 0 1 9-2.2c3.8.2 5 2.6 5 6.7v2l-.1 5.3-.1 4s-.1 2.1 1.3 1.9l-.1 2c-.4.6-1.5 1.3-2.9 1.3a4 4 0 0 1-2.8-1.4l-1.1.7c-1.1.6-2.3.7-3.6.7-3.2 0-6.2-2-6.2-6.4 0-5.7 5.3-7.4 8.2-7.7l1.4-.1 1.1.1v-2.3c0-2-.2-3-1.7-3s-3.3.7-4.7 1.2c-.5.2-1.1.4-1.7.4-.8-.8-.9-1.6-1-2zm9.1 12V34h-.5l-1.5.1h.1c-2 .4-3.8 1.3-3.8 4 0 2.2.9 3 2 3h.3c1.2 0 2.7-.6 3.2-1.4l-.1.1.1-.6c.2-.5.2-1.2.2-2.1z"></path>
-          <path
-            class="logo-alsacreations-creations"
-            d="M80.8 23.6c0 .6-.3 1.7-.7 2.5h-.6a4 4 0 0 1-1.5-.3 7 7 0 0 0-2.5-.6 1 1 0 0 0-.5.1c-2.7.2-4.6 2.7-4.6 8.1 0 6.5 2.7 7.9 5.4 7.9 1.5 0 3.1-.5 4.3-1.1l.4 1.8c-.1.7-.6 1.5-1.2 2-.9.7-2.5 1.1-4.4 1.1-5.2 0-9.8-1.9-9.8-11.4 0-4.9 1.7-8 3.5-9.8a9.8 9.8 0 0 1 6.7-2.3c3-.1 5.3 1.3 5.5 2zm8.3 3.5V42c0 .7-.1 1.3-.5 1.9-.7.6-1.5.6-4.5.6l.1-9.3.1-7.9c0-1.5-.3-2.6-.6-3.5.4-.4 1-.7 2-1.2l.7-.1c1 0 1.4.3 1.7.9.9-.6 1.9-1.1 2.8-1.4.8-.3 1.9-.5 2.7-.4 1.4.1 2.2.6 2.3 1.3 0 .7-.2 2-.9 3l-.7.1-1.4-.1-.6-.1c-1.3.1-2.3.4-3.2 1.3zM113 39.7c.3.9.4 1.9.5 2.3-.1 1-1.6 2-3 2.5h.1c-.7.2-2.2.5-3.6.5-2.3 0-4.8-.4-6.6-2.3-1.7-1.8-2.6-4.8-2.6-8.6 0-9.2 4-12.5 9.3-12.5 4.5 0 6.8 2.7 7.2 6.7l.1 2.3-.2 2.8c-.6.5-2.3 1.1-3.6 1.3-1.5.2-3.8.3-6.1.3h-1.7c.1 4.7 2 6.2 5 6.2 1.6-.2 3.4-.5 5.2-1.5zM106.2 25c-1.7.2-3.3 2.2-3.6 6.4h1.3l4.5-.1.7-.2.2-1.4-.1-.5v-.5c-.2-2.5-1.1-3.7-2.8-3.7h-.2zm11.7.1-.1-.6.1-.6a12.7 12.7 0 0 1 9-2.2c3.8.2 5 2.6 5 6.7v2l-.1 5.3-.1 4s-.1 2.1 1.3 1.9l-.1 2c-.4.6-1.5 1.3-2.9 1.3a4 4 0 0 1-2.8-1.4l-1.1.7c-1.1.6-2.3.7-3.6.7-3.2 0-6.2-2-6.2-6.4 0-5.7 5.3-7.4 8.2-7.7l1.4-.1 1.1.1v-2.3c0-2-.2-3-1.7-3s-3.3.7-4.7 1.2c-.5.2-1.1.4-1.7.4-.7-.8-.9-1.6-1-2zm9.1 12V34h-.5l-1.5.1h.1c-2 .4-3.8 1.3-3.8 4 0 2.2.9 3 2 3h.3c1.2 0 2.7-.6 3.2-1.4l-.1.1.1-.6c.2-.5.2-1.2.2-2.1zm21.6 3.4.1 1.1-.1 1.3c-.1.3-.3.6-.7.9a8.7 8.7 0 0 1-4.4 1.1c-4.7 0-5.6-4.2-5.6-8V25.8a6.3 6.3 0 0 1-2.8-.7c0-1.4.1-1.4.4-1.7.7-.5 1.4-.7 2-.9l.7-.1.2-4.1c.4-1.1 1.6-2 4.5-2.2v.7l-.1 5.3h6c-.1 2.7-.5 3.2-1.5 3.5l-1.2.1-3.3.1-.1 6.1.1 3v2.2c.2 2.5.5 4.2 2 4.2.6.1 2.5-.6 2.8-.9l1 .1zm6.3-29c2.2 0 2.7.9 2.6 2.7-.1 1.8-.6 3-2.8 3-1.9 0-2.7-.9-2.7-2.9 0-1.8 1-2.8 2.9-2.8zm1.9 10.6c.4.7.4 1.4.4 3.4v15.8c0 1.1-.2 1.9-.7 2.6-.3.5-1.1.5-4.4.6v-3.8l.1-4.3v-8.2l-.1-4.8c.6-1.2 2.2-1.3 4.3-1.3h.4zm13.6 22.8c-6 0-9.4-3.5-9.4-11.7 0-8.1 4-11.8 9.5-11.8 6.2 0 9.3 4 9.3 11.5 0 8-4 12-9.4 12zm.1-3.4c2.2 0 4.1-2.1 4.1-8.3 0-5.9-1.7-8.1-4.2-8.1-2.2 0-4.2 2.2-4.2 8 0 6.3 1.8 8.4 4.3 8.4zm18-14.2.1-.1v14.5c0 1.1-.1 1.6-.6 2.3-.7.6-1.2.6-3.3.6h-1.2l.1-9.3v-7.9c0-1.5-.2-2.6-.5-3.5.3-.4.9-.7 2-1.2l.7-.1c.9 0 1.4.4 1.7 1a10 10 0 0 1 5.8-1.9c5.9 0 7 3 7 8.3v7l.1 6.7c-.6.6-1.5.7-4.6.7a4 4 0 0 1-.5-2.1V30c0-3.4-.8-4.6-3.2-4.6-1.4 0-2.7.8-3.6 1.9zm24.7-5.7c3 .2 4.4 1.5 4.6 2.1 0 .6-.4 1.7-.9 2.4l-.9-.2-1.5-.4c-.7-.3-1.4-.4-2.1-.4-1.7 0-2.7.9-2.7 2.2 0 .7.3 1.4 1.3 2.2l2 1.4 2.7 2c2 1.7 2.9 3.3 2.9 5.3 0 4.5-3.6 6.7-8.2 6.7-3 0-5.7-.9-6.2-2.3 0-.7.4-1.8.9-2.5h.5c.4 0 .9.1 1.4.4v-.1c1 .4 2.2.7 3.3.7l.9-.1c1.4-.1 2.3-1.1 2.3-2.5 0-1.1-.5-1.9-1.8-2.8l-.6-.4c-1.1-.7-2.3-1.7-3.2-2.5l-1.2-.9c-1.5-1.5-2.2-2.9-2.2-4.6 0-3.7 3-5.9 7.5-5.9l1.2.2zm-110.1-3.4s.5-3.2 1.9-5.1c1.5-2.1 3.9-3.3 5.5-1.3 1.2 1.4.9 2.9-1.6 4.5-3.1 1.9-5.8 1.9-5.8 1.9z"></path>
-        </svg>
-      </a>
-    </footer>
+        <section
+          id="daltonismes"
+          class="section"
+          aria-labelledby="title-daltonismes">
+          <h2
+            id="title-daltonismes"
+            class="section-title">
+            Simulation des daltonismes
+          </h2>
+          <p class="section-lead">
+            Votre couple de couleurs tel que le perçoivent les personnes
+            atteintes des principaux troubles de la vision des couleurs, et le
+            contraste qui en résulte.
+          </p>
+          <ul class="cvd-list js-cvd-list"></ul>
+        </section>
 
+        <section
+          id="palette"
+          class="section"
+          aria-labelledby="title-palette">
+          <h2
+            id="title-palette"
+            class="section-title">
+            Tester une palette
+          </h2>
+          <p class="section-lead">
+            Toutes les combinaisons texte et fond de votre palette en un coup
+            d'œil. Cliquez sur une case pour la charger dans l'outil.
+          </p>
+
+          <div class="palette-bar">
+            <ul
+              class="palette-list js-palette-list"
+              aria-label="Couleurs de la palette"></ul>
+            <form class="palette-form js-palette-form">
+              <label
+                for="palette-input"
+                class="visually-hidden"
+                >Ajouter des couleurs</label
+              >
+              <input
+                id="palette-input"
+                class="input input-mono input-pill"
+                type="text"
+                spellcheck="false"
+                autocomplete="off"
+                placeholder="#0f766e, #fde68a…" />
+              <button
+                type="submit"
+                class="btn btn-primary">
+                Ajouter
+              </button>
+            </form>
+          </div>
+
+          <div class="matrix-wrapper">
+            <table class="matrix js-matrix">
+              <caption class="visually-hidden">
+                Contraste de chaque couleur de texte (lignes) sur chaque couleur
+                de fond (colonnes)
+              </caption>
+            </table>
+          </div>
+        </section>
+
+        <section
+          id="reperes"
+          class="section"
+          aria-labelledby="title-reperes">
+          <h2
+            id="title-reperes"
+            class="section-title">
+            Repères
+          </h2>
+          <ul class="landmarks">
+            <li class="landmark">
+              <span class="landmark-kicker">Critère 1.4.3 · AA</span>
+              <span class="landmark-title">4,5:1 pour le texte courant</span>
+              <p>
+                3:1 suffit pour le grand texte&nbsp;: au moins 24&nbsp;px, ou
+                18,66&nbsp;px en gras.
+              </p>
+            </li>
+            <li class="landmark">
+              <span class="landmark-kicker">Critère 1.4.6 · AAA</span>
+              <span class="landmark-title">7:1 pour le texte courant</span>
+              <p>
+                4,5:1 pour le grand texte. Le niveau AAA est recommandé pour les
+                contenus de longue lecture.
+              </p>
+            </li>
+            <li class="landmark">
+              <span class="landmark-kicker">Critère 1.4.11 · AA</span>
+              <span class="landmark-title">3:1 pour les composants</span>
+              <p>
+                Bordures de champs, icônes porteuses de sens, états de focus et
+                éléments graphiques.
+              </p>
+            </li>
+            <li class="landmark">
+              <span class="landmark-kicker">APCA · indicatif</span>
+              <span class="landmark-title">Lc 75 pour le texte courant</span>
+              <p>
+                Lc 60 pour le texte moyen (dès 24&nbsp;px, ou 16&nbsp;px en
+                gras), Lc 45 pour le grand texte (dès 36&nbsp;px, ou 24&nbsp;px
+                en gras). Lc 90 est idéal pour la lecture longue.
+              </p>
+            </li>
+          </ul>
+          <p class="note">
+            Les rapports affichés sont tronqués et non arrondis&nbsp;: 4,499:1
+            n'atteint pas 4,5:1. Les couleurs semi-transparentes sont composées
+            sur le fond avant calcul. APCA est la méthode à l'étude pour les
+            futures WCAG&nbsp;3, donnée ici à titre indicatif.
+          </p>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <p>
+          Spätzi est un outil libre proposé par
+          <a href="https://www.alsacreations.fr/">Alsacréations</a>.
+        </p>
+        <p class="footer-links">
+          <a href="https://github.com/alsacreations/spatzi">Code source</a>
+          <a href="https://www.w3.org/TR/wcag/">Lire les WCAG</a>
+        </p>
+      </footer>
+    </div>
+
+    <div
+      class="toast js-toast"
+      role="status"></div>
+
+    <script src="assets/js/theme-switcher.js"></script>
     <script
       type="module"
-      src="assets/js/color-contrast.js"></script>
-    <script
-      type="module"
-      src="assets/js/theme-switcher.js"></script>
+      src="assets/js/spatzi.js"></script>
   </body>
 </html>

@@ -1,12 +1,17 @@
 /* ----------------------------------
  * Design tokens
  * Made par Alsacréations
- * Nécessite les variables CSS primaires (theme.css)
  * ----------------------------------
  */
 
+@font-face {
+  font-family: Lexend;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("../fonts/lexend.woff2") format("woff2");
+}
+
 :root {
-  /* Color Tokens */
   color-scheme: light dark;
 
   &[data-theme="light"] {
@@ -17,59 +22,59 @@
     color-scheme: dark;
   }
 
-  --primary: var(--color-blue-500);
-  --on-primary: var(--color-white);
-  --surface: light-dark(var(--color-white), var(--color-gray-800));
-  --on-surface: light-dark(var(--color-gray-900), var(--color-gray-100));
-  --contrast: light-dark(var(--color-gray-600), var(--color-gray-200));
-  --on-contrast: light-dark(var(--color-white), var(--color-gray-800));
-  --layer-1: light-dark(var(--color-gray-50), var(--color-gray-900));
-  --layer-2: light-dark(var(--color-gray-100), var(--color-gray-700));
-  --layer-3: light-dark(var(--color-gray-200), var(--color-gray-600));
-  --link: light-dark(var(--color-green-500), var(--color-orange-300));
-  --link-hover: light-dark(var(--color-green-500), var(--color-orange-300));
-  --selection: light-dark(var(--color-orange-300), var(--color-orange-500));
-  --accent: light-dark(var(--primary), var(--color-blue-300));
-  --accent-invert: light-dark(var(--color-blue-300), var(--primary));
-  --warning: light-dark(var(--color-orange-500), var(--color-orange-300));
-  --error: light-dark(var(--color-red-500), var(--color-red-300));
-  --error-faded: rgb(255 183 177 / 80%);
-  --success: light-dark(var(--color-green-500), var(--color-green-300));
-  --success-faded: rgb(217 255 225 / 80%);
-  --border-light: var(--color-gray-200);
-  --border-medium: var(--color-gray-300);
-  --border-dark: var(--color-gray-500);
+  /* Couleurs testées (mises à jour en JS) */
+  --pair-fg: #146af5;
+  --pair-bg: #fff;
+  --pair-neutral: #595959;
 
-  /* Spacing Tokens */
-  /* Source https://utopia.fyi/clamp/calculator/?a=320,1240,48%E2%80%9480 */
-  --text-m: clamp(var(--text-16), 0.9565rem + 0.2174vw, var(--text-18));
-  --text-l: clamp(var(--text-18), 1.0761rem + 0.2174vw, var(--text-20));
-  --text-xl: clamp(var(--text-20), 1.0054rem + 1.087vw, var(--text-30));
-  --text-2xl: clamp(var(--text-24), 1.2065rem + 1.3043vw, var(--text-36));
-  --text-3xl: clamp(var(--text-30), 1.4348rem + 1.9565vw, var(--text-48));
-  --text-4xl: clamp(var(--text-48), 2.3043rem + 3.4783vw, var(--text-80));
+  /* Surfaces */
+  --page: light-dark(#fff, #111827);
+  --surface: light-dark(#f1f5f9, #1e293b);
+  --surface-hover: light-dark(#e2e8f0, #334155);
 
-  /* prettier-ignore */
-  --spacing-m: clamp(var(--spacing-16), 0.6522rem + 1.7391vw, var(--spacing-32));
+  /* Textes */
+  --text: light-dark(#374151, #fff);
+  --text-strong: light-dark(#111827, #fff);
+  --text-muted: light-dark(#374151, #cbd5e1);
+  --link: light-dark(#1d4ed8, #93c5fd);
+  --link-hover: light-dark(#1e3a8a, #fff);
 
-  /* prettier-ignore */
-  --spacing-l: clamp(var(--spacing-32),1.6522rem + 1.7391vw,var(--spacing-48));
+  /* Traits */
+  --line: light-dark(#e2e8f0, #334155);
+  --line-strong: light-dark(#cbd5e1, #334155);
+  --line-swatch: light-dark(#cbd5e1, #475569);
+  --line-control: light-dark(#6b7280, #94a3b8);
 
-  /* Forms Tokens */
-  --form-control-background: light-dark(
-    var(--color-white),
-    var(--color-gray-800)
-  );
-  --on-form-control: light-dark(var(--color-gray-900), var(--color-gray-100));
-  --form-control-spacing: var(--spacing-12) var(--spacing-16);
-  --form-control-border-width: 1px;
-  --form-control-border-color: var(--color-gray-400);
-  --form-control-border-radius: var(--radius-lg);
-  --checkables-border-color: var(--color-gray-400);
-  --checkable-size: 1.25em;
+  /* Marque */
+  --accent: #146af5;
+  --accent-hover: #1d4ed8;
+  --on-accent: #fff;
+  --highlight: #d1e576;
+  --on-highlight: #111827;
+  --error: light-dark(#b91c1c, #ff9f77);
+  --error-line: #cf3809;
 
-  /* States Tokens */
-  --focus-ring-color: AccentColor;
-  --focus-ring-width: 2px;
-  --focus-ring-offset: 2px;
+  /* Statuts (identiques dans les deux thèmes) */
+  --status-aaa-bg: #ecfccb;
+  --status-aaa: #364106;
+  --status-aa-bg: #dbeafe;
+  --status-aa: #1e3a8a;
+  --status-large-bg: #fef3c7;
+  --status-large: #111827;
+  --status-fail-bg: #fee2e2;
+  --status-fail: #b91c1c;
+
+  /* Typographie */
+  --font-base: lexend, system-ui, sans-serif;
+  --font-mono: ui-monospace, monospace;
+
+  /* Rayons */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-full: 999px;
+
+  /* Espacements de sections */
+  --section-gap: clamp(64px, 9vw, 112px);
+  --transition-duration: 0.25s;
 }
